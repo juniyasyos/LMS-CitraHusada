@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             // User belum login, redirect ke halaman login
             window.location.href = '/';
         }
+        loadProfile();
+        loadMateri();
     } catch (error) {
         // Error checking auth, redirect ke login
         window.location.href = '/';
@@ -66,219 +68,88 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         <!-- HEADER -->
         <div class="flex justify-between items-start mb-8">
-            {{-- Disesuaikan siapa yang login --}}
+
             <div>
-                <h2 class="text-2xl font-semibold">
-                    Selamat Datang Kembali, Pak Agung
+                <h2 id="welcomeText" class="text-2xl font-semibold">
+                    Selamat Datang Kembali
                 </h2>
-                <p class="text-sm text-gray-500">TIK Unit • Kepala Bagian</p>
+
+                <p id="unitJenisText" class="text-sm text-gray-500">
+                    -
+                </p>
             </div>
+
             <div class="flex items-center gap-4">
                 <i class="fas fa-bell"></i>
-                {{-- Sesuai siapa yang login --}}
+
                 <div class="text-right">
-                    <p class="font-medium">Agung Sunaryo</p>
-                    <p class="text-sm text-gray-500">TIK Unit</p>
+                    <p id="profileName" class="font-medium">-</p>
+                    <p id="profileUnit" class="text-sm text-gray-500">-</p>
                 </div>
             </div>
+
         </div>
 
         <!-- SEARCH -->
         <div class="mb-6">
-            <div class="relative w-full max-w-md">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <div class="flex items-center w-full max-w-md border rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-blue-400">
+                
+                <i class="fas fa-search text-gray-400 mr-2"></i>
+
                 <input 
                     type="text"
+                    id="searchMateri"
                     placeholder="Cari modul..."
-                    class="w-full pl-10 pr-4 py-2 
-                        border rounded-lg 
-                        focus:outline-none 
-                        focus:ring-2 focus:ring-blue-400"
+                    onkeyup="searchMateri()"
+                    class="w-full outline-none"
                 >
+
             </div>
         </div>
 
         <!-- FILTER STATUS -->
         <div class="flex w-full gap-4 mb-8">
+            <button onclick="loadMateri()"
+            class="flex-1 flex items-center justify-between px-6 py-3 bg-white border rounded-xl shadow-sm hover:bg-gray-50">
+            <span>Semua</span>
+            <i class="fa-solid fa-layer-group text-gray-400"></i>
+            </button>
 
-            <a href="/belum-mulai" 
-            class="flex-1 flex items-center justify-between 
-                    px-6 py-3 bg-white border rounded-xl shadow-sm 
-                    text-sm font-medium whitespace-nowrap 
-                    hover:bg-gray-50 transition">
+            <button onclick="filterMateri('belum')"
+            class="flex-1 flex items-center justify-between px-6 py-3 bg-white border rounded-xl shadow-sm hover:bg-gray-50">
+            <span>Belum Mulai</span>
+            <i class="fa-solid fa-exclamation-circle text-gray-400"></i>
+            </button>
 
-                <span>Belum Mulai</span>
-                <i class="fa-solid fa-exclamation-circle text-gray-400"></i>
-            </a>
+            <button onclick="filterMateri('progres')"
+            class="flex-1 flex items-center justify-between px-6 py-3 bg-white border rounded-xl shadow-sm hover:bg-gray-50">
+            <span>Sedang Berjalan</span>
+            <i class="fa-solid fa-clock text-gray-400"></i>
+            </button>
 
-            <a href="/materi-progress"
-                class="flex-1 flex items-center justify-between 
-                        px-6 py-3 bg-white border rounded-xl shadow-sm 
-                        text-sm font-medium whitespace-nowrap 
-                        hover:bg-gray-50 transition">
-
-                <span>Sedang Berjalan</span>
-                <i class="fa-solid fa-clock text-gray-400"></i>
-            </a>
-
-            <a href="/materi-selesai"
-                class="flex-1 flex items-center justify-between 
-                        px-6 py-3 bg-white border rounded-xl shadow-sm 
-                        text-sm font-medium whitespace-nowrap 
-                        hover:bg-gray-50 transition">
-
-                <span>Selesai</span>
-                <i class="fa-solid fa-check-circle text-gray-400"></i>
-            </a>
+            <button onclick="filterMateri('selesai')"
+            class="flex-1 flex items-center justify-between px-6 py-3 bg-white border rounded-xl shadow-sm hover:bg-gray-50">
+            <span>Selesai</span>
+            <i class="fa-solid fa-check-circle text-gray-400"></i>
+            </button>
         </div>
 
         <!-- CARD GRID -->
-        <div class="grid md:grid-cols-3 gap-6">
-
-            <!-- Pembelajaran progres -->
-            <div class="bg-white rounded-2xl shadow-md overflow-hidden">
-                <div class="h-40 bg-gray-300 relative">
-                    <span class="absolute top-3 right-3 bg-gray-800 text-white text-xs px-3 py-1 rounded-full">
-                        Progres
-                    </span>
-                </div>
-
-                <div class="p-5">
-                    <h3 class="font-semibold text-lg">Judul</h3>
-                    <p class="text-sm text-gray-500 mb-4">Sub Judul</p>
-
-                    <div class="flex justify-between items-center text-sm mb-2">
-                        <div class="flex items-center gap-1">
-                            <i class="fa-solid fa-clock text-gray-400"></i>
-                            <p>3 JPL</p>
-                        </div>
-                        <span class="text-red-500">
-                            Due: Oct 15, 2024
-                        </span>
-                    </div>
-
-                    <!-- Progress Bar -->
-                    <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
-                        <div class="bg-blue-600 h-2 rounded-full w-2/3"></div>
-                    </div>
-
-                    <span class="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
-                        Dalam Progress
-                    </span>
-
-                    <!-- BUTTON -->
-                    <div class="flex gap-3 mt-5">
-                        <button class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
-                            <i class="fas fa-caret-right"></i>
-                            Lanjutkan
-                        </button>
-                        <button class="flex-1 border py-2 rounded-lg hover:bg-gray-100">
-                            <i class="fas fa-eye"></i>
-                            Lihat Detail
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pembelajaran selesai-->
-            <div class="bg-white rounded-2xl shadow-md overflow-hidden">
-                <div class="h-40 bg-gray-300 relative">
-                    <span class="absolute top-3 right-3 bg-green-500 text-white text-xs px-3 py-1 rounded-full">
-                        Selesai
-                    </span>
-                </div>
-
-                <div class="p-5">
-                    <h3 class="font-semibold text-lg">Judul</h3>
-                    <p class="text-sm text-gray-500 mb-4">Sub Judul</p>
-
-                    <div class="flex justify-between items-center text-sm mb-2">
-                        <div class="flex items-center gap-1">
-                            <i class="fa-solid fa-clock text-gray-400"></i>
-                            <p>3 JPL</p>
-                        </div>
-                        <span class="text-red-500">
-                            Due: Oct 15, 2024
-                        </span>
-                    </div>
-
-                    <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
-                        <div class="bg-blue-500 h-2 rounded-full w-full"></div>
-                    </div>
-
-                    <span class="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
-                        Selesai
-                    </span>
-
-                    <div class="flex gap-3 mt-5">
-                        <button class="flex-1 bg-blue-600 text-white py-2 rounded-lg">
-                            <i class="fas fa-caret-right"></i>
-                            Lanjutkan
-                        </button>
-                        <button class="flex-1 border py-2 rounded-lg">
-                            <i class="fas fa-eye"></i>
-                            Lihat Detail
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pembelajaran belum dimulai-->
-            <div class="bg-white rounded-2xl shadow-md overflow-hidden">
-                <div class="h-40 bg-gray-300 relative">
-                    <span class="absolute top-3 right-3 bg-red-500 text-white text-xs px-3 py-1 rounded-full">
-                        Belum Dimulai
-                    </span>
-                </div>
-
-                <div class="p-5">
-                    <h3 class="font-semibold text-lg">Judul</h3>
-                    <p class="text-sm text-gray-500 mb-4">Sub Judul</p>
-
-                    <div class="flex justify-between items-center text-sm mb-2">
-                        <div class="flex items-center gap-1">
-                            <i class="fa-solid fa-clock text-gray-400"></i>
-                            <p>3 JPL</p>
-                        </div>
-                        <span class="text-red-500">
-                            Due: Oct 15, 2024
-                        </span>
-                    </div>
-
-                    <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
-                        <div class="bg-blue-500 h-2 rounded-full w-0"></div>
-                    </div>
-
-                    <span class="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
-                        Belum Dimulai
-                    </span>
-
-                    <div class="flex gap-3 mt-5">
-                        <button class="flex-1 bg-blue-600 text-white py-2 rounded-lg">
-                            <i class="fas fa-caret-right"></i>
-                            Lanjutkan
-                        </button>
-                        <button class="flex-1 border py-2 rounded-lg">
-                            <i class="fas fa-eye"></i>
-                            Lihat Detail
-                        </button>
-                    </div>
-                </div>
-            </div>
-
+        <div id="materiContainer" class="grid md:grid-cols-3 gap-6"></div>
         </div>
 
         <!-- LOAD MORE -->
-        <div class="text-center mt-10">
+        {{-- <div class="text-center mt-10">
             <button class="text-blue-600 hover:underline">
                 Lihat Lebih Banyak →
             </button>
-        </div>
+        </div> --}}
 
     </main>
 </div>
 
 <script>
+//logout
 async function handleLogout(event) {
     event.preventDefault();
 
@@ -298,6 +169,160 @@ async function handleLogout(event) {
         console.error('Logout error:', error);
         // Fallback ke redirect langsung jika ada error
         window.location.href = '/';
+    }
+}
+//load data profile
+async function loadProfile() {
+    try {
+
+        const response = await axios.get('/api/profile');
+
+        const user = response.data.data;
+
+        const nama = user.nama;
+        const unitKerja = user.unit_kerja?.unit_kerja ?? '-';
+        const jenisTenaga = user.jenis_tenaga?.jenis_tenaga ?? '-';
+
+        // Header kiri
+        document.getElementById('welcomeText').innerText =
+            'Selamat Datang Kembali, ' + nama;
+
+        document.getElementById('unitJenisText').innerText =
+            'Unit ' + unitKerja + ' • ' + jenisTenaga;
+
+        // Header kanan
+        document.getElementById('profileName').innerText = nama;
+
+        document.getElementById('profileUnit').innerText = unitKerja;
+
+    } catch (error) {
+
+        console.error('Error load profile:', error);
+
+    }
+}
+
+//load semua materi
+async function loadMateri() {
+
+    try {
+
+        const response = await axios.get('/api/materi-user');
+
+        const materis = response.data.data;
+
+        renderMateri(materis);
+
+    } catch (error) {
+
+        console.error("Error load materi", error);
+
+    }
+
+}
+
+//template card materi
+const storageUrl = "{{ asset('storage') }}";
+function renderMateri(materis){
+
+    const container = document.getElementById("materiContainer");
+
+    container.innerHTML = "";
+
+    materis.forEach(materi => {
+        console.log(materi);
+        const progressPercent = materi.progress_percent ?? 0;
+
+        container.innerHTML += `
+        <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+
+            <div class="h-40 bg-gray-300 relative">
+                <img src="${storageUrl}/${materi.image}" 
+                    class="w-full h-full object-cover">
+                <span class="absolute top-3 right-3 bg-gray-800 text-white text-xs px-3 py-1 rounded-full">
+                    ${materi.status}
+                </span>
+            </div>
+
+            <div class="p-5">
+
+                <h3 class="font-semibold text-lg">${materi.judul}</h3>
+
+                <p class="text-sm text-gray-500 mb-4">${materi.subjudul}</p>
+
+                <div class="flex justify-between items-center text-sm mb-2">
+
+                    <div class="flex items-center gap-1">
+                        <i class="fa-solid fa-clock text-gray-400"></i>
+                        <p>${materi.jam_pelajaran} JPL</p>
+                    </div>
+
+                    <span class="text-red-500">
+                        Due: ${materi.tanggal_selesai}
+                    </span>
+
+                </div>
+
+                <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
+                    <div class="bg-blue-600 h-2 rounded-full"
+                         style="width:${progressPercent}%"></div>
+                </div>
+
+                <span class="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
+                    ${progressPercent}%
+                </span>
+
+                <div class="flex gap-3 mt-5">
+
+                    <button class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                        Lanjutkan
+                    </button>
+
+                    <button class="flex-1 border py-2 rounded-lg hover:bg-gray-100">
+                        Lihat Detail
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+        `;
+    });
+
+}
+
+//filter materi
+async function filterMateri(status) {
+
+    try {
+        const response = await axios.get('/api/materi-user?status=' + status);
+        console.log("FILTER RESULT:", response.data);
+        const materis = response.data.data;
+        renderMateri(materis);
+
+    } catch (error) {
+        console.error("Error filter materi", error);
+    }
+}
+
+//search materi
+async function searchMateri() {
+
+    const keyword = document.getElementById("searchMateri").value;
+
+    try {
+
+        const response = await axios.get('/api/materi-user?search=' + keyword);
+
+        const materis = response.data.data;
+
+        renderMateri(materis);
+
+    } catch (error) {
+
+        console.error("Error search materi", error);
+
     }
 }
 </script>

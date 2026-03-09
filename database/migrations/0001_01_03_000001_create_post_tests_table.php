@@ -23,18 +23,12 @@ return new class extends Migration
     {
         Schema::create('post_tests', function (Blueprint $table) {
             $table->bigIncrements('post_test_id');
-            $table->unsignedBigInteger('sub_materi_id');
-            $table->boolean('status_pilihan')->default(false);
-            $table->text('soal');
-            $table->string('pilihan_1');
-            $table->string('pilihan_2');
-            $table->string('pilihan_3');
-            $table->string('pilihan_4');
-            $table->string('pilihan_5');
-            $table->string('jawaban_benar');
+            $table->unsignedBigInteger('materi_id');
+            $table->unsignedBigInteger('urutan_post_test');
+            $table->unsignedInteger('waktu_pengerjaan');// dalam menit
             $table->timestamps();
 
-            $table->foreign('sub_materi_id')->references('sub_materi_id')->on('sub_materis')->onDelete('cascade');
+            $table->foreign('materi_id')->references('materi_id')->on('materis')->onDelete('cascade');
         });
     }
 

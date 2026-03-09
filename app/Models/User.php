@@ -50,4 +50,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Sertifikat::class, 'user_id', 'user_id');
     }
+
+    public function progresses()
+    {
+        return $this->hasMany(UserProgress::class, 'user_id', 'user_id');
+    }
+    
+    //  public function skorUsers()
+    // {
+    //     return $this->hasMany(SkorUser::class, 'user_id', 'user_id');
+    // }
 }

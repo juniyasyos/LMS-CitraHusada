@@ -12,19 +12,18 @@ class PostTest extends Model
     protected $primaryKey = 'post_test_id';
 
     protected $fillable = [
-        'sub_materi_id',
-        'status_pilihan',
-        'soal',
-        'pilihan_1',
-        'pilihan_2',
-        'pilihan_3',
-        'pilihan_4',
-        'pilihan_5',
-        'jawaban_benar',
+        'materi_id',
+        'urutan_post_test',
+        'waktu_pengerjaan',// dalam menit
     ];
 
-    public function subMateri()
+    public function materi()
     {
-        return $this->belongsTo(SubMateri::class, 'sub_materi_id', 'sub_materi_id');
+        return $this->belongsTo(Materi::class, 'materi_id', 'materi_id');
+    }
+
+    public function soal()
+    {
+        return $this->hasMany(Soal::class, 'post_test_id', 'post_test_id');
     }
 }

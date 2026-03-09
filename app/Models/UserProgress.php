@@ -5,16 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Sertifikat extends Model
+class UserProgress extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'sertifikat_id';
+    protected $primaryKey = 'progress_id';
 
     protected $fillable = [
         'user_id',
         'materi_id',
-        'image',
+        'urutan_selesai',
+        'skor_total',
         'status',
     ];
 
@@ -26,5 +27,10 @@ class Sertifikat extends Model
     public function materi()
     {
         return $this->belongsTo(Materi::class, 'materi_id', 'materi_id');
+    }
+
+    public function skorUsers()
+    {
+        return $this->hasMany(SkorUser::class, 'progress_id', 'progress_id');
     }
 }

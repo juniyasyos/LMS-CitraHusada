@@ -15,15 +15,11 @@ class SubMateri extends Model
         'materi_id',
         'judul',
         'file_materi',
+        'urutan_sub_materi',
     ];
 
     public function materi()
     {
         return $this->belongsTo(Materi::class, 'materi_id', 'materi_id');
-    }
-
-    public function postTests()
-    {
-        return $this->hasMany(PostTest::class, 'sub_materi_id', 'sub_materi_id');
     }
 }

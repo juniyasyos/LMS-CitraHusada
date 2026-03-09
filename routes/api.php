@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\JenisTenagaController;
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\PembelajaranController;
+use App\Http\Controllers\MateriUserController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -51,6 +52,10 @@ Route::get('/debug-users', function () {
         'data' => $users
     ]);
 });
+
+//Pembelajaran API routes
+Route::middleware('auth')->get('/profile', [PembelajaranController::class, 'getProfile']);
+Route::middleware('auth')->get('/materi-user', [MateriUserController::class, 'index']);
 
 // Protected API routes (require authentication)
 Route::middleware('auth')->group(function () {

@@ -25,7 +25,8 @@ return new class extends Migration
             $table->bigIncrements('sub_materi_id');
             $table->unsignedBigInteger('materi_id');
             $table->string('judul');
-            $table->string('file_materi')->nullable();
+            $table->string('file_materi');
+            $table->unsignedInteger('urutan_sub_materi');
             $table->timestamps();
 
             $table->foreign('materi_id')->references('materi_id')->on('materis')->onDelete('cascade');

@@ -17,4 +17,9 @@ class UnitKerja extends Model
     {
         return $this->hasMany(User::class, 'unit_kerja_id', 'unit_kerja_id');
     }
+
+    public function materiUnitKerjas()
+    {
+        return $this->hasMany(MateriUnitKerja::class, 'unit_kerja_id', 'unit_kerja_id');
+    }
 }
