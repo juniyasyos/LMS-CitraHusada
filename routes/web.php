@@ -25,3 +25,22 @@ Route::get('/materi-progress', function () {
 Route::get('/materi-selesai', function () {
     return view('materi-selesai');
 });
+
+Route::get('/detail-materi', function () {
+    return view('detail-materi');
+});
+
+Route::get('/lanjutkan-materi', function () {
+    return view('lanjutkan-materi');
+});
+
+// Untuk lanjutkan materi
+// Route::get('/lanjutkan-materi/{materi}/{submateri}', [MateriController::class, 'show']);
+
+Route::get('/dummy-lanjutkan-materi-ver-ppt', function () {
+    return view('dummy-lanjutkan-materi-ppt');
+});
+
+Route::get('/final-kuis', function () {
+    return view('materi-kuis');
+});
