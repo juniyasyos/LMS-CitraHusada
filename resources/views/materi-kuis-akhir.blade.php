@@ -89,21 +89,21 @@
     
             <!-- NOMOR SOAL -->
             <div>
-                Soal <span class="text-gray-900 font-semibold">9</span> dari 
+                Soal <span class="text-gray-900 font-semibold">10</span> dari 
                 <span class="text-gray-900 font-semibold">10</span>
             </div>
 
             <!-- DURASI -->
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-clock text-gray-500"></i>
-                <span>10:00</span>
+                <span>01:00</span>
             </div>
 
         </div>
 
         <!-- PROGRESS BAR -->
         <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
-            <div class="bg-blue-500 h-2 rounded-full" style="width: 90%"></div>
+            <div class="bg-blue-500 h-2 rounded-full" style="width: 100%"></div>
         </div>
 
 
@@ -128,24 +128,60 @@
             <div class="space-y-4">
 
                 <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                    <input type="radio" name="soal1" class="w-4 h-4 jawaban">
+                    <input type="radio" name="soal1" class="w-4 h-4">
                     <span>Upaya meningkatkan jumlah pasien yang dirawat</span>
                 </label>
 
                 <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                    <input type="radio" name="soal1" class="w-4 h-4 jawaban">
+                    <input type="radio" name="soal1" class="w-4 h-4">
                     <span>Sistem untuk membuat pelayanan pasien lebih aman</span>
                 </label>
 
                 <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                    <input type="radio" name="soal1" class="w-4 h-4 jawaban">
+                    <input type="radio" name="soal1" class="w-4 h-4">
                     <span>Proses administrasi rumah sakit</span>
                 </label>
 
                 <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                    <input type="radio" name="soal1" class="w-4 h-4 jawaban">
+                    <input type="radio" name="soal1" class="w-4 h-4">
                     <span>Kegiatan promosi kesehatan kepada masyarakat</span>
                 </label>
+
+            </div>
+
+            
+            <!-- button kirim dan popup -->
+            <div class="flex justify-center mt-6">
+                <button onclick="bukaPopup()" 
+                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition">
+                    Kirim
+                </button>
+            </div>
+            <div id="popupKirim" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center">
+
+                <div class="bg-white rounded-xl p-6 w-96 text-center shadow-lg">
+
+                    <h2 class="text-lg font-semibold mb-2">
+                        Apakah anda sudah yakin?
+                    </h2>
+
+                    <div class="flex justify-center gap-4">
+                        
+                        <!-- BATAL -->
+                        <button onclick="tutupPopup()" 
+                        class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
+                            TIDAK
+                        </button>
+
+                        <!-- KONFIRMASI -->
+                        <button onclick="lanjutSoal()" 
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                            YA
+                        </button>
+
+                    </div>
+
+                </div>
 
             </div>
 

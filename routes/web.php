@@ -44,3 +44,11 @@ Route::get('/dummy-lanjutkan-materi-ver-ppt', function () {
 Route::get('/final-kuis', function () {
     return view('materi-kuis');
 });
+
+Route::get('/final-kuis-akhir', function () {
+    return view('materi-kuis-akhir');
+});
+
+Route::get('/hasil-kuis', function () {
+    return view('hasil-kuis');
+});
