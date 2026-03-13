@@ -2,11 +2,12 @@
 
     <!-- LOGO -->
     <div class="flex items-center gap-2">
-        <img src="{{ asset('images/logo-lms.png') }}" alt="Logo" class="w-12 h-12">
-
-        <div>
-            <h1 class="text-red-600 font-bold text-lg">Citra Husada</h1>
-            <p class="text-green-600 text-sm">Learning Management System</p>
+        <div class="flex items-center gap-1 mb-6 mt-6">
+            <img src="{{ asset('images/logo-lms.png') }}" alt="Logo" class="w-12 h-12">
+                <div>
+                    <h1 class="text-red-600 font-bold text-lg">Citra Husada</h1>
+                    <p class="text-green-600 text-sm ">Learning Management System</p>
+                </div>
         </div>
     </div>
 

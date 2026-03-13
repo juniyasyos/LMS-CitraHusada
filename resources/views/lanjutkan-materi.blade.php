@@ -3,14 +3,16 @@
 
 @section('content')
 
-@include('components.header')
+<div class="hidden lg:block">
+    @include('components.header')
+</div>
 
-<div class="flex min-h-screen">
+<div class="flex flex-col lg:flex-row min-h-screen">
 
     <!-- SIDEBAR MATERI -->
-    <aside class="w-72 bg-white border-r p-6">
-        
-        <h2 class="font-bold text-lg mb-4">
+    <aside class="order-3 lg:order-1 w-full lg:w-72 bg-white border-t lg:border-t-0 lg:border-r p-4 lg:p-6">
+
+        <h2 class="font-bold text-base lg:text-lg mb-4">
             Progress Belajar
         </h2>
 
@@ -26,7 +28,7 @@
             </div>
         </div>
 
-        <h2 class="font-semibold text-md mb-3">
+        <h2 class="font-semibold text-sm lg:text-md mb-3">
             Daftar Materi
         </h2>
 
@@ -78,7 +80,7 @@
 
 
     <!-- KONTEN VIDEO -->
-    <main class="flex-1 p-8">
+    <main class="order-1 lg:order-2 flex-1 p-4 sm:p-6 lg:p-8">
 
         <!-- BUTTON KELUAR -->
         <a href="/detail-materi"
@@ -87,12 +89,10 @@
             <span>Kembali</span>
         </a>
 
-
         <!-- JUDUL VIDEO -->
-        <h1 class="text-2xl font-bold mb-6">
+        <h1 class="text-lg sm:text-xl lg:text-2xl font-bold mb-6">
             Introduction Keselamatan Pasien
         </h1>
-
 
         <!-- VIDEO PLAYER -->
         <div class="bg-black rounded-xl overflow-hidden mb-6">
@@ -104,15 +104,14 @@
 
         </div>
 
-
         <!-- PENJELASAN MATERI -->
-        <div class="bg-white border rounded-xl p-6">
+        <div class="bg-white border rounded-xl p-4 sm:p-6">
 
-            <h2 class="text-lg font-semibold mb-3">
+            <h2 class="text-base lg:text-lg font-semibold mb-3">
                 Tentang Materi
             </h2>
 
-            <p class="text-gray-600 leading-relaxed">
+            <p class="text-gray-600 leading-relaxed text-sm sm:text-base">
                 Materi ini menjelaskan dasar-dasar keselamatan pasien di lingkungan rumah sakit. 
                 Keselamatan pasien merupakan sistem yang bertujuan untuk membuat asuhan pasien 
                 lebih aman dengan mencegah terjadinya cedera akibat kesalahan tindakan medis. 
