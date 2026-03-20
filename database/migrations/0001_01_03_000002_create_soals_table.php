@@ -18,11 +18,12 @@ return new class extends Migration
             $table->boolean('status_pilihan')->default(false);
             $table->text('soal');
             $table->string('pilihan_1');
-            $table->string('pilihan_2');
-            $table->string('pilihan_3');
-            $table->string('pilihan_4');
-            $table->string('pilihan_5');
+            $table->string('pilihan_2')->nullable();
+            $table->string('pilihan_3')->nullable();
+            $table->string('pilihan_4')->nullable();
+            $table->string('pilihan_5')->nullable();
             $table->string('jawaban_benar');
+            $table->unsignedInteger('poin')->default(0);
             $table->timestamps();
 
             $table->foreign('post_test_id')->references('post_test_id')->on('post_tests')->onDelete('cascade');

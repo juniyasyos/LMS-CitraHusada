@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             </div>
         </div>
         
-
         <nav class="p-4 space-y-2">
             <a href="" class="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-600 rounded-lg">
                 <i class="fa-solid fa-book"></i>
@@ -109,12 +108,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         <!-- FILTER STATUS -->
         <div class="flex w-full gap-4 mb-8">
-            <button onclick="loadMateri()"
-            class="flex-1 flex items-center justify-between px-6 py-3 bg-white border rounded-xl shadow-sm hover:bg-gray-50">
-            <span>Semua</span>
-            <i class="fa-solid fa-layer-group text-gray-400"></i>
-            </button>
-
             <button onclick="filterMateri('belum')"
             class="flex-1 flex items-center justify-between px-6 py-3 bg-white border rounded-xl shadow-sm hover:bg-gray-50">
             <span>Belum Mulai</span>
@@ -193,7 +186,7 @@ async function loadProfile() {
         // Header kanan
         document.getElementById('profileName').innerText = nama;
 
-        document.getElementById('profileUnit').innerText = unitKerja;
+        document.getElementById('profileUnit').innerText = 'Unit ' + unitKerja;
 
     } catch (error) {
 
@@ -274,13 +267,15 @@ function renderMateri(materis){
 
                 <div class="flex gap-3 mt-5">
 
-                    <button class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
-                        Lanjutkan
-                    </button>
+                    <a href="/lanjutkan-materi/${materi.materi_id}"
+                        class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 text-center">
+                            Lanjutkan
+                    </a>
 
-                    <button class="flex-1 border py-2 rounded-lg hover:bg-gray-100">
-                        Lihat Detail
-                    </button>
+                    <a href="/detail-materi/${materi.materi_id}"
+                        class="flex-1 border py-2 rounded-lg hover:bg-gray-100 text-center">
+                            Lihat Detail
+                    </a>
 
                 </div>
 

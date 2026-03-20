@@ -22,6 +22,7 @@ class Soal extends Model
         'pilihan_4',
         'pilihan_5',
         'jawaban_benar',
+        'poin',
     ];
 
     public function postTest()

@@ -22,8 +22,18 @@ class PostTest extends Model
         return $this->belongsTo(Materi::class, 'materi_id', 'materi_id');
     }
 
-    public function soal()
+    public function soals()
     {
         return $this->hasMany(Soal::class, 'post_test_id', 'post_test_id');
+    }
+
+    // public function soals()
+    // {
+    //     return $this->hasMany(\App\Models\Soal::class, 'post_test_id', 'post_test_id');
+    // }
+
+    public function userProgresses()
+    {
+        return $this->hasMany(UserProgress::class, 'post_test_id', 'post_test_id');
     }
 }

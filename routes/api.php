@@ -56,6 +56,20 @@ Route::get('/debug-users', function () {
 //Pembelajaran API routes
 Route::middleware('auth')->get('/profile', [PembelajaranController::class, 'getProfile']);
 Route::middleware('auth')->get('/materi-user', [MateriUserController::class, 'index']);
+//detai-materi API route
+Route::middleware('auth')->get('/materi-user/{id}', [MateriUserController::class, 'show']);
+//lanjutkan-materi API route
+Route::middleware('auth')->get('/materi-lanjutkan/{id}', [MateriUserController::class, 'lanjutkan']);
+//post test API route
+// Route::middleware('auth')->get('/post-test/{materiId}', [MateriUserController::class, 'getPostTest']);
+Route::middleware('auth')->get('/post-test-soal/{materiId}', [MateriUserController::class, 'getSoalPostTest']);
+//submit post test API route
+Route::middleware('auth')->post('/post-test-submit', [MateriUserController::class, 'submitPostTest']);
+//update post test API route
+Route::middleware('auth')->post('/post-test-start', [MateriUserController::class, 'startPostTest']);
+
+
+Route::post('/progress/update', [MateriUserController::class, 'updateProgress']);
 
 // Protected API routes (require authentication)
 Route::middleware('auth')->group(function () {

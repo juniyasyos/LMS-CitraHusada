@@ -10,17 +10,30 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pembelajaran', function () {
         return view('pembelajaran');
     })->name('pembelajaran');
-
-    Route::get('/belum-mulai', function () {
-        return view('belum-mulai');
+    
+    Route::get('/detail-materi/{materiId}', function ($materiId) {
+        return view('detail-materi', compact('materiId'));
     });
 
-    Route::get('/materi-progress', function () {
-        return view('materi-progress');
+    Route::get('/lanjutkan-materi/{materiId}', function ($materiId) {
+        return view('lanjutkan-materi', compact('materiId'));
     });
 
-    Route::get('/materi-selesai', function () {
-    return view('materi-selesai');
+    Route::get('/post-test/{materiId}', function ($materiId) {
+        return view('materi-kuis', compact('materiId'));
+    });
+//##############################################
+    Route::get('/lanjut', function () {
+        return view('lanjutkan-materi');
+    });
+    Route::get('/detail', function () {
+        return view('detail-materi');
+    });
+    Route::get('/lanjut-ppt', function () {
+        return view('dummu-lanjutkan-materi-ppt');
+    });
+    Route::get('/kuis', function () {
+        return view('materi-kuis');
     });
     
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

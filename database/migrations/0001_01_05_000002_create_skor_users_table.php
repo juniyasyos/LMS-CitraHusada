@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('skor_user', function (Blueprint $table) {
+        Schema::create('skor_users', function (Blueprint $table) {
             $table->bigIncrements('skor_id');
             $table->unsignedBigInteger('progress_id');
             $table->unsignedBigInteger('post_test_id');
