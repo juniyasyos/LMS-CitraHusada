@@ -55,6 +55,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserProgress::class, 'user_id', 'user_id');
     }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'user_id', 'user_id');
+    }
     
     //  public function skorUsers()
     // {

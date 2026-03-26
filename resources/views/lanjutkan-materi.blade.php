@@ -3,14 +3,16 @@
 
 @section('content')
 
-@include('components.header')
+<div class="hidden lg:block">
+    @include('components.header')
+</div>
 
-<div class="flex min-h-screen">
+<div class="flex flex-col lg:flex-row min-h-screen">
 
     <!-- SIDEBAR MATERI -->
-    <aside class="w-72 bg-white border-r p-6">
-        
-        <h2 class="font-bold text-lg mb-4">
+    <aside class="order-3 lg:order-1 w-full lg:w-72 bg-white border-t lg:border-t-0 lg:border-r p-4 lg:p-6 max-h-[300px] overflow-y-auto lg:max-h-none">
+
+        <h2 class="font-bold text-base lg:text-lg mb-4">
             Progress Belajar
         </h2>
 
@@ -26,16 +28,59 @@
             </div>
         </div>
 
-        <h2 class="font-semibold text-md mb-3">
+        <h2 class="font-semibold text-sm lg:text-md mb-3">
             Daftar Materi
         </h2>
-        
-        <div id="daftarMateri" class="space-y-2 text-sm"></div>
+
+        <div id="daftarMateri" class="space-y-2 text-sm">
+
+            {{-- <!-- SUB MATERI SELESAI -->
+            <a href=""
+            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100">
+                <i class="fa-solid fa-circle-check text-green-500"></i>
+                <span>Introduction</span>
+            </a>
+
+            <!-- SUB MATERI AKTIF -->
+            <a href="/lanjutkan-materi"
+            class="flex items-center gap-3 p-3 rounded-lg bg-blue-100 text-blue-600 font-medium">
+                <i class="fa-solid fa-play text-blue-500"></i>
+                <span>Konsep Keselamatan Pasien</span>
+            </a>
+
+            <!-- SUB MATERI TERKUNCI -->
+            <a href="/dummy-lanjutkan-materi-ver-ppt"
+            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 text-gray-500">
+                <i class="fa-solid fa-lock text-gray-400"></i>
+                <span>Standar Pelayanan Rumah Sakit</span>
+            </a>
+
+            <a href="#"
+            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 text-gray-500">
+                <i class="fa-solid fa-lock text-gray-400"></i>
+                <span>Studi Kasus</span>
+            </a>
+
+            <a href="#"
+            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 text-gray-500">
+                <i class="fa-solid fa-lock text-gray-400"></i>
+                <span>Kesimpulan</span>
+            </a>
+
+            <!-- FINAL KUIS -->
+            <a href="/final-kuis"
+            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 text-gray-500 font-medium">
+                <i class="fa-solid fa-lock text-gray-400"></i>
+                <span>Final Kuis</span>
+            </a> --}}
+
+        </div>
+
     </aside>
 
 
     <!-- KONTEN VIDEO -->
-    <main class="flex-1 p-8">
+    <main class="order-1 lg:order-2 flex-1 p-4 sm:p-6 lg:p-8">
 
         <!-- BUTTON KELUAR -->
         <a href="/detail-materi/{{ $materiId }}"
@@ -44,92 +89,80 @@
             <span>Kembali</span>
         </a>
 
+        <!-- JUDUL VIDEO -->
+        <h1 id="judulMateriAktif" class="text-lg sm:text-xl lg:text-2xl font-bold mb-6"></h1>
+        {{-- <h1 class="text-lg sm:text-xl lg:text-2xl font-bold mb-6">
+            Introduction Keselamatan Pasien
+        </h1> --}}
 
-        <!-- JUDUL -->
-        <h1 id="judulMateriAktif" class="text-2xl font-bold mb-6"></h1>
-
-        <!-- KONTEN FILE -->
-        <div id="materiViewer" class="mb-6"></div>
+        <!-- VIDEO PLAYER -->
+        <div class="bg-black rounded-xl overflow-hidden mb-6">
+            <div id="materiViewer" {{--class="mb-6"--}}></div>
+        </div>
 
         <!-- PENJELASAN MATERI -->
-        <div id="tentangMateriBox" class="bg-white border rounded-xl p-6">
-
-            <h2 class="text-lg font-semibold mb-3">
+        <div id="tentangMateriBox" class="bg-white border rounded-xl p-4 sm:p-6">
+            <h2 class="text-base lg:text-lg font-semibold mb-3">
                 Tentang Materi
             </h2>
-            
-            <p id="deskripsiMateri" class="text-gray-600 leading-relaxed"></p>
+
+            <p id="deskripsiMateri"
+            class="text-gray-600 leading-relaxed text-sm sm:text-base"></p>
         </div>
     </main>
-
 </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
 <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const stepDibuka = urlParams.get("step");
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-    const materiId = "{{ $materiId }}";
-    let currentStep = null;
-    document.addEventListener('DOMContentLoaded', function(){
-        loadMateriLanjutkan();
-    });
+const urlParams = new URLSearchParams(window.location.search);
+const stepDibuka = urlParams.get("step");
 
-    let maxWatchedTime = 0;
-    const video = document.getElementById("videoMateri");
+const materiId = "{{ $materiId }}";
+let currentStep = null;
 
-    // update waktu maksimal yang pernah ditonton
-    video.addEventListener("timeupdate", function () {
-        if (video.currentTime > maxWatchedTime) {
-            maxWatchedTime = video.currentTime;
-        }
-    });
-    // cegah user lompat ke depan
-    video.addEventListener("seeking", function () {
-        if (video.currentTime > maxWatchedTime) {
-            video.currentTime = maxWatchedTime;
-        }
-    });
+document.addEventListener('DOMContentLoaded', function(){
+    loadMateriLanjutkan();
+});
 
-    async function loadMateriLanjutkan(){
+async function loadMateriLanjutkan(){
+    try{
+        const response = await axios.get('/api/materi-lanjutkan/' + materiId);
+        const data = response.data.data;
 
-        try{
-            const response = await axios.get('/api/materi-lanjutkan/' + materiId);
-            const data = response.data.data;
-
-            document.getElementById("progressText").innerText =
+        document.getElementById("progressText").innerText =
             data.progress_percent + "%";
 
-            document.getElementById("progressBar").style.width =
+        document.getElementById("progressBar").style.width =
             data.progress_percent + "%";
 
-            renderSidebar(data.steps, data.urutan_selesai);
-            let stepAktif;
+        renderSidebar(data.steps, data.urutan_selesai);
 
-            if(stepDibuka){
-                stepAktif = data.steps.find(step =>
-                    step.urutan === parseInt(stepDibuka)
-                );
-            }
-            else{
-                stepAktif = data.steps.find(step =>
-                    step.urutan === data.urutan_selesai + 1
-                );
-            }
+        let stepAktif;
 
-            if(stepAktif){
-                loadMateri(stepAktif);
-            }
-
-        }catch(error){
-
-            console.error("Error load materi lanjutkan", error);
-
+        if(stepDibuka){
+            stepAktif = data.steps.find(step =>
+                step.urutan === parseInt(stepDibuka)
+            );
+        } else {
+            stepAktif = data.steps.find(step =>
+                step.urutan === data.urutan_selesai + 1
+            );
         }
 
+        if(stepAktif){
+            loadMateri(stepAktif);
+        }
+
+    }catch(error){
+        console.error(error);
     }
+}
 
-    //daftar materi
-    function renderSidebar(steps, urutanSelesai){
+function renderSidebar(steps, urutanSelesai){
 
         const container = document.getElementById("daftarMateri");
 
@@ -282,61 +315,65 @@
         }
 
         if(ext === "mp4"){
-        viewer.innerHTML = `
-            <div class="bg-black rounded-xl overflow-hidden">
-                <video id="videoMateri" controls class="w-full">
-                    <source src="${url}" type="video/mp4">
-                </video>
-            </div>
-        `;
+            viewer.innerHTML = `
+                <div class="bg-black rounded-xl mb-6">
+                    <video id="videoMateri" controls class="w-full">
+                        <source src="${url}" type="video/mp4">
+                    </video>
+                </div>
+            `;
 
-        setTimeout(()=>{
-            let videoCompleted = false;
-            const video = document.getElementById("videoMateri");
-            video.addEventListener("ended", function(){
-                if(!videoCompleted){
-                    videoCompleted = true;
-                    updateProgress(currentStep.urutan);
-                }
-            });
-        },200);
+            setTimeout(()=>{
+                let videoCompleted = false;
+                const video = document.getElementById("videoMateri");
+                video.addEventListener("ended", function(){
+                    if(!videoCompleted){
+                        videoCompleted = true;
+                        updateProgress(currentStep.urutan);
+                    }
+                });
+            },200);
         }
+        // else if(ext === "pdf"){
+        //     viewer.innerHTML = `
+        //     <div class="bg-white border rounded-xl p-4">
+        //         <canvas id="pdfCanvas" class="w-full"></canvas>
+
+        //         <div class="flex justify-between mt-4">
+        //             <button id="prevPage" class="px-4 py-2 bg-gray-300 rounded">
+        //                 Previous
+        //             </button>
+
+        //             <span id="pageInfo"></span>
+
+        //             <button id="nextPage" class="px-4 py-2 bg-blue-600 text-white rounded">
+        //                 Next
+        //             </button>
+        //         </div>
+        //     </div>
+        //     `;
+
+        //     loadPDF(url);
+        // }
+
+        //opsi tampilan pdf
         else if(ext === "pdf"){
             viewer.innerHTML = `
-            <div class="bg-white border rounded-xl p-4">
-                <canvas id="pdfCanvas"></canvas>
+            <div class="bg-white border rounded-xl overflow-hidden">
+                <iframe 
+                    src="${url}" 
+                    class="w-full h-[600px]">
+                </iframe>
 
-                <div class="flex justify-between mt-4">
-                    <button id="prevPage" class="px-4 py-2 bg-gray-300 rounded">
-                        Previous
-                    </button>
-
-                    <span id="pageInfo"></span>
-
-                    <button id="nextPage" class="px-4 py-2 bg-blue-600 text-white rounded">
-                        Next
+                <div class="p-4 text-right">
+                    <button onclick="updateProgress(${step.urutan})"
+                    class="bg-blue-600 text-white px-5 py-2 rounded-lg">
+                        Tandai Sudah Dibaca
                     </button>
                 </div>
             </div>
             `;
-
-            loadPDF(url);
         }
-        //tombol tandai sudah dibaca
-        // else if(ext === "pdf"){
-        // viewer.innerHTML = `
-        // <div class="bg-white border rounded-xl overflow-hidden">
-        //     <iframe src="${url}" class="w-full h-[600px]"></iframe>
-
-        //     <div class="p-4 text-right">
-        //         <button onclick="updateProgress(${step.urutan})"
-        //         class="bg-blue-600 text-white px-5 py-2 rounded-lg">
-        //             Tandai Sudah Dibaca
-        //         </button>
-        //     </div>
-        // </div>
-        // `;
-        // }
         else if(["jpg","jpeg","png","webp"].includes(ext)){
             viewer.innerHTML = `
             <div class="bg-white border rounded-xl p-4 text-center">
@@ -361,7 +398,6 @@
     }
 
     async function loadPDF(url){
-
         const pdf = await pdfjsLib.getDocument(url).promise;
 
         let pageNum = 1;
@@ -373,20 +409,28 @@
         async function renderPage(num){
 
             const page = await pdf.getPage(num);
-            const viewport = page.getViewport({scale:1.5});
 
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
+            // ambil lebar container
+            const containerWidth = canvas.parentElement.clientWidth;
+
+            const viewport = page.getViewport({ scale: 1 });
+
+            // hitung scale agar fit ke layar
+            const scale = containerWidth / viewport.width;
+
+            const scaledViewport = page.getViewport({ scale: scale });
+
+            canvas.width = scaledViewport.width;
+            canvas.height = scaledViewport.height;
 
             await page.render({
                 canvasContext: ctx,
-                viewport: viewport
+                viewport: scaledViewport
             }).promise;
 
             document.getElementById("pageInfo").innerText =
                 `Halaman ${num} / ${totalPages}`;
 
-            // jika halaman terakhir
             if(num === totalPages){
                 updateProgress(currentStep.urutan);
             }
@@ -428,5 +472,4 @@
         }
     }
 </script>
-
 @endsection

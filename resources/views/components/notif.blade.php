@@ -1,14 +1,18 @@
-<div x-data="{ openNotif: false }" class="relative">
+<div x-data="notifComponent()" class="relative">
 
     <!-- ICON BELL -->
     <button 
-        @click="openNotif = !openNotif"
+        @click="openNotif = !openNotif; if(openNotif) fetchNotifications()"
         class="relative text-gray-600 hover:text-blue-600 transition">
 
         <i class="fas fa-bell text-lg"></i>
 
         <!-- NOTIFICATION DOT -->
-        <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+        <span 
+            x-show="unreadCount > 0"
+            x-text="unreadCount"
+            class="absolute -top-2 -right-2 text-xs bg-red-500 text-white px-1.5 rounded-full">
+        </span>
 
     </button>
 
@@ -25,33 +29,22 @@
         </p>
 
         <!-- LIST NOTIFICATION -->
-        <div class="space-y-3 text-sm">
+        <div class="space-y-3 text-sm max-h-60 overflow-y-auto">
 
-            <div class="p-3 rounded-lg hover:bg-gray-50 cursor-pointer">
-                <p class="font-medium">
-                    Modul Baru Tersedia
-                </p>
-                <p class="text-gray-500 text-xs">
-                    Modul "Keselamatan Pasien" telah ditambahkan
-                </p>
-            </div>
+            <template x-for="notif in notifications" :key="notif.id">
+                <div 
+                    @click="markAsRead(notif.id)"
+                    class="p-3 rounded-lg cursor-pointer"
+                    :class="notif.is_read ? 'bg-white' : 'bg-blue-50'"
+                >
+                    <p class="font-medium" x-text="notif.title"></p>
+                    <p class="text-gray-500 text-xs" x-text="notif.message"></p>
+                </div>
+            </template>
 
-            <div class="p-3 rounded-lg hover:bg-gray-50 cursor-pointer">
-                <p class="font-medium">
-                    Deadline Mendekat
-                </p>
-                <p class="text-gray-500 text-xs">
-                    Modul "Manajemen Rumah Sakit" segera berakhir
-                </p>
-            </div>
-
-            <div class="p-3 rounded-lg hover:bg-gray-50 cursor-pointer">
-                <p class="font-medium">
-                    Sertifikat Tersedia
-                </p>
-                <p class="text-gray-500 text-xs">
-                    Sertifikat pelatihan sudah bisa diunduh
-                </p>
+            <!-- Kalau kosong -->
+            <div x-show="notifications.length === 0" class="text-center text-gray-400 text-sm">
+                Tidak ada notifikasi
             </div>
 
         </div>
@@ -65,3 +58,46 @@
 
     </div>
 </div>
+
+<script>
+function notifComponent() {
+    return {
+        openNotif: false,
+        notifications: [],
+        unreadCount: 0,
+
+        async fetchNotifications() {
+            try {
+                const res = await axios.get('/api/notifications');
+                this.notifications = res.data.data;
+            } catch (e) {
+                console.error('Gagal ambil notif', e);
+            }
+        },
+
+        async fetchUnreadCount() {
+            try {
+                const res = await axios.get('/api/notifications/count');
+                this.unreadCount = res.data.total_unread;
+            } catch (e) {
+                console.error('Gagal ambil count', e);
+            }
+        },
+
+        async markAsRead(id) {
+            try {
+                await axios.post(`/api/notifications/${id}/read`);
+                this.fetchNotifications();
+                this.fetchUnreadCount();
+            } catch (e) {
+                console.error('Gagal read notif', e);
+            }
+        },
+
+        init() {
+            this.fetchNotifications();
+            this.fetchUnreadCount();
+        }
+    }
+}
+</script>

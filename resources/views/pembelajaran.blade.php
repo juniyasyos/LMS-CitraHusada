@@ -2,112 +2,93 @@
 @section('title', 'pembelajaran')
 @section('content')
 
-<script>
-// Check authentication on page load
-document.addEventListener('DOMContentLoaded', async function() {
-    try {
-        const response = await axios.get('/api/check-auth');
-        if (!response.data.success) {
-            // User belum login, redirect ke halaman login
-            window.location.href = '/';
-        }
-        loadProfile();
-        loadMateri();
-    } catch (error) {
-        // Error checking auth, redirect ke login
-        window.location.href = '/';
-    }
-});
-</script>
-
-<div class="flex min-h-screen">
-
+<div class="flex min-h-screen bg-gray-100">
     <!-- SIDEBAR -->
-    <aside class="w-64 bg-white shadow-md">
-        {{-- Logo + Title --}}
-        <div class="p-1 border-b border-grey-200">
-            <div class="flex items-center gap-1 mb-6 mt-6">
-            <img src="{{ asset('images/logo-lms.png') }}" alt="Logo" class="w-12 h-12">
-                <div>
-                    <h1 class="text-red-600 font-bold text-lg">Citra Husada</h1>
-                    <p class="text-green-600 text-sm ">Learning Management System</p>
-                </div>
-            </div>
-        </div>
-        
-        <nav class="p-4 space-y-2">
-            <a href="" class="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-600 rounded-lg">
-                <i class="fa-solid fa-book"></i>
-                Pembelajaran Saya
-            </a>
-            <a href="#" class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 rounded-lg">
-                <i class="fa-solid fa-certificate"></i>
-                Sertifikat
-            </a>
-            <a href="#" class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 rounded-lg">
-                <i class="fa-solid fa-circle-user"></i>
-                Profil
-            </a>
-        </nav>
+    <aside id="sidebar"
+        class="fixed lg:static z-40 top-0 left-0 w-64 h-full bg-white border-r
+        transform -translate-x-full lg:translate-x-0
+        transition-transform duration-200">
 
-        <div class="p-4 border-t border-gray-200">
-            <a href="#" 
-            onclick="handleLogout(event)"
-            class="flex items-center gap-2 text-red-600 
-                    hover:text-red-800 transition duration-200">
-                <i class="fa-solid fa-arrow-left"></i>
-                Keluar
-            </a>
-        </div>
+        @include('components.nav')
 
     </aside>
 
+    <!-- OVERLAY MOBILE -->
+    <div id="overlay"
+        class="fixed inset-0 bg-black/40 hidden z-30 lg:hidden">
+    </div>
+
     <!-- MAIN CONTENT -->
-    <main class="flex-1 p-8">
+    <main class="flex-1 p-4 lg:p-8">
 
         <!-- HEADER -->
-        <div class="flex justify-between items-start mb-8">
+        <div class="flex justify-between items-center mb-6">
 
-            <div>
-                <h2 id="welcomeText" class="text-2xl font-semibold">
-                    Selamat Datang Kembali
-                </h2>
+            <!-- LEFT -->
+            <div class="flex items-center gap-3">
 
-                <p id="unitJenisText" class="text-sm text-gray-500">
-                    -
-                </p>
-            </div>
+                <!-- HAMBURGER -->
+                <button id="toggleSidebar"
+                    class="lg:hidden text-gray-600 text-xl">
+                    <i class="fas fa-bars"></i>
+                </button>
 
-            <div class="flex items-center gap-4">
-                <i class="fas fa-bell"></i>
-
-                <div class="text-right">
-                    <p id="profileName" class="font-medium">-</p>
-                    <p id="profileUnit" class="text-sm text-gray-500">-</p>
+                <!-- DESKTOP TEXT -->
+                <div class="hidden lg:block">
+                    <h2 id="welcomeText" class="text-2xl font-semibold"></h2>
+                    <p id="unitJenisText" class="text-sm text-gray-500"></p>
+                </div>
+                    
+                <!-- MOBILE LOGO -->
+                <div class="flex items-center gap-2 lg:hidden">
+                    <img src="{{ asset('images/logo-lms.png') }}" alt="Logo" class="w-10 h-10">
+                    <div class="leading-tight">
+                        <p class="text-red-600 font-bold text-lg">
+                            Citra Husada
+                        </p>
+                        <p class="text-green-600 text-sm font-semibold">
+                            Learning Management System
+                        </p>
+                    </div>
                 </div>
             </div>
 
+            <!-- RIGHT -->
+            <div class="flex items-center gap-4">
+
+                @include('components.notif')
+
+                <!-- USER INFO DESKTOP -->
+                <div class="text-right hidden lg:block">
+                    <p id="profileName" class="font-medium"></p>
+                    <p id="profileUnit" class="text-sm text-gray-500"></p>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- MOBILE WELCOME TEXT -->
+        <div class="lg:hidden mb-6">
+            <h2 id="welcomeTextMobile" class="text-lg font-semibold"></h2>
+            <p id="unitJenisMobile" class="text-sm text-gray-500"></p>
         </div>
 
         <!-- SEARCH -->
         <div class="mb-6">
-            <div class="flex items-center w-full max-w-md border rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-blue-400">
-                
-                <i class="fas fa-search text-gray-400 mr-2"></i>
-
+            <div class="relative w-full max-w-md">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                 <input 
                     type="text"
-                    id="searchMateri"
                     placeholder="Cari modul..."
-                    onkeyup="searchMateri()"
-                    class="w-full outline-none"
+                    class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                 >
-
             </div>
         </div>
 
         <!-- FILTER STATUS -->
-        <div class="flex w-full gap-4 mb-8">
+        <div class="grid grid-cols-3 gap-3 mb-8">
+
             <button onclick="filterMateri('belum')"
             class="flex-1 flex items-center justify-between px-6 py-3 bg-white border rounded-xl shadow-sm hover:bg-gray-50">
             <span>Belum Mulai</span>
@@ -125,23 +106,40 @@ document.addEventListener('DOMContentLoaded', async function() {
             <span>Selesai</span>
             <i class="fa-solid fa-check-circle text-gray-400"></i>
             </button>
+
         </div>
 
         <!-- CARD GRID -->
         <div id="materiContainer" class="grid md:grid-cols-3 gap-6"></div>
-        </div>
 
         <!-- LOAD MORE -->
-        {{-- <div class="text-center mt-10">
+        <div class="text-center mt-10">
             <button class="text-blue-600 hover:underline">
                 Lihat Lebih Banyak →
             </button>
-        </div> --}}
+        </div>
 
     </main>
+
 </div>
 
 <script>
+// Check authentication on page load
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const response = await axios.get('/api/check-auth');
+        if (!response.data.success) {
+            // User belum login, redirect ke halaman login
+            window.location.href = '/';
+        }
+        loadProfile();
+        loadMateri();
+    } catch (error) {
+        // Error checking auth, redirect ke login
+        window.location.href = '/';
+    }
+});
+
 //logout
 async function handleLogout(event) {
     event.preventDefault();
@@ -183,6 +181,12 @@ async function loadProfile() {
         document.getElementById('unitJenisText').innerText =
             'Unit ' + unitKerja + ' • ' + jenisTenaga;
 
+        document.getElementById('welcomeTextMobile').innerText =
+            'Selamat Datang Kembali, ' + nama;
+
+        document.getElementById('unitJenisMobile').innerText =
+            'Unit ' + unitKerja + ' • ' + jenisTenaga;
+
         // Header kanan
         document.getElementById('profileName').innerText = nama;
 
@@ -216,23 +220,27 @@ async function loadMateri() {
 
 //template card materi
 const storageUrl = "{{ asset('storage') }}";
+
 function renderMateri(materis){
-
     const container = document.getElementById("materiContainer");
-
     container.innerHTML = "";
 
     materis.forEach(materi => {
-        console.log(materi);
+
         const progressPercent = materi.progress_percent ?? 0;
+
+        let statusColor = "bg-gray-800";
+        if (materi.status === "Selesai") statusColor = "bg-green-500";
+        if (materi.status === "Belum Dimulai") statusColor = "bg-red-500";
 
         container.innerHTML += `
         <div class="bg-white rounded-2xl shadow-md overflow-hidden">
 
             <div class="h-40 bg-gray-300 relative">
                 <img src="${storageUrl}/${materi.image}" 
-                    class="w-full h-full object-cover">
-                <span class="absolute top-3 right-3 bg-gray-800 text-white text-xs px-3 py-1 rounded-full">
+                     class="w-full h-full object-cover">
+
+                <span class="absolute top-3 right-3 ${statusColor} text-white text-xs px-3 py-1 rounded-full">
                     ${materi.status}
                 </span>
             </div>
@@ -240,20 +248,17 @@ function renderMateri(materis){
             <div class="p-5">
 
                 <h3 class="font-semibold text-lg">${materi.judul}</h3>
-
                 <p class="text-sm text-gray-500 mb-4">${materi.subjudul}</p>
 
                 <div class="flex justify-between items-center text-sm mb-2">
-
                     <div class="flex items-center gap-1">
                         <i class="fa-solid fa-clock text-gray-400"></i>
                         <p>${materi.jam_pelajaran} JPL</p>
                     </div>
 
-                    <span class="text-red-500">
+                    <span class="text-red-500 text-xs">
                         Due: ${materi.tanggal_selesai}
                     </span>
-
                 </div>
 
                 <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
@@ -268,13 +273,15 @@ function renderMateri(materis){
                 <div class="flex gap-3 mt-5">
 
                     <a href="/lanjutkan-materi/${materi.materi_id}"
-                        class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 text-center">
-                            Lanjutkan
+                        class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2">
+                        <i class="fas fa-caret-right"></i>
+                        Lanjutkan
                     </a>
 
                     <a href="/detail-materi/${materi.materi_id}"
-                        class="flex-1 border py-2 rounded-lg hover:bg-gray-100 text-center">
-                            Lihat Detail
+                        class="flex-1 border py-2 rounded-lg hover:bg-gray-100 flex items-center justify-center gap-2">
+                        <i class="fas fa-eye"></i>
+                        Detail
                     </a>
 
                 </div>
@@ -284,7 +291,6 @@ function renderMateri(materis){
         </div>
         `;
     });
-
 }
 
 //filter materi

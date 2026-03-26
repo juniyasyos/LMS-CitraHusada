@@ -7,6 +7,8 @@ use App\Http\Controllers\JenisTenagaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PembelajaranController;
 use App\Http\Controllers\MateriUserController;
+use App\Http\Controllers\NotificationController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -67,9 +69,23 @@ Route::middleware('auth')->get('/post-test-soal/{materiId}', [MateriUserControll
 Route::middleware('auth')->post('/post-test-submit', [MateriUserController::class, 'submitPostTest']);
 //update post test API route
 Route::middleware('auth')->post('/post-test-start', [MateriUserController::class, 'startPostTest']);
-
-
+//update progress API route
 Route::post('/progress/update', [MateriUserController::class, 'updateProgress']);
+
+
+//Notification API routes
+Route::middleware('auth')->group(function () {
+
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/notifications/unread', [NotificationController::class, 'unread']);
+    Route::get('/notifications/count', [NotificationController::class, 'countUnread']);
+
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
+
+});
 
 // Protected API routes (require authentication)
 Route::middleware('auth')->group(function () {

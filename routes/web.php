@@ -32,8 +32,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/lanjut-ppt', function () {
         return view('dummu-lanjutkan-materi-ppt');
     });
-    Route::get('/kuis', function () {
+    Route::get('/materi-kuis', function () {
         return view('materi-kuis');
+    });
+    Route::get('/materi-kuis-akhir', function () {
+        return view('materi-kuis-akhir');
     });
     
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

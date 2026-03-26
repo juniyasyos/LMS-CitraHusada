@@ -27,5 +27,7 @@ class DatabaseSeeder extends Seeder
 
         // create default admin user
         $this->call(UserSeeder::class);
+
+        $this->call([NotificationSeeder::class,]);
     }
 }

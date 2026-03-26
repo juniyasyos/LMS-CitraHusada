@@ -3,17 +3,18 @@
 
 @section('content')
 
-@include('components.header')
+<!-- HEADER DESKTOP -->
+<div class="hidden lg:block">
+    @include('components.header')
+</div>
 
-<div class="flex min-h-screen">
+<div class="flex flex-col lg:flex-row min-h-screen">
 
-    <!-- SIDEBAR MATERI -->
-    <aside class="w-72 bg-white border-r p-6">
-        <h2 class="font-bold text-lg mb-4">
-            Progress Belajar
-        </h2>
+    <!-- SIDEBAR -->
+    <aside class="order-2 lg:order-1 w-full lg:w-72 bg-white border-t lg:border-t-0 lg:border-r p-4 lg:p-6">
 
-        <!-- PROGRESS BAR -->
+        <h2 class="font-bold text-base lg:text-lg mb-4">Progress Belajar</h2>
+
         <div class="mb-6">
             <div class="flex justify-between text-sm mb-1">
                 <span>Progress</span>
@@ -25,83 +26,89 @@
             </div>
         </div>
 
-        <h2 class="font-semibold text-md mb-3">
-            Daftar Materi
-        </h2>
+        <h2 class="font-semibold text-sm lg:text-md mb-3">Daftar Materi</h2>
 
         <div id="daftarMateri" class="space-y-2 text-sm"></div>
 
     </aside>
 
+    <!-- MAIN -->
+    <main class="order-1 lg:order-2 flex-1 p-4 sm:p-6 lg:p-8">
 
-    <!-- HALAMAN KUIS -->
-    <main class="flex-1 p-8">
+        <!-- MOBILE TITLE -->
+        <div class="lg:hidden mb-4">
+            <h1 class="text-xl font-bold text-gray-800">Kuis</h1>
+        </div>
 
-        <!-- BUTTON KEMBALI -->
+        <!-- BUTTON BACK -->
         <a href="/lanjutkan-materi/{{ $materiId }}"
         class="inline-flex items-center gap-2 text-gray-600 hover:text-red-500 mb-6 transition">
             <i class="fas fa-times text-lg"></i>
             <span>Kembali</span>
         </a>
 
-        <div id="quizHeader" class="text-center mt-10">
-            <div class="flex justify-between items-center mb-3 text-sm text-gray-600 font-medium">
+        <!-- HEADER QUIZ -->
+        <div id="quizHeader">
+
+            <div class="flex justify-between items-center mb-3 text-xl text-black font-bold">
+
                 <div>
                     Soal 
-                    <span id="nomorSoal" class="text-gray-900 font-semibold">1</span> 
+                    <span id="nomorSoal" class="text-gray-900 font-bold">0</span> 
                     dari 
-                    <span id="totalSoal" class="text-gray-900 font-semibold">0</span>
+                    <span id="totalSoal" class="text-gray-900 font-bold">0</span>
                 </div>
-                
-                <div class="flex items-center gap-2 bg-gray-100 text-gray-800 px-4 py-1.5 rounded-full font-semibold border">
-                    <i class="fa-solid fa-clock"></i>
+
+                <div class="flex items-center gap-2 text-sm bg-gray-100 rounded-full px-2 py-1">
+                    <i class="fa-solid fa-clock text-gray-500"></i>
                     <span id="timer">00:00</span>
                 </div>
-                
+
             </div>
-            
-            <!-- PROGRESS BAR -->
-            <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
+
+            <!-- PROGRESS -->
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
                 <div id="progressSoal" class="bg-blue-500 h-2 rounded-full" style="width:0%"></div>
             </div>
-        </div>
 
-
-        <!-- CARD SOAL -->
-        <div id="cardSoal" class="bg-white border rounded-xl p-6"></div>
-
-        <div id="hasilContainer" class="hidden text-center mt-10"></div>
-
-        <div id="modalKonfirmasi" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
-
-            <!-- BOX POPUP -->
-            <div id="modalBox" class="bg-white rounded-xl p-6 w-80 text-center border-2 border-blue-500">
-
-                <h2 class="text-lg font-semibold mb-6">
-                    Apakah anda sudah yakin ?
-                </h2>
-
-                <div class="flex justify-center gap-4">
-                    
-                    <button onclick="konfirmasiSubmit()"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
-                        Ya
-                    </button>
-
-                    <button onclick="tutupModal()"
-                        class="bg-gray-300 hover:bg-gray-400 text-white px-6 py-2 rounded-lg">
-                        Tidak
-                    </button>
-
-                </div>
-
+            <div class="mb-8 text-right">
+                <span id="poinSoal" class="text-sm text-blue-600 font-medium bg-blue-100 rounded-full px-2 py-1">
+                    Poin : 0
+                </span>
             </div>
 
         </div>
+
+        <!-- CARD SOAL -->
+        <div id="cardSoal" class="bg-white border rounded-xl p-4 sm:p-6"></div>
+
+        <!-- HASIL -->
+        <div id="hasilContainer" class="hidden text-center mt-10"></div>
+
     </main>
 
 </div>
 
+<!-- MODAL -->
+<div id="modalKonfirmasi" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
+    <div id="modalBox" class="bg-white rounded-xl p-6 w-80 text-center border-2 border-blue-500">
+        <h2 class="text-lg font-semibold mb-6">
+            Apakah anda sudah yakin ?
+        </h2>
+
+        <div class="flex justify-center gap-4">
+            <button onclick="konfirmasiSubmit()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+                Ya
+            </button>
+
+            <button onclick="tutupModal()"
+                class="bg-gray-300 hover:bg-gray-400 text-white px-6 py-2 rounded-lg">
+                Tidak
+            </button>
+        </div>
+    </div>
+</div>
 
 <script>
 let materiId = "{{ $materiId }}";
@@ -130,33 +137,22 @@ document.addEventListener("DOMContentLoaded", function(){
 });
 
 async function loadSidebarMateri(){
-
     try{
-
         const response = await axios.get('/api/materi-lanjutkan/' + materiId);
         const data = response.data.data;
 
-        // progress bar
-        document.getElementById("progressText").innerText =
-            data.progress_percent + "%";
-
-        document.getElementById("progressBar").style.width =
-            data.progress_percent + "%";
+        document.getElementById("progressText").innerText = data.progress_percent + "%";
+        document.getElementById("progressBar").style.width = data.progress_percent + "%";
 
         renderSidebar(data.steps, data.urutan_selesai);
 
     }catch(error){
-
-        console.error("Error load sidebar", error);
-
+        console.error(error);
     }
-
 }
 
 function renderSidebar(steps, urutanSelesai){
-
     const container = document.getElementById("daftarMateri");
-
     container.innerHTML = "";
 
     steps.forEach(step => {
@@ -165,7 +161,7 @@ function renderSidebar(steps, urutanSelesai){
         let icon = "fa-lock text-gray-400";
         let classItem = "text-gray-500";
 
-        if(step.urutan <= urutanSelesai){   
+        if(step.urutan <= urutanSelesai){
             status = "selesai";
             icon = "fa-circle-check text-green-500";
             classItem = "";
@@ -177,32 +173,24 @@ function renderSidebar(steps, urutanSelesai){
         }
 
         if(status !== "lock"){
-
             container.innerHTML += `
-            <a href="/lanjutkan-materi/${materiId}"
+            <a href="/lanjutkan-materi/${materiId}?step=${step.urutan}"
             class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 ${classItem}">
                 <i class="fa-solid ${icon}"></i>
                 <span>${step.judul}</span>
-            </a>
-            `;
-
+            </a>`;
         }else{
-
             container.innerHTML += `
             <div class="flex items-center gap-3 p-3 rounded-lg text-gray-500">
                 <i class="fa-solid ${icon}"></i>
                 <span>${step.judul}</span>
-            </div>
-            `;
-
+            </div>`;
         }
 
     });
-
 }
 
 async function loadSoal(){
-
     const response = await axios.get('/api/post-test-soal/' + materiId);
 
     soalList = response.data.data.soals;
@@ -211,7 +199,7 @@ async function loadSoal(){
 
     startTimer();
     document.getElementById("totalSoal").innerText = totalQuestion;
-    
+
     renderSoal();
 }
 
@@ -228,10 +216,11 @@ function renderSoal(){
     }
 
     document.getElementById("nomorSoal").innerText = currentQuestion + 1;
-    
+    document.getElementById("poinSoal").innerText = "Poin : " + soal.poin;
+
     let progress = ((currentQuestion + 1) / totalQuestion) * 100;
     document.getElementById("progressSoal").style.width = progress + "%";
-    
+
     const pilihan = [
         soal.pilihan_1,
         soal.pilihan_2,
@@ -242,57 +231,45 @@ function renderSoal(){
 
     if(currentQuestion < totalQuestion - 1){
         tombolHTML = `
-            <div class="flex justify-end mt-8">
-                <button onclick="nextSoal()"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
-                    Selanjutnya
-                </button>
-            </div>
-        `;
-
+        <div class="flex justify-end mt-8">
+            <button onclick="nextSoal()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+                Selanjutnya
+            </button>
+        </div>`;
     }else{
-
         tombolHTML = `
-            <div class="flex justify-center mt-8">
-                <button onclick="bukaModal()"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-lg">
-                    Kirim
-                </button>
-            </div>
-        `;
-
+        <div class="flex justify-center mt-8">
+            <button onclick="bukaModal()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-lg">
+                Kirim
+            </button>
+        </div>`;
     }
 
     pilihan.forEach((p, index) => {
-
         if(p){
-
             pilihanHTML += `
-            <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+            <label class="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
                 <input type="${soal.status_pilihan ? 'checkbox' : 'radio'}"
                 name="soal"
                 value="${index+1}"
-                class="w-4 h-4">
+                class="mt-1 w-4 h-4">
                 <span>${p}</span>
-            </label>
-            `;
-
+            </label>`;
         }
-
     });
 
     document.getElementById("cardSoal").innerHTML = `
-        <div class="flex justify-between items-start mb-6">
-            <h2 class="text-xl font-semibold leading-relaxed max-w-xl">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-6">
+            <h2 class="text-lg sm:text-xl font-semibold leading-relaxed sm:max-w-xl">
                 ${soal.soal}
             </h2>
 
-            <span class="flex item-center text-sm gap-3 bg-blue-100 text-blue-600 font-medium px-4 py-1.5 rounded-full">
-                Poin: ${soal.poin}
-            </span>
+            
         </div>
 
-        <div class="space-y-4">
+        <div class="space-y-3 sm:space-y-4">
             ${pilihanHTML}
         </div>
 
@@ -538,7 +515,6 @@ async function mulaiUlangKuis(){
 
     }
 }
-
-
 </script>
+
 @endsection
