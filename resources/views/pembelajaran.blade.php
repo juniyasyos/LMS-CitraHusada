@@ -6,7 +6,7 @@
 
     <!-- SIDEBAR -->
     <aside id="sidebar"
-        class="fixed lg:static z-40 top-0 left-0 w-64 h-full bg-white border-r
+        class="fixed lg:static z-40 top-0 left-0 w-64 min-h-screen bg-white border-r
         transform -translate-x-full lg:translate-x-0
         transition-transform duration-200">
 
