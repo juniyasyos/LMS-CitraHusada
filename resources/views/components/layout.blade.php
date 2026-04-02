@@ -87,6 +87,78 @@
     }
 
     </script>
+
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+    <script>
+    function quizApp() {
+        return {
+            welcomeOpen: false,
+            open: false,
+            confirmOpen: false,
+
+            soalKe: 1,
+            totalSoal: 10,
+            jawaban: null,
+
+            currentMsg: 0,
+            messages: [
+                { title: "Santai aja, baca pelan-pelan.", desc: "Kamu pasti bisa jawab." },
+                    { title: "Tidak perlu buru-buru.", desc: "Fokus satu soal dulu." },
+                    { title: "Kamu sudah belajar,", desc: "sekarang tinggal tunjukin aja." },
+                    { title: "Percaya sama jawabanmu.", desc: "Kamu lebih paham dari yang kamu kira" },
+                    { title: "Kalau ragu, tarik napas dulu.", desc: "Lalu coba lagi pelan-pelan." },
+                    { title: "Sedikit lagi selesai.", desc: "Tetap fokus ya!" },
+                    { title: "Tidak harus sempurna,", desc: "yang penting kamu mencoba." },
+                    { title: "Kerjakan dengan tenang.", desc: "Jawab yang kamu yakin dulu." },
+                    { title: "Satu soal demi satu soal.", desc: "Kamu pasti sampai akhir." },
+                    { title: "Kamu sudah sampai di sini,", desc: "itu artinya kamu siap." },
+                    { title: "Tidak apa-apa kalau ragu,", desc: "yang penting tetap lanjut." },
+                    { title: "Fokus,", desc: "kamu lagi on track." },
+                    { title: "Jawab saja yang menurutmu paling benar.", desc: "Ikuti instingmu." },
+                    { title: "Kamu tidak sendirian,", desc: "banyak yang juga berproses seperti kamu." },
+                    { title: "Sedikit lagi, kamu hampir selesai.", desc: "Tetap semangat!" }
+            ],
+
+            init() {
+                this.welcomeOpen = true
+                setTimeout(() => this.welcomeOpen = false, 2000)
+
+                this.$watch('soalKe', (v) => {
+                    if (v % 3 === 0 && v !== this.totalSoal) {
+                        this.currentMsg = Math.floor(Math.random() * this.messages.length)
+                        this.showPopup()
+                    }
+                })
+            },
+
+            showPopup() {
+                this.open = true
+                setTimeout(() => this.open = false, 2000)
+            },
+
+            closePopup() {
+                this.open = false
+            },
+
+            handleButton() {
+                if (this.soalKe < this.totalSoal) {
+                    this.soalKe++
+                    this.jawaban = null
+                } else {
+                    this.confirmOpen = true
+                }
+            },
+
+            submitQuiz() {
+                this.confirmOpen = false
+                setTimeout(() => {
+                    window.location.href = "/hasil-kuis"
+                }, 300)
+            }
+        }
+    }
+    </script>
     
     @yield('content')
 </body>

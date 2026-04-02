@@ -30,6 +30,10 @@ Route::get('/detail-materi', function () {
     return view('detail-materi');
 });
 
+Route::get('/awal-submateri', function () {
+    return view('dummy-awal-submateri');
+});
+
 Route::get('/lanjutkan-materi', function () {
     return view('lanjutkan-materi');
 });
@@ -41,14 +45,18 @@ Route::get('/dummy-lanjutkan-materi-ver-ppt', function () {
     return view('dummy-lanjutkan-materi-ppt');
 });
 
+Route::get('/akhir-submateri', function () {
+    return view('dummy-akhir-submateri');
+});
+
 Route::get('/final-kuis', function () {
     return view('materi-kuis');
 });
 
-Route::get('/final-kuis-akhir', function () {
-    return view('materi-kuis-akhir');
-});
-
 Route::get('/hasil-kuis', function () {
     return view('hasil-kuis');
+});
+
+Route::get('/dummy-hasil-kuis-gagal', function () {
+    return view('hasil-kuis-gagal');
 });
