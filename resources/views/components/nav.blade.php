@@ -1,7 +1,7 @@
-<!-- SIDEBAR -->
-<aside class="w-64 bg-white shadow-md">
+<!-- NAV CONTAINER -->
+<div class="w-full h-full flex flex-col bg-white shadow-md">
     {{-- Logo + Title --}}
-    <div class="p-1 border-b border-grey-200">
+    <div class="p-1 border-b border-gray-200 shrink-0">
         <div class="flex items-center gap-1 mb-6 mt-6">
         <img src="{{ asset('images/logo-lms.png') }}" alt="Logo" class="w-12 h-12">
             <div>
@@ -11,8 +11,7 @@
         </div>
     </div>
     
-
-    <nav class="p-4 space-y-2">
+    <nav class="p-4 space-y-2 flex-grow overflow-y-auto">
         <a href="pembelajaran" class="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-600 rounded-lg">
             <i class="fa-solid fa-book"></i>
             Pembelajaran Saya
@@ -75,18 +74,16 @@
             </div>
 
         </div>
+
+        <div class="pt-2">
+            <a href="#" onclick="handleLogout(event)"
+            class="flex items-center gap-2 px-4 py-2 text-red-600 rounded-lg hover:bg-gray-100 transition duration-200">
+                <i class="fa-solid fa-arrow-left"></i>
+                Keluar
+            </a>
+        </div>
     </nav>
-
-    <div class="p-4 border-t border-gray-200">
-        <a href="#" onclick="handleLogout(event)"
-        class="flex items-center gap-2 text-red-600 
-                hover:text-red-800 transition duration-200">
-            <i class="fa-solid fa-arrow-left"></i>
-            Keluar
-        </a>
-    </div>
-
-</aside>
+</div>
 <script>
 document.addEventListener("DOMContentLoaded", loadUserProfile);
 

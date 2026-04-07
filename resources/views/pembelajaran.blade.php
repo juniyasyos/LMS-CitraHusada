@@ -5,9 +5,9 @@
 <div class="flex min-h-screen bg-gray-100">
     <!-- SIDEBAR -->
     <aside id="sidebar"
-        class="fixed lg:static z-40 top-0 left-0 w-64 h-full bg-white border-r
+        class="fixed lg:sticky z-40 top-0 left-0 w-64 h-screen bg-white border-r
         transform -translate-x-full lg:translate-x-0
-        transition-transform duration-200">
+        transition-transform duration-200 flex flex-col">
 
         @include('components.nav')
 
