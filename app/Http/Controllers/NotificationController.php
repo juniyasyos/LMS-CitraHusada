@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+// use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Notification;
 
@@ -16,12 +16,14 @@ class NotificationController extends Controller
         $user = Auth::user();
 
         $notifications = Notification::where('user_id', $user->user_id)
-            ->latest()
+            ->orderBy('is_read', 'asc')
+            ->orderBy('created_at', 'desc')
             ->get();
 
         return response()->json([
             'success' => true,
-            'data' => $notifications
+            'data' => $notifications,
+            'total_all' => $notifications->count()
         ]);
     }
 
@@ -34,12 +36,15 @@ class NotificationController extends Controller
 
         $notifications = Notification::where('user_id', $user->user_id)
             ->where('is_read', false)
-            ->latest()
+            ->orderBy('created_at', 'desc')
             ->get();
+
+        $totalAll = Notification::where('user_id', $user->user_id)->count();
 
         return response()->json([
             'success' => true,
-            'data' => $notifications
+            'data' => $notifications,
+            'total_all' => $totalAll
         ]);
     }
 

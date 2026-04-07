@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -46,9 +47,10 @@ class AuthController extends Controller
                 'password' => 'required|string',
             ]);
 
-            // Debug: find user to see if they exist
+            $remember = $request->boolean('remember'); // 🔥 ini pengganti remember_token
+
             $user = \App\Models\User::where('nik', $credentials['nik'])->first();
-            
+
             if (!$user) {
                 return response()->json([
                     'success' => false,
@@ -57,25 +59,36 @@ class AuthController extends Controller
                 ], 401);
             }
 
-            if (Auth::attempt($credentials)) {
-                // Session akan ter-set otomatis oleh Auth::attempt()
-                $user = Auth::user();
-                
+            if (!\Illuminate\Support\Facades\Hash::check($credentials['password'], $user->password)) {
                 return response()->json([
-                    'success' => true,
-                    'message' => 'Login berhasil',
-                    'data' => [
-                        'user' => $user,
-                        'redirect' => '/pembelajaran'
-                    ]
-                ], 200);
+                    'success' => false,
+                    'message' => 'Password salah untuk user dengan NIK ini',
+                    'data' => null
+                ], 401);
             }
 
+            // 🔥 Hapus token lama (optional)
+            $user->tokens()->delete();
+
+            // 🔥 Buat token baru
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            // 🔥 Atur expiry logic manual (simulasi "remember me")
+            $expires_at = $remember 
+                ? now()->addDays(30)   // ingat saya → 30 hari
+                : now()->addHours(2);  // tidak → 2 jam
+
             return response()->json([
-                'success' => false,
-                'message' => 'Password salah untuk user dengan NIK ini',
-                'data' => null
-            ], 401);
+                'success' => true,
+                'message' => 'Login berhasil',
+                'data' => [
+                    'user' => $user,
+                    'token' => $token,
+                    'expires_at' => $expires_at,
+                    'redirect' => '/pembelajaran'
+                ]
+            ], 200);
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -97,10 +110,11 @@ class AuthController extends Controller
     public function logoutApi(Request $request)
     {
         try {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
+            // Auth::logout();
+            // $request->session()->invalidate();
+            // $request->session()->regenerateToken(); // Dihapus karena murni REST API Token
+            $request->user()->currentAccessToken()->delete();
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Logout berhasil',

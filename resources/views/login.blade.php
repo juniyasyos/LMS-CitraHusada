@@ -84,7 +84,7 @@
             {{-- Remember me --}}
             <div class="flex items-center gap-2">
                 <input type="checkbox" id="rememberInput" name="remember" class="w-4 h-4 text-blue-600 rounded">
-                <label for="rememberInput" class="text-sm text-gray-600">Ingat saya</label>
+                <label id="remember" for="rememberInput" class="text-sm text-gray-600">Ingat saya</label>
             </div>
 
             {{-- Button submit --}}
@@ -134,33 +134,24 @@ async function handleLogin(event) {
         console.log('Step 3: Login response received:', response.data);
 
         if (response.data.success) {
-            // Login berhasil, wait a moment untuk session di-set
-            console.log('Step 4: Login successful, waiting 500ms...');
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            // Verify session dengan check-auth endpoint
-            console.log('Step 5: Checking auth status...');
-            const authCheck = await window.axios.get('/api/check-auth');
-            console.log('Step 6: Auth check response:', authCheck.data);
-            
-            if (authCheck.data.success) {
-                // Session verified, redirect ke dashboard
-                console.log('Step 7: Auth verified, redirecting to:', response.data.data.redirect);
-                errorContainer.classList.add('hidden');
-                
-                // Ensure redirect URL exists
-                if (!response.data.data.redirect) {
-                    throw new Error('No redirect URL in response!');
-                }
-                
-                window.location.href = response.data.data.redirect;
+            console.log('Step 4: Login successful');
+
+            const token = response.data.data.token;
+            const remember = document.getElementById('rememberInput').checked;
+
+            // ✅ SIMPAN TOKEN
+            if (remember) {
+                localStorage.setItem('token', token);
             } else {
-                // Session tidak ter-set, tampilkan error
-                console.log('Step 6b: Auth check failed');
-                errorContainer.textContent = 'Session tidak ter-set. Silakan coba lagi. [' + authCheck.data.message + ']';
-                errorContainer.classList.remove('hidden');
+                sessionStorage.setItem('token', token);
             }
-        } else {
+
+            console.log('Token saved:', token);
+
+            // ✅ LANGSUNG REDIRECT (tidak perlu check-auth)
+            window.location.href = response.data.data.redirect;
+        }
+        else {
             // Login gagal
             console.log('Step 3b: Login failed:', response.data.message);
             errorContainer.textContent = response.data.message;

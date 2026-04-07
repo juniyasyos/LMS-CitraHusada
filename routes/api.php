@@ -22,14 +22,16 @@ use App\Http\Controllers\NotificationController;
 
 // Public API routes
 Route::post('/login', [AuthController::class, 'loginApi']);
-Route::post('/logout', [AuthController::class, 'logoutApi'])->middleware('auth');
+Route::post('/logout', [AuthController::class, 'logoutApi'])->middleware('auth:sanctum');
+// Route::post('/logout', [AuthController::class, 'logoutApi'])->middleware('auth');
 Route::get('/check-auth', function (Request $request) {
     if (Auth::check()) {
         return response()->json([
             'success' => true,
             'message' => 'User sudah ter-login',
             'data' => [
-                'user' => Auth::user()
+                'user' => $request->user()
+                // 'user' => Auth::user()
             ]
         ], 200);
     }
@@ -56,25 +58,25 @@ Route::get('/debug-users', function () {
 });
 
 //Pembelajaran API routes
-Route::middleware('auth')->get('/profile', [PembelajaranController::class, 'getProfile']);
-Route::middleware('auth')->get('/materi-user', [MateriUserController::class, 'index']);
+Route::middleware('auth:sanctum')->get('/profile', [PembelajaranController::class, 'getProfile']);
+Route::middleware('auth:sanctum')->get('/materi-user', [MateriUserController::class, 'index']);
 //detai-materi API route
-Route::middleware('auth')->get('/materi-user/{id}', [MateriUserController::class, 'show']);
+Route::middleware('auth:sanctum')->get('/materi-user/{id}', [MateriUserController::class, 'show']);
 //lanjutkan-materi API route
-Route::middleware('auth')->get('/materi-lanjutkan/{id}', [MateriUserController::class, 'lanjutkan']);
+Route::middleware('auth:sanctum')->get('/materi-lanjutkan/{id}', [MateriUserController::class, 'lanjutkan']);
 //post test API route
-// Route::middleware('auth')->get('/post-test/{materiId}', [MateriUserController::class, 'getPostTest']);
-Route::middleware('auth')->get('/post-test-soal/{materiId}', [MateriUserController::class, 'getSoalPostTest']);
+// Route::middleware('auth:sanctum')->get('/post-test/{materiId}', [MateriUserController::class, 'getPostTest']);
+Route::middleware('auth:sanctum')->get('/post-test-soal/{materiId}', [MateriUserController::class, 'getSoalPostTest']);
 //submit post test API route
-Route::middleware('auth')->post('/post-test-submit', [MateriUserController::class, 'submitPostTest']);
+Route::middleware('auth:sanctum')->post('/post-test-submit', [MateriUserController::class, 'submitPostTest']);
 //update post test API route
-Route::middleware('auth')->post('/post-test-start', [MateriUserController::class, 'startPostTest']);
+Route::middleware('auth:sanctum')->post('/post-test-start', [MateriUserController::class, 'startPostTest']);
 //update progress API route
-Route::post('/progress/update', [MateriUserController::class, 'updateProgress']);
+Route::middleware('auth:sanctum')->post('/progress/update', [MateriUserController::class, 'updateProgress']);
 
 
 //Notification API routes
-Route::middleware('auth')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::get('/notifications/unread', [NotificationController::class, 'unread']);

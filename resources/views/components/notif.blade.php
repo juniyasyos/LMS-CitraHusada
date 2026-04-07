@@ -44,15 +44,14 @@
 
             <!-- Kalau kosong -->
             <div x-show="notifications.length === 0" class="text-center text-gray-400 text-sm">
-                Tidak ada notifikasi
+                Tidak ada notifikasi terbaru
             </div>
 
         </div>
 
         <!-- FOOTER -->
-        <div class="mt-4 text-center">
-            <button class="text-blue-600 text-sm hover:underline">
-                Lihat semua notifikasi
+        <div class="mt-4 text-center" x-show="totalAll > 0">
+            <button @click="toggleShowAll()" class="text-blue-600 text-sm hover:underline" x-text="showAll ? 'Sembunyikan' : 'Lihat semua notifikasi'">
             </button>
         </div>
 
@@ -65,14 +64,23 @@ function notifComponent() {
         openNotif: false,
         notifications: [],
         unreadCount: 0,
+        totalAll: 0,
+        showAll: false,
 
         async fetchNotifications() {
             try {
-                const res = await axios.get('/api/notifications');
+                const endpoint = this.showAll ? '/api/notifications' : '/api/notifications/unread';
+                const res = await axios.get(endpoint);
                 this.notifications = res.data.data;
+                this.totalAll = res.data.total_all;
             } catch (e) {
                 console.error('Gagal ambil notif', e);
             }
+        },
+
+        toggleShowAll() {
+            this.showAll = !this.showAll;
+            this.fetchNotifications();
         },
 
         async fetchUnreadCount() {
@@ -95,7 +103,9 @@ function notifComponent() {
         },
 
         init() {
-            this.fetchNotifications();
+            this.unreadCount = 0; // Inisialisasi awal
+            // Tidak perlu panggil secara default karena akan dipanggil ketika popover terbuka, 
+            // ATAU panggil count saja untuk nampilin red dot.
             this.fetchUnreadCount();
         }
     }

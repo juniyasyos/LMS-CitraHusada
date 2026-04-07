@@ -1,0 +1,141 @@
+[
+    {
+        "materi_id": 1,
+        "judul": "Materi 1",
+        "subjudul": "testing sub judul 1",
+        "deskripsi": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
+        "image_path": "materi\/cover\/Cover Materi 1.jpg",
+        "tanggal_upload": "2026-03-08",
+        "tanggal_selesai": "2026-03-10",
+        "jam_pelajaran": 3,
+        "created_at": "2026-03-08T10:56:14.000000Z",
+        "updated_at": "2026-03-09T10:56:14.000000Z",
+        "sub_materis": [
+            {
+                "sub_materi_id": 1,
+                "materi_id": 1,
+                "judul": "sub judul 1",
+                "deskripsi": "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\"",
+                "file_materi": "materi\/PDF\/materi1.pdf",
+                "urutan_sub_materi": 1,
+                "created_at": "2026-03-08T11:01:23.000000Z",
+                "updated_at": "2026-03-08T11:01:23.000000Z"
+            },
+            {
+                "sub_materi_id": 2,
+                "materi_id": 1,
+                "judul": "sub judul 2 (update)",
+                "deskripsi": "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\"",
+                "file_materi": "materi\/PDF\/materi2.pdf",
+                "urutan_sub_materi": 2,
+                "created_at": "2026-03-08T11:01:23.000000Z",
+                "updated_at": "2026-03-08T11:01:23.000000Z"
+            },
+            {
+                "sub_materi_id": 3,
+                "materi_id": 1,
+                "judul": "sub judul 3",
+                "deskripsi": "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\"",
+                "file_materi": "materi\/Video\/contoh.mp4",
+                "urutan_sub_materi": 3,
+                "created_at": "2026-03-08T11:01:23.000000Z",
+                "updated_at": "2026-03-08T11:01:23.000000Z"
+            }
+        ],
+        "post_tests": [
+            {
+                "post_test_id": 1,
+                "materi_id": 1,
+                "urutan_post_test": 4,
+                "waktu_pengerjaan": 600,
+                "ulang_post_test": 100,
+                "created_at": "2026-03-08T11:03:50.000000Z",
+                "updated_at": "2026-03-08T11:03:50.000000Z"
+            }
+        ]
+    },
+    {
+        "materi_id": 2,
+        "judul": "materi 2",
+        "subjudul": "test materi 2",
+        "deskripsi": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
+        "image_path": "materi\/cover\/materi 2.png",
+        "tanggal_upload": "2026-03-08",
+        "tanggal_selesai": "2026-03-11",
+        "jam_pelajaran": 2,
+        "created_at": "2026-03-08T12:46:44.000000Z",
+        "updated_at": "2026-03-08T12:46:44.000000Z",
+        "sub_materis": [
+            {
+                "sub_materi_id": 4,
+                "materi_id": 2,
+                "judul": "sub materi 2",
+                "deskripsi": "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\"",
+                "file_materi": "materi\/PDF\/materi1.pdf",
+                "urutan_sub_materi": 1,
+                "created_at": null,
+                "updated_at": null
+            },
+            {
+                "sub_materi_id": 6,
+                "materi_id": 2,
+                "judul": "sub materi 2.1",
+                "deskripsi": "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\"",
+                "file_materi": "materi\/PDF\/materi1.pdf",
+                "urutan_sub_materi": 2,
+                "created_at": null,
+                "updated_at": null
+            }
+        ],
+        "post_tests": [
+            {
+                "post_test_id": 2,
+                "materi_id": 2,
+                "urutan_post_test": 3,
+                "waktu_pengerjaan": 60,
+                "ulang_post_test": 5,
+                "created_at": "2026-03-10T13:35:36.000000Z",
+                "updated_at": "2026-03-10T13:35:36.000000Z"
+            }
+        ]
+    },
+    {
+        "materi_id": 3,
+        "judul": "materi 3",
+        "subjudul": "subjudul 3",
+        "deskripsi": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
+        "image_path": "materi\/cover\/materi_3.png",
+        "tanggal_upload": "2026-03-08",
+        "tanggal_selesai": "2026-03-13",
+        "jam_pelajaran": 2,
+        "created_at": "2026-03-08T13:15:50.000000Z",
+        "updated_at": "2026-03-08T13:15:50.000000Z",
+        "sub_materis": [
+            {
+                "sub_materi_id": 5,
+                "materi_id": 3,
+                "judul": "sub materi 3",
+                "deskripsi": "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\"",
+                "file_materi": "materi\/PDF\/materi1.pdf",
+                "urutan_sub_materi": 1,
+                "created_at": null,
+                "updated_at": null
+            }
+        ],
+        "post_tests": []
+    },
+    {
+        "materi_id": 4,
+        "judul": "materi 4",
+        "subjudul": "subjudul 34",
+        "deskripsi": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
+        "image_path": "materi\/cover\/test ukuran.png",
+        "tanggal_upload": "2026-03-08",
+        "tanggal_selesai": "2026-03-13",
+        "jam_pelajaran": 4,
+        "created_at": "2026-03-08T13:15:50.000000Z",
+        "updated_at": "2026-03-08T13:15:50.000000Z",
+        "sub_materis": [],
+        "post_tests": []
+    }
+]

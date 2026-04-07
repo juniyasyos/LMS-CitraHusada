@@ -41,6 +41,17 @@
 
 </div>
 
+<!-- TOAST ALERT KUNCI -->
+<div id="lockedAlert" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-white border-l-4 border-red-500 text-gray-800 px-6 py-4 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center gap-4 transition-all duration-300 opacity-0 -translate-y-10 pointer-events-none min-w-[320px]">
+    <div class="bg-red-50 text-red-500 rounded-full w-10 h-10 flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-lock text-lg"></i>
+    </div>
+    <div>
+        <h4 class="font-bold text-sm sm:text-base text-gray-900">Akses Terkunci</h4>
+        <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Selesaikan materi sebelumnya terlebih dahulu!</p>
+    </div>
+</div>
+
 <script>
 const materiId = window.location.pathname.split('/').pop();
 
@@ -60,40 +71,60 @@ async function loadDetailMateri() {
         document.getElementById("jamPelajaran").innerText =
             materi.jam_pelajaran + " JPL";
 
-        renderSteps(materi.steps, materi.urutan_selesai);
+        renderSteps(materi.steps, materi.urutan_selesai, materi.status);
 
     } catch (error) {
         console.error("Error load detail", error);
     }
 }
 
-function renderSteps(steps, urutanSelesai) {
+function renderSteps(steps, urutanSelesai, materiStatus) {
 
     const container = document.getElementById("listMateri");
-
-    container.innerHTML = `
-        <h2 class="text-lg sm:text-xl font-semibold mb-4">
-            Materi
-        </h2>
-    `;
+    container.innerHTML = `<h2 class="text-lg font-semibold mb-4">Materi</h2>`;
 
     steps.forEach(step => {
-
-        let status = "Belum";
+        let statusText = "Terkunci";
         let warna = "bg-gray-400";
+        let icon = "fa-lock text-gray-400";
+        let isLocked = true;
 
         if (step.urutan <= urutanSelesai) {
-            status = "Selesai";
-            warna = "bg-green-500";
+            // Logika khusus untuk Kuis yang sudah dikerjakan tapi nilainya kecil
+            if (step.type === 'post_test' && step.skor < 75) {
+                statusText = `Skor: ${step.skor} (Remidi)`;
+                warna = "bg-orange-500"; // Warna orange sebagai penanda perlu perbaikan
+                icon = "fa-circle-exclamation text-orange-500";
+            } else {
+                statusText = step.type === 'post_test' ? `Skor: ${step.skor}` : "Selesai";
+                warna = "bg-green-500";
+                icon = "fa-circle-check text-green-500";
+            }
+            isLocked = false;
+        } else if (step.urutan === urutanSelesai + 1) {
+            statusText = "Buka";
+            warna = "bg-blue-500";
+            icon = "fa-play text-blue-500";
+            isLocked = false;
         }
 
+        if (materiStatus === "Sesi Berakhir") {
+            statusText = "Ditutup";
+            warna = "bg-red-500";
+            icon = "fa-ban text-red-100";
+            isLocked = true;
+        }
+
+        let onclickAction = isLocked ? `onclick="showLockedAlert()"` : `onclick="goToStep(${step.urutan})"`;
+        let cursorStyle = isLocked && materiStatus === "Sesi Berakhir" ? "cursor-not-allowed opacity-50 bg-red-50" : (isLocked ? "cursor-not-allowed opacity-75" : "cursor-pointer hover:bg-gray-50");
+
         container.innerHTML += `
-        <div onclick="goToStep(${step.urutan})"
-            class="flex items-center justify-between p-4 sm:p-5 border rounded-xl hover:bg-gray-50 transition cursor-pointer">
+        <div ${onclickAction}
+            class="flex items-center justify-between p-4 sm:p-5 border rounded-xl transition ${cursorStyle}">
 
             <!-- LEFT -->
             <div class="flex items-center gap-3 sm:gap-4">
-                <i class="fa-solid fa-file-lines text-blue-500 text-xl sm:text-2xl"></i>
+                <i class="fa-solid ${icon} text-xl sm:text-2xl"></i>
 
                 <div>
                     <p class="font-medium text-sm sm:text-base">
@@ -103,53 +134,8 @@ function renderSteps(steps, urutanSelesai) {
             </div>
 
             <!-- STATUS -->
-            <span class="text-white ${warna} px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm">
-                ${status}
-            </span>
-
-        </div>
-        `;
-    });
-}
-
-function renderSteps(steps, urutanSelesai) {
-
-    const container = document.getElementById("listMateri");
-
-    container.innerHTML = `
-        <h2 class="text-lg sm:text-xl font-semibold mb-4">
-            Materi
-        </h2>
-    `;
-
-    steps.forEach(step => {
-
-        let status = "Belum";
-        let warna = "bg-gray-400";
-
-        if (step.urutan <= urutanSelesai) {
-            status = "Selesai";
-            warna = "bg-green-500";
-        }
-
-        container.innerHTML += `
-        <div onclick="goToStep(${step.urutan})"
-            class="flex items-center justify-between p-4 sm:p-5 border rounded-xl hover:bg-gray-50 transition cursor-pointer">
-
-            <!-- LEFT -->
-            <div class="flex items-center gap-3 sm:gap-4">
-                <i class="fa-solid fa-file-lines text-blue-500 text-xl sm:text-2xl"></i>
-
-                <div>
-                    <p class="font-medium text-sm sm:text-base">
-                        ${step.judul}
-                    </p>
-                </div>
-            </div>
-
-            <!-- STATUS -->
-            <span class="text-white ${warna} px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm">
-                ${status}
+            <span class="text-white ${warna} px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm shadow-sm">
+                ${statusText}
             </span>
 
         </div>
@@ -159,6 +145,22 @@ function renderSteps(steps, urutanSelesai) {
 
 function goToStep(step){
     window.location.href = "/lanjutkan-materi/" + materiId + "?step=" + step;
+}
+
+let alertTimeout;
+function showLockedAlert() {
+    const alertBox = document.getElementById('lockedAlert');
+    
+    // Reset any existing timeout so it doesn't hide early if clicked multiple times
+    if(alertTimeout) clearTimeout(alertTimeout);
+    
+    alertBox.classList.remove('opacity-0', '-translate-y-10', 'pointer-events-none');
+    alertBox.classList.add('opacity-100', 'translate-y-0');
+
+    alertTimeout = setTimeout(() => {
+        alertBox.classList.remove('opacity-100', 'translate-y-0');
+        alertBox.classList.add('opacity-0', '-translate-y-10', 'pointer-events-none');
+    }, 3000);
 }
 </script>
 @endsection

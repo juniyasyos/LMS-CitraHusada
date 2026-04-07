@@ -32,49 +32,7 @@
             Daftar Materi
         </h2>
 
-        <div id="daftarMateri" class="space-y-2 text-sm">
-
-            {{-- <!-- SUB MATERI SELESAI -->
-            <a href=""
-            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100">
-                <i class="fa-solid fa-circle-check text-green-500"></i>
-                <span>Introduction</span>
-            </a>
-
-            <!-- SUB MATERI AKTIF -->
-            <a href="/lanjutkan-materi"
-            class="flex items-center gap-3 p-3 rounded-lg bg-blue-100 text-blue-600 font-medium">
-                <i class="fa-solid fa-play text-blue-500"></i>
-                <span>Konsep Keselamatan Pasien</span>
-            </a>
-
-            <!-- SUB MATERI TERKUNCI -->
-            <a href="/dummy-lanjutkan-materi-ver-ppt"
-            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 text-gray-500">
-                <i class="fa-solid fa-lock text-gray-400"></i>
-                <span>Standar Pelayanan Rumah Sakit</span>
-            </a>
-
-            <a href="#"
-            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 text-gray-500">
-                <i class="fa-solid fa-lock text-gray-400"></i>
-                <span>Studi Kasus</span>
-            </a>
-
-            <a href="#"
-            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 text-gray-500">
-                <i class="fa-solid fa-lock text-gray-400"></i>
-                <span>Kesimpulan</span>
-            </a>
-
-            <!-- FINAL KUIS -->
-            <a href="/final-kuis"
-            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 text-gray-500 font-medium">
-                <i class="fa-solid fa-lock text-gray-400"></i>
-                <span>Final Kuis</span>
-            </a> --}}
-
-        </div>
+        <div id="daftarMateri" class="space-y-2 text-sm"></div>
 
     </aside>
 
@@ -112,6 +70,26 @@
     </main>
 </div>
 
+<!-- TOAST PERCOBAAN HABIS -->
+<div id="quizLimitAlert" 
+    class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-white border-l-4 border-red-500 text-gray-800 px-6 py-4 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center gap-4 transition-all duration-300 opacity-0 -translate-y-10 pointer-events-none min-w-[320px]">
+
+    <!-- ICON -->
+    <div class="bg-red-50 text-red-500 rounded-full w-10 h-10 flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-circle-xmark text-lg"></i>
+    </div>
+
+    <!-- TEXT -->
+    <div>
+        <h4 class="font-bold text-sm sm:text-base text-gray-900">
+            Percobaan Habis
+        </h4>
+        <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
+            Kamu sudah mencapai batas maksimal percobaan kuis.
+        </p>
+    </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
 <script>
@@ -119,10 +97,13 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
 const urlParams = new URLSearchParams(window.location.search);
-const stepDibuka = urlParams.get("step");
+let stepDibuka = urlParams.get("step");
 
 const materiId = "{{ $materiId }}";
 let currentStep = null;
+let quizAlertTimeout;
+let allSteps = [];
+let globalUrutanSelesai = 0;
 
 document.addEventListener('DOMContentLoaded', function(){
     loadMateriLanjutkan();
@@ -133,28 +114,41 @@ async function loadMateriLanjutkan(){
         const response = await axios.get('/api/materi-lanjutkan/' + materiId);
         const data = response.data.data;
 
+        allSteps = data.steps;
+        globalUrutanSelesai = data.urutan_selesai;
+
         document.getElementById("progressText").innerText =
             data.progress_percent + "%";
 
         document.getElementById("progressBar").style.width =
             data.progress_percent + "%";
 
-        renderSidebar(data.steps, data.urutan_selesai);
-
         let stepAktif;
 
         if(stepDibuka){
-            stepAktif = data.steps.find(step =>
-                step.urutan === parseInt(stepDibuka)
-            );
+            let stepInt = parseInt(stepDibuka);
+            if(stepInt > data.urutan_selesai + 1) {
+                alert("Anda tidak dapat membuka materi ini sebelum menyelesaikan materi sebelumnya.");
+                stepAktif = data.steps.find(step => step.urutan === data.urutan_selesai + 1);
+            } else {
+                stepAktif = data.steps.find(step => step.urutan === stepInt);
+            }
         } else {
             stepAktif = data.steps.find(step =>
                 step.urutan === data.urutan_selesai + 1
             );
         }
 
+        if(!stepAktif && data.steps.length > 0){
+            // Jika sudah selesai semua, buka step terakhir
+            stepAktif = data.steps[data.steps.length - 1];
+        }
+
         if(stepAktif){
             loadMateri(stepAktif);
+        } else {
+            // Render default
+            renderSidebar(allSteps, globalUrutanSelesai, null);
         }
 
     }catch(error){
@@ -162,35 +156,56 @@ async function loadMateriLanjutkan(){
     }
 }
 
-function renderSidebar(steps, urutanSelesai){
+function showQuizLimitAlert() {
+    const alertBox = document.getElementById('quizLimitAlert');
+
+    if (quizAlertTimeout) clearTimeout(quizAlertTimeout);
+
+    alertBox.classList.remove('opacity-0', '-translate-y-10', 'pointer-events-none');
+    alertBox.classList.add('opacity-100', 'translate-y-0');
+
+    quizAlertTimeout = setTimeout(() => {
+        alertBox.classList.remove('opacity-100', 'translate-y-0');
+        alertBox.classList.add('opacity-0', '-translate-y-10', 'pointer-events-none');
+    }, 3000);
+}
+
+function renderSidebar(steps, urutanSelesai, activeUrutan){
 
         const container = document.getElementById("daftarMateri");
 
         container.innerHTML = "";
 
         steps.forEach(step => {
+            let isOpened = step.urutan === activeUrutan;
+            let isUnlocked = step.urutan <= urutanSelesai + 1;
 
-            let status = "lock";
             let icon = "fa-lock text-gray-400";
-            let classItem = "text-gray-500";
+            let classItem = "text-gray-400 cursor-not-allowed";
+            let status = "lock";
 
-            if(step.urutan <= urutanSelesai){   
-                status = "selesai";
-                icon = "fa-circle-check text-green-500";
-                classItem = "";
-            }
-            else if(step.urutan === urutanSelesai + 1){
-                status = "aktif";
+            if (isOpened) {
                 icon = "fa-play text-blue-500";
                 classItem = "bg-blue-100 text-blue-600 font-medium";
+                status = "aktif";
+            } else if (isUnlocked) {
+                if (step.urutan <= urutanSelesai) {
+                    icon = "fa-circle-check text-green-500";
+                    classItem = "text-gray-800 font-medium hover:bg-gray-100";
+                    status = "selesai";
+                } else {
+                    icon = "fa-unlock text-gray-600";
+                    classItem = "text-gray-800 font-medium hover:bg-gray-100";
+                    status = "unlocked";
+                }
             }
 
             if(status !== "lock"){
 
             container.innerHTML += `
             <a href="#"
-            onclick="loadMateri(${JSON.stringify(step).replace(/"/g, '&quot;')})"
-            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 ${classItem}">
+            onclick='loadMateri(${JSON.stringify(step).replace(/'/g, "\\'")})'
+            class="flex items-center gap-3 p-3 rounded-lg transition-colors ${classItem}">
                 <i class="fa-solid ${icon}"></i>
                 <span>${step.judul}</span>
             </a>
@@ -200,7 +215,7 @@ function renderSidebar(steps, urutanSelesai){
             else{
 
             container.innerHTML += `
-            <div class="flex items-center gap-3 p-3 rounded-lg text-gray-500">
+            <div class="flex items-center gap-3 p-3 rounded-lg ${classItem}">
                 <i class="fa-solid ${icon}"></i>
                 <span>${step.judul}</span>
             </div>
@@ -212,6 +227,9 @@ function renderSidebar(steps, urutanSelesai){
 
     function loadMateri(step){
         currentStep = step;
+        
+        renderSidebar(allSteps, globalUrutanSelesai, step.urutan);
+
         document.getElementById("judulMateriAktif").innerText = step.judul;
 
         const deskripsiContainer = document.getElementById("deskripsiMateri");
@@ -258,8 +276,8 @@ function renderSidebar(steps, urutanSelesai){
 
                     ${
                         skor >= 75
-                        ? `<p class="text-green-600 font-semibold">Lulus</p>`
-                        : `<p class="text-red-500 font-semibold">Belum Lulus</p>`
+                        ? `<p class="text-green-600 font-semibold">Memenuhi KKM</p>`
+                        : `<p class="text-orange-500 font-semibold">Di Bawah KKM (Boleh lanjut / Remidi)</p>`
                     }
 
                     <p class="text-gray-500 mt-3">
@@ -390,6 +408,11 @@ function renderSidebar(steps, urutanSelesai){
                 materi_id: materiId,
                 urutan: urutan
             });
+            
+            // Hapus parameter ?step dari URL dan variabel agar auto-next berjalan mulus
+            stepDibuka = null;
+            window.history.replaceState(null, null, window.location.pathname);
+            
             loadMateriLanjutkan();
         }catch(error){
 
@@ -455,16 +478,17 @@ function renderSidebar(steps, urutanSelesai){
         try{
 
             await axios.post('/api/post-test-start', {
-                materi_id: materiId
+                materi_id: materiId,
+                post_test_id: currentStep.id
             });
 
             // kalau sukses → redirect ke halaman kuis
-            window.location.href = "/post-test/" + materiId;
+            window.location.href = "/post-test/" + materiId + "?post_test_id=" + currentStep.id;
 
         }catch(error){
 
             if(error.response && error.response.status === 403){
-                alert("Percobaan sudah habis!");
+                showQuizLimitAlert();
             }else{
                 console.error(error);
             }

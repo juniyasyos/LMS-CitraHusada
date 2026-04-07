@@ -43,14 +43,16 @@
             >
 
                 <!-- Foto Profil -->
-                <div class="flex flex-col items-center text-center mb-4">
-                    <div class="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center">
+                <div class="flex flex-col mb-4">
+                    <div class="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center self-center mb-4">
                         <i class="fa-solid fa-user text-gray-500 text-xl"></i>
                     </div>
-
-                    <p id="navProfileName" class="font-semibold mt-3"></p>
-                    <p id="navProfileJabatan" class="text-xs text-gray-500"></p>
-                    <p id="navProfileNIK" class="text-xs text-gray-400"></p>
+                    <p class="text-left">Nama</p>
+                    <p id="navProfileName" class="text-xs text-left font-semibold border-2 border-blue-300 p-2 rounded-lg"></p>
+                    <p class="text-left">NIK</p>
+                    <p id="navProfileNIK" class="text-xs text-left font-semibold border-2 border-blue-300 p-2 rounded-lg"></p>
+                    <p class="text-left">Unit</p>
+                    <p id="navProfileJabatan" class="text-xs text-left font-semibold border-2 border-blue-300 p-2 rounded-lg"></p>
                 </div>
 
                 <!-- Divider -->
@@ -76,7 +78,7 @@
     </nav>
 
     <div class="p-4 border-t border-gray-200">
-        <a href="/" 
+        <a href="#" onclick="handleLogout(event)"
         class="flex items-center gap-2 text-red-600 
                 hover:text-red-800 transition duration-200">
             <i class="fa-solid fa-arrow-left"></i>

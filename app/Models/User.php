@@ -5,11 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+
+/**
+ * @method \Laravel\Sanctum\NewAccessToken createToken(string $name, array $abilities = ['*'])
+ * @property-read \Illuminate\Database\Eloquent\Collection $tokens
+ */
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
-
+    use HasApiTokens, HasFactory, Notifiable;
+    
     protected $primaryKey = 'user_id';
 
     protected $fillable = [
@@ -24,6 +30,7 @@ class User extends Authenticatable
 
     protected $hidden = [
         'password',
+        // 'remember_token',
     ];
 
     protected $casts = [

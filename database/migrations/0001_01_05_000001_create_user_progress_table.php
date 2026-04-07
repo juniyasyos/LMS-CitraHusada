@@ -21,7 +21,9 @@ return new class extends Migration
             $table->enum('status', [
                 'Belum Dimulai',
                 'Progres',
-                'Selesai'
+                'Selesai',
+                'Gagal',
+                'Sesi Berakhir'
             ])->default('Belum Dimulai');
 
             $table->timestamps();

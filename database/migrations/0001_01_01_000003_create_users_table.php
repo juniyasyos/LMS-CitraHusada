@@ -39,8 +39,8 @@ return new class extends Migration
             $table->string('password');
             $table->unsignedBigInteger('role_id')->default(43);
             $table->boolean('status')->default(true);
+            // $table->rememberToken();
             $table->timestamps();
-
             // foreign keys will be added in a separate migration to ensure referenced tables exist
         });
     }
@@ -50,8 +50,12 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down(): void
-    {
-        Schema::dropIfExists('users');
-    }
+    // public function down(): void
+    // {
+    //     Schema::dropIfExists('users');
+
+    //     Schema::table('users', function (Blueprint $table) {
+    //     $table->dropColumn('remember_token');
+    // });
+    // }
 };

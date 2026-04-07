@@ -6,7 +6,8 @@ use App\Http\Controllers\AuthController;
 Route::get('/', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/', [AuthController::class, 'login'])->name('login.post');
 
-Route::middleware(['auth'])->group(function () {
+// Kita hapus middleware 'auth' bawaan Laravel karena proteksi sekarang 100% dari Frontend (Javascript Token)
+Route::group([], function () {
     Route::get('/pembelajaran', function () {
         return view('pembelajaran');
     })->name('pembelajaran');
@@ -37,6 +38,18 @@ Route::middleware(['auth'])->group(function () {
     });
     Route::get('/materi-kuis-akhir', function () {
         return view('materi-kuis-akhir');
+    });
+    Route::get('/hasil-kuis-gagal', function () {
+        return view('hasil-kuis-gagal');
+    });
+    Route::get('/hasil-kuis', function () {
+        return view('hasil-kuis');
+    });
+    Route::get('/pembelajaran-new', function () {
+        return view('pembelajaran-new');
+    });
+    Route::get('/materi-kuis-new', function () {
+        return view('materi-kuis-new');
     });
     
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
