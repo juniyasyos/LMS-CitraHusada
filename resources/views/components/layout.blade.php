@@ -11,6 +11,7 @@
 <body>
     <script src="https://cdn.tailwindcss.com"></script>
 
+    {{-- user karyawan --}}
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const texts = [
@@ -159,6 +160,8 @@
         }
     }
     </script>
+
+    {{-- user superadmin --}}
     
     @yield('content')
 </body>
