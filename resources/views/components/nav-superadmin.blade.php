@@ -1,105 +1,79 @@
-<div class="flex">
+<div class="flex flex-col h-full">
+    @php
+        $active = 'bg-blue-600 text-white';
+        $inactive = 'hover:bg-gray-100 text-gray-700';
+    @endphp
 
-    <!-- SIDEBAR -->
-    <aside class="fixed top-0 left-0 w-64 min-h-screen max-h-screen bg-white overflow-y-auto z-50">
-
-        @php
-            $active = 'bg-blue-500 text-white';
-            $inactive = 'hover:bg-gray-100 text-gray-700';
-        @endphp
-
-        {{-- Logo + Title --}}
-        <div class="p-1 border-b border-gray-200">
-            <div class="flex items-center gap-1 mb-6 mt-6">
-                <img src="{{ asset('images/logo-lms.png') }}" alt="Logo" class="w-12 h-12">
-                <div>
-                    <h1 class="text-red-600 font-bold text-lg">Citra Husada</h1>
-                    <p class="text-green-600 text-sm">Learning Management System</p>
-                </div>
+    {{-- Logo + Title --}}
+    <div class="p-6 border-b border-gray-100">
+        <div class="flex items-center gap-3">
+            <img src="{{ asset('images/logo-lms.png') }}" alt="Logo" class="w-10 h-10">
+            <div>
+                <h1 class="text-red-600 font-bold text-base leading-tight">Citra Husada</h1>
+                <p class="text-green-600 text-[10px] font-medium uppercase tracking-wider">Learning Management System</p>
             </div>
         </div>
-        
-        <nav class="p-4 space-y-2">
-
-            <!-- BERANDA -->
+    </div>
+    
+    <nav class="flex-1 p-4 space-y-1 overflow-y-auto custom-scrollbar">
+        @if(!isset($hideSideMenu) || !$hideSideMenu)
             <a href="/beranda-superadmin"
-            class="flex items-center gap-2 px-4 py-2 rounded-lg transition duration-200
-            {{ request()->is('beranda-superadmin') ? $active : $inactive }}">
-                <i class="fa-brands fa-microsoft {{ request()->is('beranda-superadmin') ? 'text-white' : '' }}"></i>
+                class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 {{ request()->is('beranda-superadmin') ? $active : $inactive }}">
+                <i class="fa-brands fa-microsoft text-sm"></i>
                 Beranda
             </a>
 
-            <!-- MANAJEMEN PENGGUNA -->
             <a href="/manajemen-pengguna"
-            class="flex items-center gap-2 px-4 py-2 rounded-lg transition duration-200
-            {{ request()->is('manajemen-pengguna') ? $active : $inactive }}">
-                <i class="fa-solid fa-users {{ request()->is('manajemen-pengguna') ? 'text-white' : '' }}"></i>
+                class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 {{ request()->is('manajemen-pengguna*') ? $active : $inactive }}">
+                <i class="fa-solid fa-users text-sm"></i>
                 Manajemen Pengguna
             </a>
 
-            <!-- UNIT KERJA -->
             <a href="/manajemen-unit-kerja"
-            class="flex items-center gap-2 px-4 py-2 rounded-lg transition duration-200
-            {{ request()->is('manajemen-unit-kerja') ? $active : $inactive }}">
-                <i class="fa-solid fa-building {{ request()->is('manajemen-unit-kerja') ? 'text-white' : '' }}"></i>
+                class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 {{ request()->is('manajemen-unit-kerja*') ? $active : $inactive }}">
+                <i class="fa-solid fa-building text-sm"></i>
                 Manajemen Unit Kerja
             </a>
 
-            <!-- MEDIA -->
-            <a href="#"
-            class="flex items-center gap-2 px-4 py-2 rounded-lg transition duration-200
-            {{ request()->is('manajemen-media') ? $active : $inactive }}">
-                <i class="fa-solid fa-circle-play {{ request()->is('manajemen-media') ? 'text-white' : '' }}"></i>
+            <a href="/manajemen-pelatihan"
+                class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 {{ request()->is('manajemen-pelatihan*') ? $active : $inactive }}">
+                <i class="fa-solid fa-circle-play text-sm"></i>
                 Manajemen Media Pelatihan
             </a>
 
-            <!-- KATEGORI -->
             <a href="/manajemen-kategori"
-            class="flex items-center gap-2 px-4 py-2 rounded-lg transition duration-200
-            {{ request()->is('manajemen-kategori') ? $active : $inactive }}">
-                <i class="fa-solid fa-tags {{ request()->is('manajemen-kategori') ? 'text-white' : '' }}"></i>
+                class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 {{ request()->is('manajemen-kategori*') ? $active : $inactive }}">
+                <i class="fa-solid fa-tags text-sm"></i>
                 Manajemen Kategori
             </a>
 
-            <!-- LAPORAN -->
             <a href="/laporan-monitoring"
-            class="flex items-center gap-2 px-4 py-2 rounded-lg transition duration-200
-            {{ request()->is('laporan-monitoring') ? $active : $inactive }}">
-                <i class="fa-solid fa-file {{ request()->is('laporan-monitoring') ? 'text-white' : '' }}"></i>
-                Laporan Monitoring
+                class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 {{ request()->is('laporan-monitoring*') ? $active : $inactive }}">
+                <i class="fa-solid fa-file-lines text-sm"></i>
+                Laporan & Monitoring
             </a>
 
-            <!-- LOG -->
             <a href="/log-aktivitas"
-            class="flex items-center gap-2 px-4 py-2 rounded-lg transition duration-200
-            {{ request()->is('log-aktivitas') ? $active : $inactive }}">
-                <i class="fa-solid fa-clock-rotate-left {{ request()->is('log-aktivitas') ? 'text-white' : '' }}"></i>
+                class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 {{ request()->is('log-aktivitas*') ? $active : $inactive }}">
+                <i class="fa-solid fa-clock-rotate-left text-sm"></i>
                 Log Aktivitas
             </a>
+        @else
+            <div class="px-4 py-2"></div>
+        @endif
+    </nav>
 
-        </nav>
+    <div class="p-4 border-t border-gray-100 space-y-1 flex-shrink-0 bg-white">
+        <a href="/cadangan"
+            class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 {{ request()->is('cadangan*') ? $active : $inactive }}">
+            <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
+            Cadangan
+        </a>
 
-        <!-- FOOTER SIDEBAR -->
-        <div class="p-4 border-t border-gray-200 mt-auto">
-            <a href="/cadangan"
-            class="flex items-center gap-2 px-4 py-2 rounded-lg transition duration-200
-            {{ request()->is('cadangan') ? $active : $inactive }}">
-                <i class="fa-solid fa-cloud-arrow-up {{ request()->is('cadangan') ? 'text-white' : '' }}"></i>
-                Cadangan
-            </a>
-
-            <a href="/"
-            class="flex items-center gap-2 px-4 py-2 text-red-600 hover:text-red-800 transition duration-200">
-                <i class="fa-solid fa-arrow-left"></i>
-                Keluar
-            </a>
-        </div>
-        
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main class="ml-64 w-full p-6">
-        <!-- isi halaman -->
-    </main>
-
+        <a href="/logout"
+            class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold text-red-500 hover:bg-red-50 transition-all duration-200">
+            <i class="fa-solid fa-arrow-right-from-bracket text-sm"></i>
+            Keluar
+        </a>
+    </div>
 </div>

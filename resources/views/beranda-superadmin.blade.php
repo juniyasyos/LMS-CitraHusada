@@ -2,18 +2,15 @@
 @section('title', 'Beranda Dashboard')
 
 @section('content')
-<div class="flex min-h-screen bg-slate-50">
-
+<div class="flex h-screen overflow-hidden bg-slate-50">
     <aside id="sidebar"
-        class="fixed lg:static z-40 top-0 left-0 w-64 min-h-screen bg-white border-r
-        transform -translate-x-full lg:translate-x-0
-        transition-transform duration-200">
+        class="w-64 h-screen bg-white border-r flex-shrink-0 overflow-y-auto">
         @include('components.nav-superadmin')
     </aside>
 
-    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <div class="flex-1 flex flex-col min-w-0 bg-slate-50">
         
-        <header class="bg-white border-b h-16 flex items-center justify-between px-8">
+        <header class="bg-white border-b h-16 flex items-center justify-between px-8 flex-shrink-0 z-10">
             <h1 class="text-sm font-semibold text-gray-600">Beranda Dashboard</h1>
             
             <div class="flex items-center gap-6">
@@ -22,7 +19,7 @@
                         <i class="fa-solid fa-magnifying-glass text-[10px]"></i>
                     </span>
                     <input type="text" 
-                        class="block w-full pl-8 pr-3 py-1.5 border border-gray-200 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 text-[11px]" 
+                        class="block w-full pl-8 pr-3 py-1.5 border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-[11px] transition-all" 
                         placeholder="Cari data atau laporan...">
                 </div>
 
@@ -45,18 +42,19 @@
             </div>
         </header>
 
-        <main class="p-8">
+        <main class="flex-1 overflow-y-auto p-8">
             
             <div class="mb-8">
                 <h2 class="text-xl font-bold text-gray-800">Selamat Datang, Superadmin</h2>
                 <p class="text-sm text-gray-500 mt-1">Pantau statistik pelatihan dan aktivitas sistem <span class="font-semibold text-gray-700">Hospital LMS</span> hari ini.</p>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
                 @php
                     $stats = [
                         ['label' => 'Total Pengguna', 'value' => '1,284', 'sub' => 'Karyawan terdaftar aktif', 'icon' => 'fa-users', 'color' => 'text-blue-600'],
                         ['label' => 'Total Unit Kerja', 'value' => '24', 'sub' => 'Departemen terintegrasi', 'icon' => 'fa-building', 'color' => 'text-emerald-600'],
+                        ['label' => 'Total Jenis Tenaga Kerja', 'value' => '156', 'sub' => 'Jenis tenaga kerja tersedia', 'icon' => 'fa-id-card-clip', 'color' => 'text-indigo-600'],
                         ['label' => 'Total Pelatihan', 'value' => '156', 'sub' => 'Modul pelatihan tersedia', 'icon' => 'fa-book-open', 'color' => 'text-purple-600'],
                         ['label' => 'Pelatihan Aktif', 'value' => '42', 'sub' => 'Sedang berjalan saat ini', 'icon' => 'fa-clock', 'color' => 'text-orange-600'],
                         ['label' => 'Pelatihan Selesai', 'value' => '114', 'sub' => 'Sertifikat telah diterbitkan', 'icon' => 'fa-certificate', 'color' => 'text-pink-600'],
@@ -70,7 +68,7 @@
                         <i class="fa-solid {{ $stat['icon'] }} {{ $stat['color'] }} opacity-20 text-sm group-hover:opacity-100 transition-opacity"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-gray-800">{{ $stat['value'] }}</h3>
-                    <p class="text-[10px] text-gray-400 mt-1 font-medium">{{ $stat['sub'] }}</p>
+                    <p class="text-[10px] text-gray-400 mt-1 font-medium leading-tight">{{ $stat['sub'] }}</p>
                 </div>
                 @endforeach
             </div>
@@ -78,8 +76,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                 <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                     <div class="mb-6">
-                        <h3 class="font-bold text-gray-800">Ikhtisar Penyelesaian Pelatihan</h3>
-                        <p class="text-xs text-gray-400">Perbandingan modul direncanakan vs selesai (6 bulan terakhir)</p>
+                        <h3 class="font-bold text-gray-800">Grafik Keaktifan</h3>
                     </div>
 
                     @php
@@ -104,32 +101,36 @@
                         @foreach ($data as $item)
                         <div class="relative flex flex-col items-center flex-1 h-full">
                             <div class="flex items-end gap-1.5 h-full">
-                                <div class="w-2.5 bg-blue-500 rounded-t-sm transition-all duration-700 hover:bg-blue-600 cursor-pointer" 
-                                     style="height: {{ $item['plan'] }}%" title="Rencana: {{ $item['plan'] }}"></div>
-                                <div class="w-2.5 bg-emerald-500 rounded-t-sm transition-all duration-700 hover:bg-emerald-600 cursor-pointer" 
-                                     style="height: {{ $item['done'] }}%" title="Selesai: {{ $item['done'] }}"></div>
+                                <div class="w-2.5 bg-red-500 rounded-t-sm transition-all duration-700 hover:bg-red-600 cursor-pointer" 
+                                    style="height: {{ $item['plan'] }}%" title="Rencana: {{ $item['plan'] }}"></div>
+                                <div class="w-2.5 bg-green-500 rounded-t-sm transition-all duration-700 hover:bg-green-600 cursor-pointer" 
+                                    style="height: {{ $item['done'] }}%" title="Selesai: {{ $item['done'] }}"></div>
                             </div>
                             <span class="text-[10px] font-bold text-gray-400 mt-3 uppercase tracking-tighter">{{ $item['month'] }}</span>
                         </div>
                         @endforeach
                     </div>
 
-                    <div class="flex items-center gap-6 mt-8 pt-4 border-t border-gray-50">
+                    <div class="flex items-center justify-center gap-6 mt-8 pt-4 border-t border-gray-50">
                         <div class="flex items-center gap-2">
-                            <div class="w-2 h-2 bg-blue-500 rounded-full shadow-sm"></div>
-                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">Direncanakan</span>
+                            <div class="w-2 h-2 bg-red-500 rounded-full shadow-sm"></div>
+                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">Belum Selesai</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <div class="w-2 h-2 bg-emerald-500 rounded-full shadow-sm"></div>
+                            <div class="w-2 h-2 bg-green-500 rounded-full shadow-sm"></div>
                             <span class="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">Selesai</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col">
-                    <div class="mb-6">
-                        <h3 class="font-bold text-gray-800">Distribusi Unit Kerja</h3>
-                        <p class="text-xs text-gray-400">Partisipasi pelatihan tiap departemen</p>
+                    <div class="mb-6 relative">
+                        <h3 class="font-bold text-gray-800">Leaderboard Jam Pembelajaran</h3>
+                        <p class="text-xs text-gray-400">Partisipasi Unit Kerja</p>
+                        
+                        <a href="/detail-leaderboard" class="absolute top-0 right-0 text-[11px] text-blue-600 font-bold underline hover:text-blue-800 transition-colors">
+                            Detail
+                        </a>
                     </div>
 
                     <div class="flex justify-center mb-8">
@@ -164,14 +165,15 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+            <div class="grid grid-cols-1 gap-6 mb-10">
+                <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm w-full">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="font-bold text-gray-800">Log Aktivitas Terkini</h3>
                         <a href="#" class="text-[10px] font-bold text-blue-600 uppercase tracking-widest hover:underline transition">Lihat Semua</a>
                     </div>
 
                     <div class="space-y-5">
+                        {{-- Item 1 --}}
                         <div class="flex gap-4">
                             <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
                                 <i class="fa-solid fa-plus text-blue-500 text-xs"></i>
@@ -182,6 +184,7 @@
                             </div>
                         </div>
 
+                        {{-- Item 2 --}}
                         <div class="flex gap-4 border-t border-gray-50 pt-4">
                             <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
                                 <i class="fa-solid fa-rotate text-emerald-500 text-xs"></i>
@@ -192,6 +195,7 @@
                             </div>
                         </div>
 
+                        {{-- Item 3 --}}
                         <div class="flex gap-4 border-t border-gray-50 pt-4">
                             <div class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center flex-shrink-0">
                                 <i class="fa-solid fa-key text-rose-500 text-xs"></i>
@@ -203,29 +207,7 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="bg-green-50 p-6 rounded-xl border border-green-100 shadow-sm flex flex-col gap-4">
-                    <h3 class="font-bold text-green-800 text-sm flex items-center gap-2">
-                        <i class="fa-solid fa-circle-info"></i>
-                        Informasi Penting
-                    </h3>
-
-                    <div class="bg-white p-4 rounded-lg border border-green-100 shadow-sm hover:shadow-md transition">
-                        <p class="text-xs font-bold text-gray-800 mb-1 leading-tight">Pemeliharaan Rutin</p>
-                        <p class="text-[10px] text-gray-500 leading-relaxed">
-                            Sistem akan menjalani pemeliharaan rutin pada Minggu, 20 Oktober pukul 02.00 - 04.00 WIB.
-                        </p>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-lg border border-green-100 shadow-sm hover:shadow-md transition">
-                        <p class="text-xs font-bold text-gray-800 mb-1 leading-tight">Fitur Baru: Export Laporan PDF</p>
-                        <p class="text-[10px] text-gray-500 leading-relaxed">
-                            Kini Anda dapat mengunduh laporan monitoring pelatihan dalam format PDF secara langsung.
-                        </p>
-                    </div>
-                </div>
             </div>
-
         </main>
     </div>
 </div>

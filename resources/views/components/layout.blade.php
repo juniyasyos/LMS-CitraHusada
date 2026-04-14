@@ -162,7 +162,12 @@
     </script>
 
     {{-- user superadmin --}}
-    
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+    function toggleDropdown() {
+        document.getElementById("dropdownFilter").classList.toggle("hidden");
+    }
+    </script>
     @yield('content')
 </body>
 </html>
