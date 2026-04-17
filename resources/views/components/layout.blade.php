@@ -168,6 +168,25 @@
         document.getElementById("dropdownFilter").classList.toggle("hidden");
     }
     </script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // Baris ini WAJIB ada agar mode gelap bisa dipicu lewat class 'dark'
+            theme: {
+                extend: {
+                    // Anda bisa menambahkan kustomisasi warna di sini jika perlu
+                }
+            }
+        }
+    </script>
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
     @yield('content')
 </body>
 </html>
