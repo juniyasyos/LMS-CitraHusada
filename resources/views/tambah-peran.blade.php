@@ -2,127 +2,181 @@
 @section('title', 'Tambah Peran')
 
 @section('content')
-<div class="flex h-screen overflow-hidden bg-slate-50">
-    <aside id="sidebar" class="w-64 h-screen bg-white border-r flex-shrink-0 overflow-y-auto">
+{{-- Root container dengan state utama --}}
+<div class="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300" 
+    x-data="{ 
+        darkMode: localStorage.getItem('theme') === 'dark', 
+        sidebarOpen: false,
+        userStatus: true 
+    }">
+    
+    {{-- Sidebar Responsive --}}
+    <aside 
+        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+        class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 border-r dark:border-slate-800 transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0 flex-shrink-0 overflow-y-auto">
         @include('components.nav-superadmin', ['hideSideMenu' => true])
     </aside>
 
-    <div class="flex-1 flex flex-col min-w-0">
+    {{-- Overlay --}}
+    <div x-show="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden" x-cloak></div>
+
+    <div class="flex-1 flex flex-col min-w-0 transition-colors duration-300">
         
-        <header class="bg-white border-b h-16 flex items-center justify-between px-8 flex-shrink-0 z-10">
-            <h1 class="text-sm font-semibold text-gray-800">Manajemen Pengguna</h1>
+        {{-- Header --}}
+        <header class="bg-white dark:bg-slate-900 border-b dark:border-slate-800 h-16 flex items-center justify-between px-4 lg:px-8 flex-shrink-0 z-10">
             <div class="flex items-center gap-4">
-                <div class="relative cursor-pointer">
-                    <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full border-2 border-white"></span>
-                    <i class="fa-solid fa-bell text-gray-400"></i>
-                </div>
-                <div class="flex items-center gap-3 pl-4 border-l border-gray-100">
-                    <div class="text-right">
-                        <p class="text-xs font-bold text-gray-800 leading-tight">Superadmin</p>
-                        <p class="text-[10px] text-gray-500 font-medium">Administrator Utama</p>
+                <button @click="sidebarOpen = true" class="lg:hidden p-2 text-gray-500 dark:text-white">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+                <h1 class="text-sm font-semibold text-gray-600 dark:text-white truncate">Manajemen Pengguna</h1>
+            </div>
+
+            <div class="flex items-center gap-4">
+                @include('components.notif-superadmin')
+                <div class="flex items-center gap-3 pl-4 border-l border-gray-100 dark:border-slate-800">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-xs font-bold text-gray-800 dark:text-white leading-tight">Superadmin</p>
+                        <p class="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Administrator Utama</p>
                     </div>
-                    <div class="w-8 h-8 bg-gray-200 rounded-full overflow-hidden border">
-                        <img src="https://ui-avatars.com/api/?name=Super+Admin" alt="Profile">
+                    <div class="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden border dark:border-slate-800 flex items-center justify-center">
+                        <i class="fa-solid fa-user text-gray-500 dark:text-white text-xs"></i>
                     </div>
                 </div>
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-8">
+        <main class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar">
             
+            {{-- Breadcrumb --}}
             <nav class="mb-6 text-[14px] font-medium">
-                <ol class="flex items-center gap-2 text-gray-500">
+                <ol class="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                     <li>
-                        <a href="/manajemen-pengguna" class="hover:text-blue-600 transition-colors">
+                        <a href="/manajemen-pengguna" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                             Manajemen Pengguna
                         </a>
                     </li>
                     <li class="flex items-center gap-2">
-                        <span class="text-gray-300"> > </span>
-                        <span class="text-gray-800 font-semibold">Tambah Peran</span>
+                        <span class="text-gray-300 dark:text-gray-600"> > </span>
+                        <span class="text-gray-800 dark:text-white font-semibold">Tambah Peran</span>
                     </li>
                 </ol>
             </nav>
 
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-8 mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {{-- Form Card Utama --}}
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm p-6 lg:p-10 mb-6 transition-colors">
+                
+                <div class="space-y-6">
+                    {{-- Input Nama --}}
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-2">Label</label>
-                        <input type="text" class="w-full bg-gray-100 border border-gray-200 rounded-lg h-12 px-4 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all">
+                        <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2">Nama</label>
+                        <input type="text" placeholder="Masukkan nama lengkap" class="w-full bg-slate-100 dark:bg-slate-800 border border-transparent dark:border-slate-700 rounded-lg h-12 px-4 focus:ring-2 focus:ring-blue-500/20 focus:bg-white dark:focus:bg-slate-800 outline-none transition-all text-sm dark:text-white">
                     </div>
+
+                    {{-- Input NIK --}}
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-2">Nama</label>
-                        <input type="text" class="w-full bg-gray-100 border border-gray-200 rounded-lg h-12 px-4 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all">
+                        <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2">Nomor Induk Karyawan</label>
+                        <input type="text" placeholder="Masukkan NIK" class="w-full bg-slate-100 dark:bg-slate-800 border border-transparent dark:border-slate-700 rounded-lg h-12 px-4 focus:ring-2 focus:ring-blue-500/20 focus:bg-white dark:focus:bg-slate-800 outline-none transition-all text-sm dark:text-white">
                     </div>
+
+                    {{-- Input Password --}}
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-2">Nama Penjaga</label>
-                        <input type="text" class="w-full bg-gray-100 border border-gray-200 rounded-lg h-12 px-4 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all">
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-3">
-                    <button type="button" class="w-9 h-5 bg-gray-200 rounded-full relative transition-colors focus:outline-none">
-                        <div class="absolute left-1 top-1 bg-white w-3 h-3 rounded-full shadow-sm"></div>
-                    </button>
-                    <div>
-                        <span class="block text-xs font-bold text-gray-700">Pilih Semua</span>
-                        <p class="text-[10px] text-gray-400">Aktifkan semua izin yang tersedia untuk peran ini.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-8">
-                <div class="flex border-b">
-                    <button class="px-8 py-4 text-xs font-bold text-blue-600 border-b-2 border-blue-600">Sumber Daya</button>
-                    <button class="px-8 py-4 text-xs font-medium text-gray-500 hover:text-gray-700">Halaman</button>
-                    <button class="px-8 py-4 text-xs font-medium text-gray-500 hover:text-gray-700">Widget</button>
-                </div>
-
-                <div class="p-8 space-y-12">
-                    
-                    {{-- Loop Izin --}}
-                    @php
-                        $sections = [
-                            ['title' => 'Audit & Log Aktivitas', 'path' => 'aaaa/bbbb/cccc'],
-                            ['title' => 'Laporan harian', 'path' => 'aaaa/bbbb/cccc'],
-                            ['title' => 'Laporan harian', 'path' => 'aaaa/bbbb/cccc']
-                        ];
-                    @endphp
-
-                    @foreach ($sections as $section)
-                    <div>
-                        <div class="mb-4">
-                            <h3 class="text-sm font-bold text-gray-800">{{ $section['title'] }}</h3>
-                            <p class="text-xs text-gray-400 font-mono">{{ $section['path'] }}</p>
+                        <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2">Password</label>
+                        <div class="relative group">
+                            <input type="text" value="123" readonly
+                                class="w-full bg-slate-100 dark:bg-slate-800 border border-transparent dark:border-slate-700 rounded-lg h-12 pl-4 pr-36 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm dark:text-white">
                         </div>
-                        
-                        <div class="border-t pt-4">
-                            <button class="text-xs font-bold text-blue-600 mb-4 hover:underline uppercase">Pilih Semua</button>
-                            <div class="grid grid-cols-2 md:grid-cols-5 gap-y-4">
-                                @php
-                                    $perms = ($loop->first) ? ['Lihat', 'Lihat Apa Saja'] : array_fill(0, 8, 'Lihat');
-                                @endphp
-                                @foreach ($perms as $index => $label)
-                                <label class="flex items-center gap-3 cursor-pointer">
-                                    <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-0">
-                                    <span class="text-xs text-gray-700 font-medium">
-                                        {{ $index % 2 != 0 && !$loop->parent->first ? 'Lihat Apa Saja' : $label }}
-                                    </span>
-                                </label>
-                                @endforeach
+                    </div>
+
+                    {{-- Input JPL --}}
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2">JPL</label>
+                        <div class="relative group">
+                            <input type="text" value="20" readonly
+                                class="w-full bg-slate-100 dark:bg-slate-800 border border-transparent dark:border-slate-700 rounded-lg h-12 pl-4 pr-36 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm dark:text-white">
+                        </div>
+                    </div>
+
+                    {{-- Row Select Dropdown (3 Kolom) --}}
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2">Unit Kerja</label>
+                            <select class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer">
+                                <option disabled selected>Pilih Unit Kerja</option>
+                                <option>UGD</option>
+                                <option>Farmasi</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2">Jenis Tenaga</label>
+                            <select class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer">
+                                <option disabled selected>Pilih Jenis Tenaga</option>
+                                <option>Medis</option>
+                                <option>Administrasi</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2">Role/Peran</label>
+                            <select class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer">
+                                <option disabled selected>Pilih Role/Peran</option>
+                                <option>User</option>
+                                <option>Admin Unit</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {{-- Status Pengguna dengan Toggle --}}
+                    <div class="pt-4">
+                        <div class="flex items-center justify-between bg-gray-50 dark:bg-slate-800/40 p-4 rounded-xl border border-gray-100 dark:border-slate-800/60 transition-all">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-bold text-gray-700 dark:text-white">Status Pengguna</span>
+                                <span class="text-[10px] font-medium transition-colors" 
+                                    :class="userStatus ? 'text-emerald-500' : 'text-rose-500'" 
+                                    x-text="userStatus ? 'Akun Aktif (Dapat mengakses sistem)' : 'Akun Nonaktif (Akses ditangguhkan)'"></span>
                             </div>
+
+                            {{-- Switch Toggle --}}
+                            <button type="button" 
+                                @click="userStatus = !userStatus"
+                                :class="userStatus ? 'bg-blue-600' : 'bg-gray-300 dark:bg-slate-700'"
+                                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out focus:outline-none ring-offset-2 dark:ring-offset-slate-900 focus:ring-2 focus:ring-blue-500/40">
+                                
+                                {{-- Dot Toggle --}}
+                                <span :class="userStatus ? 'translate-x-5' : 'translate-x-0'"
+                                    class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-300 ease-in-out">
+                                </span>
+                            </button>
                         </div>
                     </div>
-                    @endforeach
-
                 </div>
             </div>
 
+            {{-- Footer Button --}}
             <div class="flex justify-end gap-3 mb-10">
-                <button class="px-6 py-2 text-xs font-bold text-gray-500">Batal</button>
-                <button class="px-8 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition">Simpan</button>
+                <button type="button" class="px-8 py-3 rounded-lg text-sm font-bold text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-all">
+                    Batal
+                </button>
+                <button class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-10 py-3 rounded-lg text-sm font-bold transition shadow-lg shadow-blue-200 dark:shadow-none active:scale-95">
+                    Simpan Perubahan
+                </button>
             </div>
         </main>
     </div>
 </div>
+
+<style>
+    [x-cloak] { display: none !important; }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
+    
+    /* Mencegah input autofill merusak warna dark mode */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus {
+        -webkit-text-fill-color: inherit;
+        -webkit-box-shadow: 0 0 0px 1000px transparent inset;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+</style>
 @endsection
