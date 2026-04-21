@@ -1,122 +1,315 @@
 @extends('components.layout')
-@section('title', 'Manajemen Kategori')
+@section('title', 'Laporan & Monitoring')
+
 @section('content')
-<div class="flex min-h-screen bg-slate-50">
+{{-- Menambahkan state showDetail dan selectedUser pada x-data --}}
+<div class="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300" 
+    x-data="{ 
+        sidebarOpen: false, 
+        darkMode: localStorage.getItem('theme') === 'dark', 
+        openSertifikat: false,
+        activeTab: 'internal',
+        showDetail: false,
+        selectedUser: ''
+    }">
+    
+    {{-- Sidebar Responsive Logic --}}
     <aside id="sidebar"
-        class="fixed lg:static z-40 top-0 left-0 w-64 min-h-screen bg-white border-r
-        transform -translate-x-full lg:translate-x-0
-        transition-transform duration-200">
+        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+        class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 border-r dark:border-slate-800 transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0 flex-shrink-0 overflow-y-auto">
         @include('components.nav-superadmin')
     </aside>
 
-    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    {{-- Overlay untuk menutup sidebar mobile --}}
+    <div x-show="sidebarOpen" 
+        @click="sidebarOpen = false" 
+        x-transition:enter="transition opacity-100 ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:leave="transition opacity-100 ease-in duration-200"
+        x-transition:leave-end="opacity-0"
+        class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden" x-cloak>
+    </div>
+
+    <div class="flex-1 flex flex-col min-w-0 transition-colors duration-300">
         
-        <header class="bg-white border-b h-16 flex items-center justify-between px-8">
-            <h1 class="text-sm font-semibold text-gray-600">Manajemen Kategori</h1>
+        {{-- Header Responsive --}}
+        <header class="bg-white dark:bg-slate-900 border-b dark:border-slate-800 h-16 flex items-center justify-between px-4 lg:px-8 flex-shrink-0 z-10 transition-colors duration-300">
             <div class="flex items-center gap-4">
-                <div class="relative">
-                    <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full border-2 border-white"></span>
-                    <i class="fa-solid fa-bell text-gray-500"></i>
+                <button @click="sidebarOpen = true" class="lg:hidden p-2 text-gray-500 dark:text-white">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+                <h1 class="text-sm font-semibold text-gray-600 dark:text-white truncate">Laporan & Monitoring</h1>
+            </div>
+
+            <div class="flex items-center gap-3 lg:gap-4">
+                <div class="">
+                    @include('components.notif-superadmin')
                 </div>
-                <div class="flex items-center gap-3">
-                    <div class="text-right">
-                        <p class="text-xs font-bold text-gray-800 leading-tight">Superadmin</p>
-                        <p class="text-[10px] text-gray-500 font-medium">Administrator Utama</p>
+                <div class="flex items-center gap-3 pl-2 lg:pl-4 border-l border-gray-100 dark:border-slate-800">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-xs font-bold text-gray-800 dark:text-white leading-tight">Superadmin</p>
+                        <p class="text-[10px] text-gray-500 dark:text-gray-300 font-medium italic">Utama</p>
                     </div>
-                    <div class="w-8 h-8 bg-gray-200 rounded-full overflow-hidden border border-gray-100">
-                        <img src="https://ui-avatars.com/api/?name=Super+Admin" alt="Profile">
+                    <div class="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden border border-gray-100 dark:border-slate-800 flex items-center justify-center">
+                        <i class="fa-solid fa-user text-gray-500 dark:text-white text-xs"></i>
                     </div>
                 </div>
             </div>
         </header>
 
-        <main class="p-8">
-            
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-                <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-[10px] font-bold text-gray-400 uppercase">Total Kategori</p>
-                        <h3 class="text-xl font-bold text-gray-800">6</h3>
-                    </div>
-                    <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
-                        </div>
-                </div>
+        <main class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar">
+            {{-- Title Section --}}
+            <div class="mb-8">
+                <h2 class="text-lg lg:text-xl font-bold text-gray-800 dark:text-white transition-colors" 
+                    x-text="activeTab === 'internal' ? 'Monitoring Pelatihan Karyawan' : (showDetail ? 'Detail Sertifikat: ' + selectedUser : 'Sertifikat Eksternal')"></h2>
+                <p class="text-xs lg:text-sm text-gray-500 dark:text-gray-200 transition-colors leading-relaxed">Pantau kemajuan dan sertifikasi pelatihan seluruh staf rumah sakit secara real-time.</p>
+            </div>
 
-                <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-[10px] font-bold text-gray-400 uppercase">Total Pelatihan Terkait</p>
-                        <h3 class="text-xl font-bold text-gray-800">84</h3>
+            {{-- Stat Cards: Hanya Tampil jika activeTab === 'internal' --}}
+            <div x-show="activeTab === 'internal'" x-transition:enter="transition ease-out duration-300" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm flex items-center gap-3 lg:gap-4 transition hover:shadow-md">
+                    <div class="w-10 h-10 lg:w-12 lg:h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg shrink-0">
+                        <i class="fa-solid fa-users text-sm lg:text-base"></i>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center">
-                        </div>
+                    <div class="min-w-0">
+                        <p class="text-[9px] lg:text-[10px] font-bold text-gray-400 dark:text-white uppercase tracking-wider transition-colors truncate">Total Peserta</p>
+                        <p class="text-base lg:text-lg font-bold text-gray-800 dark:text-white">1,248 <span class="text-blue-500 text-[10px] font-medium">+12%</span></p>
+                    </div>
                 </div>
-
-                <div class="bg-transparent p-5 rounded-xl border-2 border-dashed border-gray-200 flex items-center">
-                    <p class="text-[10px] text-gray-400 leading-relaxed italic">
-                        Gunakan kategori untuk mengelompokkan materi pelatihan agar memudahkan staf medis dalam pencarian modul yang relevan dengan unit kerja mereka.
-                    </p>
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm flex items-center gap-3 lg:gap-4 transition hover:shadow-md">
+                    <div class="w-10 h-10 lg:w-12 lg:h-12 bg-emerald-500 rounded-lg flex items-center justify-center text-white shadow-lg shrink-0">
+                        <i class="fa-solid fa-check-double text-sm lg:text-base"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-[9px] lg:text-[10px] font-bold text-gray-400 dark:text-white uppercase tracking-wider transition-colors truncate">Penyelesaian</p>
+                        <p class="text-base lg:text-lg font-bold text-gray-800 dark:text-white">84% <span class="text-emerald-500 text-[10px] font-medium">+5%</span></p>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm flex items-center gap-3 lg:gap-4 transition hover:shadow-md">
+                    <div class="w-10 h-10 lg:w-12 lg:h-12 bg-indigo-500 rounded-lg flex items-center justify-center text-white shadow-lg shrink-0">
+                        <i class="fa-solid fa-file-arrow-down text-sm lg:text-base"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-[9px] lg:text-[10px] font-bold text-gray-400 dark:text-white uppercase tracking-wider transition-colors truncate">Sertifikat</p>
+                        <p class="text-base lg:text-lg font-bold text-gray-800 dark:text-white">956 <span class="text-indigo-500 text-[10px] font-medium">+28</span></p>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm flex items-center gap-3 lg:gap-4 transition hover:shadow-md">
+                    <div class="w-10 h-10 lg:w-12 lg:h-12 bg-amber-500 rounded-lg flex items-center justify-center text-white shadow-lg shrink-0">
+                        <i class="fa-solid fa-star text-sm lg:text-base"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-[9px] lg:text-[10px] font-bold text-gray-400 dark:text-white uppercase tracking-wider transition-colors truncate">Rata-rata Nilai</p>
+                        <p class="text-base lg:text-lg font-bold text-gray-800 dark:text-white">88.5 <span class="text-amber-500 text-[10px] font-medium">+2.4</span></p>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-                <div class="flex justify-between items-start mb-6">
-                    <div>
-                        <h2 class="text-lg font-bold text-gray-800">Daftar Kategori Pelatihan</h2>
-                        <p class="text-sm text-gray-500 mt-1">Kelola klasifikasi taksonomi materi pembelajaran rumah sakit.</p>
-                    </div>
-                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg flex items-center gap-2 text-sm font-bold transition shadow-sm">
-                        <i class="fa-solid fa-plus text-xs"></i>
-                        Tambah Kategori
+            {{-- Toggle Navigasi --}}
+            <div class="w-full">
+                <div class="flex p-1 bg-gray-100 dark:bg-slate-800 rounded-xl mb-6 border dark:border-slate-700">
+                    <button @click="activeTab = 'internal'; showDetail = false"
+                        :class="activeTab === 'internal' ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'"
+                        class="flex-1 py-2.5 text-xs font-bold rounded-lg transition-all duration-300">
+                        Sertifikat Internal
+                    </button>
+                    <button @click="activeTab = 'external'; showDetail = false"
+                        :class="activeTab === 'external' ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'"
+                        class="flex-1 py-2.5 text-xs font-bold rounded-lg transition-all duration-300">
+                        Sertifikat Eksternal
                     </button>
                 </div>
+            </div>
 
-                <div class="mb-6">
-                    <div class="relative w-full">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
-                        </span>
-                        <input type="text" 
-                            class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500 text-xs" 
-                            placeholder="Cari nama kategori...">
+            {{-- Tombol Kembali (Hanya muncul saat di mode detail eksternal) --}}
+            <div x-show="activeTab === 'external' && showDetail" class="mb-4" x-cloak>
+                <button @click="showDetail = false" class="flex items-center gap-2 text-xs font-bold text-blue-600 hover:text-blue-700 transition">
+                    <i class="fa-solid fa-arrow-left"></i> Kembali ke Daftar Sertifikat Eksternal
+                </button>
+            </div>
+
+            {{-- Filter Section --}}
+            <div class="bg-white dark:bg-slate-900 p-4 lg:p-6 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm mb-8 transition-colors">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-500 dark:text-white uppercase mb-2 block tracking-tight">Rentang Waktu</label>
+                        <input type="text" placeholder="Pilih Tanggal..." class="w-full border-gray-200 dark:border-slate-700 rounded-lg text-xs p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-white focus:outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-500 dark:text-white uppercase mb-2 block tracking-tight">Unit Kerja</label>
+                        <select class="w-full border-gray-200 dark:border-slate-700 rounded-lg text-xs p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-white">
+                            <option value="">Semua Unit</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-500 dark:text-white uppercase mb-2 block tracking-tight">Status Pelatihan</label>
+                        <select class="w-full border-gray-200 dark:border-slate-700 rounded-lg text-xs p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-white">
+                            <option value="">Semua Status</option>
+                        </select>
+                    </div>
+                    <button class="bg-blue-700 hover:bg-blue-800 text-white py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 active:scale-95 shadow-lg shadow-blue-100 dark:shadow-none">
+                        <i class="fa-solid fa-filter text-[10px]"></i>
+                        Terapkan Filter
+                    </button>
+                </div>
+            </div>
+
+            {{-- Table List --}}
+            <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-4 lg:p-8 mb-10 transition-colors duration-300">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <h3 class="font-bold text-gray-800 dark:text-white transition-colors" 
+                        x-text="activeTab === 'internal' ? 'Daftar Laporan Pelatihan' : (showDetail ? 'Daftar Pelatihan Eksternal' : 'Daftar Sertifikat Eksternal')"></h3>
+                    <div class="relative w-full sm:w-64">
+                        <input type="text" placeholder="Cari..." class="w-full pl-3 pr-8 py-2 border-gray-200 dark:border-slate-700 rounded-lg text-xs bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-white outline-none">
+                        <i class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-gray-400 dark:text-white text-xs"></i>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto border rounded-lg">
-                    <table class="w-full text-left text-xs">
-                        <thead class="text-gray-500 font-bold bg-gray-50 border-b">
+                <div class="overflow-x-auto border dark:border-slate-800 rounded-lg transition-colors">
+                    {{-- ================= TABEL SERTIFIKAT INTERNAL ================= --}}
+                    <table x-show="activeTab === 'internal'" class="w-full text-left text-xs min-w-[900px]">
+                        <thead class="bg-gray-50 dark:bg-slate-800/50 text-gray-500 dark:text-white font-bold border-b dark:border-slate-800">
                             <tr>
-                                <th class="py-4 px-6">Nama Kategori</th>
-                                <th class="py-4 px-4 text-center">Jumlah Pelatihan</th>
-                                <th class="py-4 px-4 text-center">Terakhir Diperbarui</th>
-                                <th class="py-4 px-6 text-right">Aksi</th>
+                                <th class="py-4 px-6 uppercase tracking-wider">Nama Karyawan</th>
+                                <th class="py-4 px-4 uppercase tracking-wider">Unit Kerja</th>
+                                <th class="py-4 px-4 uppercase tracking-wider">Nama Pelatihan</th>
+                                <th class="py-4 px-4 uppercase tracking-wider text-center">Kemajuan</th>
+                                <th class="py-4 px-4 uppercase tracking-wider text-center">Status</th>
+                                <th class="py-4 px-4 uppercase tracking-wider text-center">Nilai</th>
+                                <th class="py-4 px-4 uppercase tracking-wider text-center">Sertifikat</th>
+                                <th class="py-4 px-6 uppercase tracking-wider text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100 text-gray-700">
+                        <tbody class="divide-y divide-gray-100 dark:divide-slate-800 text-gray-700 dark:text-white transition-colors">
                             @php
-                                $categories = [
-                                    ['name' => 'Keperawatan Dasar', 'count' => '24 Pelatihan', 'date' => '2023-11-20'],
-                                    ['name' => 'Gawat Darurat (ER)', 'count' => '15 Pelatihan', 'date' => '2023-11-18'],
-                                    ['name' => 'Prosedur Bedah Sentral', 'count' => '8 Pelatihan', 'date' => '2023-11-15'],
-                                    ['name' => 'Administrasi Rekam Medis', 'count' => '12 Pelatihan', 'date' => '2023-11-10'],
-                                    ['name' => 'Etika & Hukum Kesehatan', 'count' => '6 Pelatihan', 'date' => '2023-11-05'],
-                                    ['name' => 'Farmakologi Klinik', 'count' => '19 Pelatihan', 'date' => '2023-10-28'],
+                                $internalReports = [
+                                    ['name' => 'dr. Ahmad Subarjo', 'nip' => '198103101', 'unit' => 'Unit Gawat Darurat', 'course' => 'Prosedur Resusitasi', 'progress' => 100, 'status' => 'Selesai', 'score' => 95, 'cert' => 'Issued'],
+                                    ['name' => 'Siti Aminah, S.Kep', 'nip' => '198203201', 'unit' => 'Keperawatan Rawat Inap', 'course' => 'Manajemen Nyeri', 'progress' => 65, 'status' => 'Aktif', 'score' => '-', 'cert' => 'Not Issued'],
                                 ];
                             @endphp
 
-                            @foreach($categories as $cat)
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="py-5 px-6 font-bold text-gray-800">{{ $cat['name'] }}</td>
-                                <td class="py-5 px-4 text-center">
-                                    <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full font-medium text-[10px]">
-                                        {{ $cat['count'] }}
+                            @foreach($internalReports as $report)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+                                <td class="py-4 px-6 shrink-0">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 bg-gray-100 dark:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-gray-400 dark:text-white text-[10px] border border-gray-200 dark:border-slate-600">
+                                            {{ substr($report['name'], 0, 2) }}
+                                        </div>
+                                        <div class="truncate max-w-[120px]">
+                                            <p class="font-bold text-gray-800 dark:text-white truncate">{{ $report['name'] }}</p>
+                                            <p class="text-[10px] text-gray-400 dark:text-gray-300">NIP: {{ $report['nip'] }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-4 text-gray-500 dark:text-gray-200 leading-tight">{{ $report['unit'] }}</td>
+                                <td class="py-4 px-4 font-bold text-gray-800 dark:text-white">{{ $report['course'] }}</td>
+                                <td class="py-4 px-4">
+                                    <div class="flex items-center gap-2 justify-center">
+                                        <p class="text-[10px] text-gray-400 dark:text-white w-8 font-bold">{{ $report['progress'] }}%</p>
+                                        <div class="w-20 bg-gray-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                                            <div class="bg-blue-600 h-1.5 rounded-full transition-all duration-1000" style="width: {{ $report['progress'] }}%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-4 text-center">
+                                    <span class="font-bold {{ $report['status'] == 'Selesai' ? 'text-gray-800 dark:text-emerald-400' : 'text-blue-500 dark:text-blue-300' }}">
+                                        {{ $report['status'] }}
                                     </span>
                                 </td>
-                                <td class="py-5 px-4 text-center text-gray-500">
-                                    {{ $cat['date'] }}
+                                <td class="py-4 px-4 text-center font-bold dark:text-white">{{ $report['score'] }}</td>
+                                <td class="py-4 px-4 text-center">
+                                    <span class="px-2 py-1 rounded-full text-[9px] font-bold {{ $report['cert'] == 'Issued' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'bg-amber-100 text-amber-600 dark:bg-amber-950/30 dark:text-amber-400' }}">
+                                        {{ strtoupper($report['cert']) }}
+                                    </span>
                                 </td>
-                                <td class="py-5 px-6 text-right space-x-3 text-gray-400">
-                                    <button class="hover:text-blue-600 transition"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="hover:text-red-600 transition"><i class="fa-solid fa-trash-can"></i></button>
+                                <td class="py-4 px-6 text-center text-gray-400 dark:text-white">
+                                    <div class="flex flex-col items-center gap-1">
+                                        <button @click="openSertifikat = true" class="hover:text-blue-600 transition"><i class="fa-solid fa-eye"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                    {{-- ================= TABEL DAFTAR KARYAWAN (EKSTERNAL) ================= --}}
+                    <table x-show="activeTab === 'external' && !showDetail" x-cloak class="w-full text-left text-xs min-w-[700px]">
+                        <thead class="bg-gray-50 dark:bg-slate-800/50 text-gray-500 dark:text-white font-bold border-b dark:border-slate-800">
+                            <tr>
+                                <th class="py-4 px-6 uppercase tracking-wider">Nama Karyawan</th>
+                                <th class="py-4 px-4 uppercase tracking-wider">Unit Kerja</th>
+                                <th class="py-4 px-4 uppercase tracking-wider text-center">Jumlah Sertifikat</th>
+                                <th class="py-4 px-6 uppercase tracking-wider text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-slate-800 text-gray-700 dark:text-white transition-colors">
+                            @php
+                                $externalList = [
+                                    ['name' => 'Budi Santoso', 'nip' => '198303301', 'unit' => 'Administrasi & Keuangan', 'count' => 5],
+                                    ['name' => 'dr. Sarah Smith', 'nip' => '198504402', 'unit' => 'Spesialis Jantung', 'count' => 3],
+                                ];
+                            @endphp
+                            @foreach($externalList as $report)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+                                <td class="py-4 px-6 shrink-0">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 bg-gray-100 dark:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-gray-400 dark:text-white text-[10px] border border-gray-200 dark:border-slate-600">
+                                            {{ substr($report['name'], 0, 2) }}
+                                        </div>
+                                        <div class="truncate max-w-[150px]">
+                                            <p class="font-bold text-gray-800 dark:text-white truncate">{{ $report['name'] }}</p>
+                                            <p class="text-[10px] text-gray-400 dark:text-gray-300">NIP: {{ $report['nip'] }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-4 text-gray-500 dark:text-gray-200 leading-tight">{{ $report['unit'] }}</td>
+                                <td class="py-4 px-4 text-center">
+                                    <span class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full font-bold text-[10px] border border-blue-100 dark:border-blue-800">
+                                        {{ $report['count'] }} Sertifikat
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6 text-center text-gray-400 dark:text-white">
+                                    <button @click="showDetail = true; selectedUser = '{{ $report['name'] }}'" class="hover:text-blue-600 transition p-1">
+                                        <i class="fa-solid fa-eye text-lg"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                    {{-- ================= TABEL DETAIL PELATIHAN (EKSTERNAL) ================= --}}
+                    <table x-show="activeTab === 'external' && showDetail" x-cloak class="w-full text-left text-xs min-w-[700px]">
+                        <thead class="bg-gray-50 dark:bg-slate-800/50 text-gray-500 dark:text-white font-bold border-b dark:border-slate-800">
+                            <tr>
+                                <th class="py-4 px-6 uppercase tracking-wider">Nama Pelatihan</th>
+                                <th class="py-4 px-4 uppercase tracking-wider">Tanggal</th>
+                                <th class="py-4 px-4 uppercase tracking-wider text-center">Status</th>
+                                <th class="py-4 px-6 uppercase tracking-wider text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-slate-800 text-gray-700 dark:text-white transition-colors">
+                            @php
+                                $externalDetails = [
+                                    ['course' => 'Seminar Kardiologi Modern', 'date' => '12 April 2026', 'status' => 'Disetujui'],
+                                    ['course' => 'Pelatihan BTCLS Internasional', 'date' => '10 April 2026', 'status' => 'Belum Disetujui'],
+                                    ['course' => 'Workshop Manajemen Lab', 'date' => '05 April 2026', 'status' => 'Tidak Disetujui'],
+                                ];
+                            @endphp
+                            @foreach($externalDetails as $detail)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+                                <td class="py-5 px-6 font-bold text-gray-800 dark:text-white">{{ $detail['course'] }}</td>
+                                <td class="py-5 px-4 text-gray-500 dark:text-gray-300 font-medium italic">{{ $detail['date'] }}</td>
+                                <td class="py-5 px-4 text-center">
+                                    <span class="px-3 py-1 rounded-full text-[9px] font-bold border uppercase 
+                                        {{ $detail['status'] == 'Disetujui' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 border-emerald-100' : 
+                                        ($detail['status'] == 'Belum Disetujui' ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 border-amber-100' : 
+                                        'bg-rose-50 dark:bg-rose-900/30 text-rose-600 border-rose-100') }}">
+                                        {{ $detail['status'] }}
+                                    </span>
+                                </td>
+                                <td class="py-5 px-6 text-center text-gray-400 dark:text-white">
+                                    <button @click="openSertifikat = true" class="hover:text-blue-600 transition p-1"><i class="fa-solid fa-eye text-lg"></i></button>
                                 </td>
                             </tr>
                             @endforeach
@@ -124,16 +317,65 @@
                     </table>
                 </div>
 
-                <div class="flex justify-between items-center mt-6">
-                    <p class="text-[10px] text-gray-400 font-medium">Menampilkan <span class="font-bold">6</span> dari 6 data kategori</p>
-                    <div class="flex items-center gap-1">
-                        <button class="px-3 py-1.5 border border-gray-200 rounded text-[10px] text-gray-400 font-semibold bg-white" disabled>Sebelumnya</button>
-                        <button class="w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded text-[10px] font-bold">1</button>
-                        <button class="px-3 py-1.5 border border-gray-200 rounded text-[10px] text-gray-400 font-semibold bg-white" disabled>Berikutnya</button>
+                {{-- Pagination & Export --}}
+                <div class="flex flex-col xl:flex-row justify-between items-center mt-8 gap-6 transition-colors">
+                    <p class="text-[10px] text-gray-400 dark:text-white font-medium italic order-3 xl:order-1">Menampilkan data laporan</p>
+                    <div class="flex flex-col sm:flex-row items-center gap-4 order-1 xl:order-2 w-full sm:w-auto">
+                        <div class="flex gap-2 w-full sm:w-auto transition-colors">
+                            <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border-2 border-blue-600 text-blue-600 rounded-lg text-[10px] lg:text-[11px] font-bold active:scale-95 transition-all">
+                                <i class="fa-solid fa-file-excel"></i> Export Excel
+                            </button>
+                            <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border-2 border-red-500 text-red-500 rounded-lg text-[10px] lg:text-[11px] font-bold active:scale-95 transition-all">
+                                <i class="fa-solid fa-file-pdf"></i> Export PDF
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
+
+    {{-- Modal Pop-Up Sertifikat --}}
+    <div x-show="openSertifikat" class="fixed inset-0 z-[100] flex items-center justify-center p-4" x-cloak>
+        <div x-show="openSertifikat" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="openSertifikat = false"></div>
+        <div x-show="openSertifikat" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="relative bg-white dark:bg-slate-900 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden border dark:border-slate-800">
+            <div class="flex items-center justify-between px-6 py-4 border-b dark:border-slate-800">
+                <h3 class="text-base font-bold text-slate-800 dark:text-white">Sertifikat</h3>
+                <button @click="openSertifikat = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-4 sm:p-6 lg:p-12 flex justify-center bg-slate-50 dark:bg-slate-950/50 overflow-hidden">
+                <div class="certificate-scaler-wrapper w-full flex items-center justify-center">
+                    <div class="certificate-content relative w-[800px] aspect-[1.414/1] bg-white shadow-lg border-[12px] border-blue-100 flex flex-col items-center p-8 lg:p-12 text-center flex-shrink-0">
+                        <div class="absolute top-0 left-0 w-24 h-24 border-t-4 border-l-4 border-blue-400 rounded-tl-lg"></div>
+                        <div class="absolute bottom-0 right-0 w-24 h-24 border-b-4 border-r-4 border-blue-400 rounded-br-lg"></div>
+                        <div class="mb-6 text-center">
+                            <h4 class="text-red-600 font-bold text-xs leading-none uppercase">Citra Husada</h4>
+                            <p class="text-green-600 font-bold text-[10px]">Learning Management System</p>
+                        </div>
+                        <h2 class="text-2xl lg:text-3xl font-serif font-bold text-slate-800 mb-2">Certificate of Completion</h2>
+                        <h1 class="text-3xl lg:text-4xl font-bold text-blue-600 border-b-2 border-blue-50 px-4 mt-8">Dr. Sarah Smith</h1>
+                        <p class="text-xs text-slate-500 mt-12">Has successfully completed the training module</p>
+                        <h3 class="text-sm lg:text-base font-bold text-slate-800 max-w-md uppercase mt-2">Advanced Cardiology Management</h3>
+                        <div class="mt-auto w-full flex justify-between items-end px-4">
+                            <div class="text-left"><p class="text-xs font-bold text-slate-700">Nov 24, 2023</p></div>
+                            <div class="w-20 h-20 bg-blue-50/50 rounded-full flex items-center justify-center border-2 border-blue-100"><i class="fa-solid fa-stamp text-blue-200 text-3xl"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
+    [x-cloak] { display: none !important; }
+    .certificate-scaler-wrapper { min-height: 250px; }
+    @media (max-width: 850px) { .certificate-content { transform: scale(0.8); transform-origin: center center; } }
+    @media (max-width: 640px) { .certificate-content { transform: scale(0.55); } .certificate-scaler-wrapper { height: 320px; } }
+    @media (max-width: 480px) { .certificate-content { transform: scale(0.42); } .certificate-scaler-wrapper { height: 250px; } }
+</style>
 @endsection
