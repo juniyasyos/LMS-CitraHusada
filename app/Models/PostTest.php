@@ -13,8 +13,10 @@ class PostTest extends Model
 
     protected $fillable = [
         'materi_id',
+        'judul',
         'urutan_post_test',
-        'waktu_pengerjaan',// dalam menit
+        'waktu_pengerjaan', // dalam menit
+        'ulang_post_test',
     ];
 
     public function materi()

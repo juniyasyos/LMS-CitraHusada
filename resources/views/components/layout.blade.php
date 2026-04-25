@@ -12,6 +12,19 @@
     
     <!-- Tailwind tetap di head (ikut layout lama) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class', 
+            theme: { extend: {} }
+        }
+    </script>
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -44,9 +57,35 @@
     <!-- Alpine (fix: hanya sekali) -->
     <script src="//unpkg.com/alpinejs" defer></script>
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
+    @if(session()->has('impersonate_by'))
+    <div class="fixed top-0 left-0 right-0 z-[9999] bg-amber-500 text-white px-4 py-2 flex justify-between items-center shadow-lg animate-bounce-subtle">
+        <div class="flex items-center gap-3">
+            <div class="bg-white/20 p-1.5 rounded-lg">
+                <i class="fa-solid fa-user-secret text-sm"></i>
+            </div>
+            <p class="text-xs font-bold tracking-wide">
+                MODE IMPERSONASI: Anda sedang masuk sebagai <span class="underline decoration-2 underline-offset-4">{{ Auth::user()->nama }}</span>
+            </p>
+        </div>
+        <a href="{{ route('impersonate.stop') }}" 
+           class="bg-white text-amber-600 px-4 py-1.5 rounded-full text-[10px] font-black uppercase hover:bg-amber-50 transition active:scale-95 shadow-sm">
+            Kembali ke Admin
+        </a>
+    </div>
+    <style>
+        @keyframes bounce-subtle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(3px); }
+        }
+        .animate-bounce-subtle { animation: bounce-subtle 3s infinite ease-in-out; }
+        body { padding-top: 45px; } /* Space for the banner */
+    </style>
+    @endif
 
     <!-- Sidebar Toggle (SAFE VERSION) -->
     <script>

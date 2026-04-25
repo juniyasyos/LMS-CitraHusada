@@ -11,7 +11,7 @@ class JenisTenaga extends Model
 
     protected $primaryKey = 'jenis_tenaga_id';
 
-    protected $fillable = ['jenis_tenaga'];
+    protected $fillable = ['jenis_tenaga', 'deskripsi'];
 
     public function users()
     {

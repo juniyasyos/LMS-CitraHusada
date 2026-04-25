@@ -23,6 +23,7 @@ return new class extends Migration
         Schema::create('jenis_tenagas', function (Blueprint $table) {
             $table->bigIncrements('jenis_tenaga_id');
             $table->string('jenis_tenaga');
+            $table->text('deskripsi')->nullable();
             $table->timestamps();
         });
     }

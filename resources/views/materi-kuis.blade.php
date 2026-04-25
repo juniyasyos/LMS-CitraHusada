@@ -586,6 +586,13 @@
             submitKuis();
         }
 
+        function formatDurasi(detik) {
+            let menit = Math.floor(detik / 60);
+            let sisaDetik = detik % 60;
+            if (menit > 0) return `${menit} Menit ${sisaDetik} Detik`;
+            return `${sisaDetik} Detik`;
+        }
+
         document.getElementById("modalKonfirmasi").addEventListener("click", function (e) {
 
             const modalBox = document.getElementById("modalBox");
@@ -597,6 +604,8 @@
         });
 
         async function submitKuis() {
+            const durasiPengerjaan = waktuPengerjaan - (timeLeft > 0 ? timeLeft : 0);
+            
             localStorage.removeItem("quiz_time_left");
             localStorage.removeItem("quiz_current_question");
             localStorage.removeItem("quiz_jawaban");
@@ -608,7 +617,8 @@
                 const response = await axios.post('/api/post-test-submit', {
                     materi_id: materiId,
                     post_test_id: postTestId,
-                    jawaban: jawabanUser
+                    jawaban: jawabanUser,
+                    waktu_pengerjaan: durasiPengerjaan
                 });
 
                 const data = response.data;
@@ -616,6 +626,29 @@
                 document.getElementById("quizHeader").style.display = "none";
                 document.getElementById("cardSoal").style.display = "none";
                 document.getElementById("hasilContainer").classList.remove("hidden");
+
+                if (data.is_locked_back) {
+                    document.getElementById("hasilContainer").innerHTML = `
+                        <div class="bg-white border rounded-xl p-6 sm:p-8 max-w-xl mx-auto text-center shadow-sm border-red-200">
+                            <div class="text-4xl sm:text-5xl mb-4 text-red-500">
+                                <i class="fa-solid fa-rotate-left"></i>
+                            </div>
+                            <h2 class="text-xl sm:text-2xl font-bold mb-2 text-red-600">
+                                Kesempatan Habis!
+                            </h2>
+                            <p class="text-gray-600 mb-6 text-sm sm:text-base">
+                                ${data.lockback_message}
+                            </p>
+                            <div class="mt-6 flex justify-center">
+                                <a href="/lanjutkan-materi/${materiId}?step=1"
+                                class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition">
+                                    Mulai Dari Awal
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
 
                 let tombolUlang = "";
 
@@ -667,9 +700,14 @@
                             </p>
 
                             <!-- NILAI -->
-                            <div class="text-3xl sm:text-4xl font-bold text-blue-600 mb-6">
+                            <div class="text-3xl sm:text-4xl font-bold text-blue-600 mb-2">
                                 ${data.skor_kuis_ini} / 100
                             </div>
+
+                            <!-- DURASI -->
+                            <p class="text-[11px] text-gray-400 font-medium mb-6">
+                                <i class="fa-regular fa-clock mr-1"></i> Waktu pengerjaan: ${formatDurasi(data.waktu_pengerjaan)}
+                            </p>
 
                             <!-- PESAN -->
                             <p class="text-gray-500 mb-8 text-sm sm:text-base">
@@ -702,9 +740,14 @@
                             </p>
 
                             <!-- NILAI -->
-                            <div class="text-3xl sm:text-4xl font-bold mb-6 text-red-600">
+                            <div class="text-3xl sm:text-4xl font-bold mb-2 text-red-600">
                                 ${data.skor_kuis_ini} / 100
                             </div>
+
+                            <!-- DURASI -->
+                            <p class="text-[11px] text-gray-400 font-medium mb-6">
+                                <i class="fa-regular fa-clock mr-1"></i> Waktu pengerjaan: ${formatDurasi(data.waktu_pengerjaan)}
+                            </p>
 
                             <!-- PESAN MOTIVASI -->
                             <p class="text-gray-500 mb-6 text-sm sm:text-base">

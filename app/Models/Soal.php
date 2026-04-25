@@ -12,7 +12,7 @@ class Soal extends Model
     protected $primaryKey = 'soal_id';
 
     protected $fillable = [
-        'urutan_post_test',
+        'urutan_soal',
         'post_test_id',
         'status_pilihan',
         'soal',

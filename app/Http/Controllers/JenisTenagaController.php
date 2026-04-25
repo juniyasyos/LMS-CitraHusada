@@ -37,6 +37,7 @@ class JenisTenagaController extends Controller
         try {
             $validated = $request->validate([
                 'jenis_tenaga' => 'required|string|max:255',
+                'deskripsi' => 'nullable|string',
             ]);
 
             $jenisTenaga = JenisTenaga::create($validated);
@@ -89,6 +90,7 @@ class JenisTenagaController extends Controller
         try {
             $validated = $request->validate([
                 'jenis_tenaga' => 'required|string|max:255',
+                'deskripsi' => 'nullable|string',
             ]);
 
             $jenisTenaga->update($validated);

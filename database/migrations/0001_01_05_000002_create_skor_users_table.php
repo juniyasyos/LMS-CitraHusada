@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('progress_id');
             $table->unsignedBigInteger('post_test_id');
             $table->unsignedInteger('skor');
+            $table->integer('waktu_pengerjaan')->default(0);
             $table->dateTime('waktu_mulai_pengerjaan')->nullable();
             $table->dateTime('waktu_selesai_pengerjaan')->nullable();
             $table->timestamps();

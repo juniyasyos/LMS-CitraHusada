@@ -14,6 +14,7 @@ class SubMateri extends Model
     protected $fillable = [
         'materi_id',
         'judul',
+        'deskripsi',
         'file_materi',
         'urutan_sub_materi',
     ];

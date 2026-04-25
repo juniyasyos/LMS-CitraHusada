@@ -23,6 +23,7 @@ return new class extends Migration
         Schema::create('unit_kerjas', function (Blueprint $table) {
             $table->bigIncrements('unit_kerja_id');
             $table->string('unit_kerja');
+            $table->text('deskripsi')->nullable();
             $table->timestamps();
         });
     }

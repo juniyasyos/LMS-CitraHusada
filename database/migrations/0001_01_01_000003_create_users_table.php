@@ -21,8 +21,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Menjalankan migrasi: membuat tabel `users`.
      *
@@ -37,9 +36,9 @@ return new class extends Migration
             $table->unsignedBigInteger('unit_kerja_id')->nullable();
             $table->string('nik')->unique();
             $table->string('password');
-            $table->unsignedBigInteger('role_id')->default(43);
-            $table->boolean('status')->default(true);
-            // $table->rememberToken();
+            $table->unsignedBigInteger('role_id')->default(4);
+            $table->boolean('status')->default(true); //Aktif dan Nonaktif
+            $table->integer('total_jpl')->default(0);
             $table->timestamps();
             // foreign keys will be added in a separate migration to ensure referenced tables exist
         });

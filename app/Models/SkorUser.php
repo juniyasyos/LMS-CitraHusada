@@ -15,6 +15,7 @@ class SkorUser extends Model
         'progress_id',
         'post_test_id',
         'skor',
+        'waktu_pengerjaan',
         'waktu_mulai_pengerjaan',
         'waktu_selesai_pengerjaan',
     ];

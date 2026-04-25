@@ -73,6 +73,13 @@ class AuthController extends Controller
             // 🔥 Buat token baru
             $token = $user->createToken('auth_token')->plainTextToken;
 
+            // 🔥 SINKRONISASI HYBRID: Buat session Laravel dari API Login agar Frontend Blade bisa diakses
+            Auth::login($user, $remember);
+            $request->session()->regenerate();
+
+            // Atur redirect berdasarkan role! Mencegah user Karyawan dilempar ke Admin dan 403 Forbidden
+            $redirectUrl = ($user->role_id == 1) ? '/beranda-superadmin' : '/pembelajaran';
+
             // 🔥 Atur expiry logic manual (simulasi "remember me")
             $expires_at = $remember 
                 ? now()->addDays(30)   // ingat saya → 30 hari
@@ -85,7 +92,7 @@ class AuthController extends Controller
                     'user' => $user,
                     'token' => $token,
                     'expires_at' => $expires_at,
-                    'redirect' => '/pembelajaran'
+                    'redirect' => $redirectUrl
                 ]
             ], 200);
 
@@ -110,10 +117,13 @@ class AuthController extends Controller
     public function logoutApi(Request $request)
     {
         try {
-            // Auth::logout();
-            // $request->session()->invalidate();
-            // $request->session()->regenerateToken(); // Dihapus karena murni REST API Token
+            // Bersihkan token Sanctum
             $request->user()->currentAccessToken()->delete();
+            
+            // Bersihkan Session Web agar tidak ada bocoran state
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken(); 
             
             return response()->json([
                 'success' => true,

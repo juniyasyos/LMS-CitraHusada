@@ -12,6 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->alias([
+            'role' => \App\Http\Middleware\CheckRole::class,
+        ]);
+
         // Add session middleware to API routes for session-based authentication
         // Use prepend to ensure session middleware runs early in the stack
         $middleware->api(prepend: [

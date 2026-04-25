@@ -15,7 +15,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-    
+
     protected $primaryKey = 'user_id';
 
     protected $fillable = [
@@ -26,6 +26,7 @@ class User extends Authenticatable
         'password',
         'role_id',
         'status',
+        'total_jpl',
     ];
 
     protected $hidden = [
@@ -34,7 +35,6 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'status' => 'boolean',
         'password' => 'hashed',
     ];
 
@@ -67,7 +67,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(Notification::class, 'user_id', 'user_id');
     }
-    
+
     //  public function skorUsers()
     // {
     //     return $this->hasMany(SkorUser::class, 'user_id', 'user_id');

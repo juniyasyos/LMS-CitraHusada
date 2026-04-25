@@ -11,7 +11,7 @@ class UnitKerja extends Model
 
     protected $primaryKey = 'unit_kerja_id';
 
-    protected $fillable = ['unit_kerja'];
+    protected $fillable = ['unit_kerja', 'deskripsi'];
 
     public function users()
     {

@@ -19,6 +19,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Illuminate\Support\Facades\Event::listen(
+            \Spatie\Backup\Events\BackupWasSuccessful::class,
+            \App\Listeners\BackupSuccessfulListener::class
+        );
+
+        \Illuminate\Support\Facades\Event::listen(
+            \Spatie\Backup\Events\BackupHasFailed::class,
+            \App\Listeners\BackupFailedListener::class
+        );
     }
 }
