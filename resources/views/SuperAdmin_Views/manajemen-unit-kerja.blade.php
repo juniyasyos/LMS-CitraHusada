@@ -16,7 +16,7 @@
     {{-- SIDEBAR RESPONSIVE --}}
     <aside 
         :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-        class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 border-r dark:border-slate-800 transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0 flex-shrink-0 overflow-y-auto">
+        class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 border-r dark:border-slate-800 transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0 shrink-0 overflow-y-auto">
         @include('components.nav-superadmin')
     </aside>
 
@@ -32,45 +32,11 @@
     <div class="flex-1 flex flex-col min-w-0 transition-colors duration-300">
         
         {{-- HEADER --}}
-        <header class="bg-white dark:bg-slate-900 border-b dark:border-slate-800 h-16 flex items-center justify-between px-4 lg:px-8 flex-shrink-0 z-10">
-            <div class="flex items-center gap-4">
-                <button @click="sidebarOpen = true" class="lg:hidden p-2 text-gray-500 dark:text-white">
-                    <i class="fa-solid fa-bars text-lg"></i>
-                </button>
-                <h1 class="text-sm font-semibold text-gray-600 dark:text-white truncate uppercase tracking-tight">Manajemen Master Data</h1>
-            </div>
-
-            <div class="flex items-center gap-4">
-                @include('components.notif-superadmin')
-                <div class="flex items-center gap-3 pl-4 border-l border-gray-100 dark:border-slate-800">
-                    <div class="text-right hidden sm:block">
-                        <p class="text-xs font-bold text-gray-800 dark:text-white leading-tight">Superadmin</p>
-                        <p class="text-[10px] text-gray-500 dark:text-gray-300 font-medium italic uppercase tracking-wider">Administrator Utama</p>
-                    </div>
-                    <div class="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded-full flex items-center justify-center border dark:border-slate-800">
-                        <i class="fa-solid fa-user text-gray-500 dark:text-white text-xs"></i>
-                    </div>
-                </div>
-            </div>
-        </header>
+        @include('components.header-superadmin', ['title' => 'Manajemen Unit Kerja'])
 
         <main class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar">
             
-            {{-- SUCCESS / ERROR MESSAGES --}}
-            @if(session('success'))
-                <script>
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: "{{ session('success') }}",
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true
-                    });
-                </script>
-            @endif
+
 
             {{-- TITLE SECTION DENGAN SWITCHER --}}
             <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
@@ -152,7 +118,7 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-slate-800 transition duration-150">
                             <td class="py-5 px-6">
                                 <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 {{ $type === 'unit' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-500' : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500' }} rounded-lg flex items-center justify-center flex-shrink-0 shadow-inner">
+                                    <div class="w-10 h-10 {{ $type === 'unit' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-500' : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500' }} rounded-lg flex items-center justify-center shrink-0 shadow-inner">
                                         <i class="fa-solid {{ $type === 'unit' ? 'fa-building' : 'fa-user-doctor' }} text-lg"></i>
                                     </div>
                                     <div>
@@ -173,7 +139,7 @@
                                 <div class="flex justify-end gap-5 text-gray-400 dark:text-white">
                                     {{-- Edit Button --}}
                                     <button @click="openEdit = true; editData = { id: '{{ $id }}', name: '{{ $name }}', desc: '{{ $item->deskripsi }}' }" 
-                                            class="hover:text-blue-600 transition-all p-1 active:scale-95" title="Edit Data">
+                                            class="hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-500 rounded-lg transition-all active:scale-90" title="Edit Data">
                                         <i class="fa-solid fa-pen"></i>
                                     </button>
 
@@ -181,7 +147,7 @@
                                     <form action="{{ route('manajemen-unit-kerja.destroy', $id) }}" method="POST" class="inline-block delete-form">
                                         @csrf @method('DELETE')
                                         <input type="hidden" name="type" value="{{ $type }}">
-                                        <button type="button" onclick="confirmDelete(this)" class="hover:text-red-600 transition-all p-1 active:scale-95" title="Hapus Data">
+                                        <button type="button" onclick="confirmDelete(this)" class="hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 rounded-lg transition-all active:scale-90" title="Hapus Data">
                                             <i class="fa-solid fa-trash-can"></i>
                                         </button>
                                     </form>
@@ -210,7 +176,7 @@
             {{-- TIPS SECTION --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                 <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm flex gap-4 transition-all hover:shadow-md">
-                    <div class="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-full flex-shrink-0 flex items-center justify-center">
+                    <div class="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-full shrink-0 flex items-center justify-center">
                         <i class="fa-solid fa-circle-info text-blue-600"></i>
                     </div>
                     <div>
@@ -219,7 +185,7 @@
                     </div>
                 </div>
                 <div class="bg-blue-600 p-6 rounded-xl shadow-lg shadow-blue-100 dark:shadow-none flex gap-4 transition-all hover:bg-blue-700">
-                    <div class="w-10 h-10 bg-white/20 rounded-full flex-shrink-0 flex items-center justify-center">
+                    <div class="w-10 h-10 bg-white/20 rounded-full shrink-0 flex items-center justify-center">
                         <i class="fa-solid fa-bullseye text-white"></i>
                     </div>
                     <div>
@@ -228,7 +194,7 @@
                     </div>
                 </div>
                 <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm flex gap-4 transition-all hover:shadow-md">
-                    <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/30 rounded-full flex-shrink-0 flex items-center justify-center">
+                    <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/30 rounded-full shrink-0 flex items-center justify-center">
                         <i class="fa-solid fa-hospital text-emerald-600"></i>
                     </div>
                     <div>
@@ -242,7 +208,7 @@
 
     {{-- MODAL TAMBAH --}}
     <div x-show="openTambah" 
-         class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" 
+         class="fixed inset-0 z-60 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" 
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
@@ -277,7 +243,7 @@
                     </div>
                     <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4">
                         <button @click="openTambah = false" type="button" class="w-full sm:w-auto px-8 py-2.5 border border-gray-200 dark:border-slate-700 text-gray-500 dark:text-white font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition text-xs">Batal</button>
-                        <button type="submit" class="w-full sm:w-auto px-8 py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-100 transition text-xs active:scale-95">Simpan Data</button>
+                        <button type="submit" class="w-full sm:w-auto px-8 py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-blue-100 transition text-xs active:scale-95">Simpan Data</button>
                     </div>
                 </form>
             </div>
@@ -286,7 +252,7 @@
 
     {{-- MODAL EDIT --}}
     <div x-show="openEdit" 
-         class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" 
+         class="fixed inset-0 z-60 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" 
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
@@ -321,7 +287,7 @@
                     </div>
                     <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4">
                         <button @click="openEdit = false" type="button" class="w-full sm:w-auto px-8 py-2.5 border border-gray-200 dark:border-slate-700 text-gray-500 dark:text-white font-bold rounded-lg text-xs">Batal</button>
-                        <button type="submit" class="w-full sm:w-auto px-8 py-2.5 bg-blue-600 text-white font-bold rounded-lg shadow-lg shadow-blue-100 transition text-xs active:scale-95">Simpan Perubahan</button>
+                        <button type="submit" class="w-full sm:w-auto px-8 py-2.5 bg-blue-600 text-white font-bold rounded-lg shadow-blue-100 transition text-xs active:scale-95">Simpan Perubahan</button>
                     </div>
                 </form>
             </div>

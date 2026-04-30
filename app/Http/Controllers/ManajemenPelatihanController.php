@@ -625,21 +625,21 @@ class ManajemenPelatihanController extends Controller
     /**
      * Download file sub-materi dan catat log.
      */
-    public function downloadSubMateri(Request $request, $id)
-    {
-        $sub = SubMateri::findOrFail($id);
-        $filePath = $sub->file_materi;
-        $judul = $sub->judul;
+    // public function downloadSubMateri(Request $request, $id)
+    // {
+    //     $sub = SubMateri::findOrFail($id);
+    //     $filePath = $sub->file_materi;
+    //     $judul = $sub->judul;
 
-        if (!$filePath || !Storage::disk('public')->exists($filePath)) {
-            return back()->with('error', 'File tidak ditemukan di server.');
-        }
+    //     if (!$filePath || !Storage::disk('public')->exists($filePath)) {
+    //         return back()->with('error', 'File tidak ditemukan di server.');
+    //     }
 
-        // Log Aktivitas
-        $this->logActivity($request, 'Download', 'sub_materis', $id, "Mengunduh file materi: [{$judul}]");
+    //     // Log Aktivitas
+    //     $this->logActivity($request, 'Download', 'sub_materis', $id, "Mengunduh file materi: [{$judul}]");
 
-        return Storage::disk('public')->download($filePath);
-    }
+    //     return Storage::disk('public')->download($filePath);
+    // }
 
     /**
      * Halaman Arsip: Menampilkan materi yang sudah melewati tanggal_selesai.

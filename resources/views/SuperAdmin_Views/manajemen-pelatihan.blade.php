@@ -41,27 +41,7 @@
             class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden" x-cloak></div>
 
         <div class="flex-1 flex flex-col min-w-0 transition-colors duration-300">
-            <header
-                class="bg-white dark:bg-slate-900 border-b dark:border-slate-800 h-16 flex items-center justify-between px-4 lg:px-8 shrink-0 z-10 transition-colors duration-300">
-                <div class="flex items-center gap-4">
-                    <button @click="sidebarOpen = true" class="lg:hidden p-2 text-gray-500 dark:text-white"><i
-                            class="fa-solid fa-bars text-lg"></i></button>
-                    <h1 class="text-sm font-semibold text-gray-600 dark:text-white truncate">Manajemen Pelatihan</h1>
-                </div>
-                <div class="flex items-center gap-3 lg:gap-4">
-                    @include('components.notif-superadmin')
-                    <div class="flex items-center gap-3 pl-2 lg:pl-4 border-l border-gray-100 dark:border-slate-800">
-                        <div class="text-right hidden sm:block">
-                            <p class="text-xs font-bold text-gray-800 dark:text-white leading-tight">Superadmin</p>
-                            <p class="text-[10px] text-gray-500 dark:text-gray-300 font-medium italic">Utama</p>
-                        </div>
-                        <div
-                            class="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden border border-gray-100 dark:border-slate-800 flex items-center justify-center">
-                            <i class="fa-solid fa-user text-gray-500 dark:text-white text-xs"></i>
-                        </div>
-                    </div>
-                </div>
-            </header>
+            @include('components.header-superadmin', ['title' => 'Manajemen Media'])
 
             <main class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar">
                 <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
@@ -74,7 +54,7 @@
                     <div class="flex flex-wrap items-center gap-3">
                         <a href="{{ route('pelatihan.arsip') }}"
                             class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 text-xs font-bold transition shadow-sm active:scale-95">
-                            <i class="fa-solid fa-box-archive text-xs"></i> Arsip Pelatihan
+                            <i class="fa-solid fa-box-archive text-xs"></i> Arsip
                         </a>
                         <a href="{{ route('pelatihan.trash') }}"
                             class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 text-xs font-bold transition shadow-sm active:scale-95">
@@ -87,18 +67,7 @@
                     </div>
                 </div>
 
-                @if(session('success'))
-                    <div
-                        class="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 text-xs font-bold rounded-xl flex items-center gap-3">
-                        <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
-                    </div>
-                @endif
-                @if(session('error'))
-                    <div
-                        class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 text-red-600 dark:text-red-400 text-xs font-bold rounded-xl flex items-center gap-3">
-                        <i class="fa-solid fa-circle-xmark"></i> {{ session('error') }}
-                    </div>
-                @endif
+
 
                 <div
                     class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-4 lg:p-6 mb-10 transition-colors duration-300">
@@ -221,7 +190,7 @@
                 class="bg-white dark:bg-slate-900 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden transition-colors duration-300">
                 <div
                     class="flex justify-between items-center px-6 lg:px-8 py-5 border-b border-gray-100 dark:border-slate-800">
-                    <h2 class="text-base font-bold text-gray-800 dark:text-white">Tambah Pelatihan</h2>
+                    <h2 class="text-base font-bold text-gray-800 dark:text-white">Tambah Folder</h2>
                     <button @click="openTambahFolder = false"
                         class="text-gray-400 hover:text-gray-800 dark:hover:text-white transition"><i
                             class="fa-solid fa-xmark text-lg"></i></button>
@@ -370,8 +339,7 @@
                             <button @click="openTambahFolder = false" type="button"
                                 class="w-full sm:w-auto px-8 py-2.5 border dark:border-slate-700 text-gray-500 dark:text-white font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition text-xs">Batal</button>
                             <button type="submit"
-                                class="w-full sm:w-auto px-8 py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-100 dark:shadow-none transition text-xs active:scale-95">Simpan
-                                Pelatihan</button>
+                                class="w-full sm:w-auto px-8 py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-100 dark:shadow-none transition text-xs active:scale-95">Simpan</button>
                         </div>
                     </form>
                 </div>

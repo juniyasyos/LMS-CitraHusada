@@ -111,6 +111,58 @@
 
 
 
+    <!-- Global Notifications -->
+    <script>
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        window.showExportNotification = function() {
+            Swal.fire({
+                icon: 'info',
+                title: 'Memproses...',
+                text: 'Data sedang disiapkan. Unduhan akan dimulai otomatis.',
+                timer: 4000,
+                showConfirmButton: false,
+                timerProgressBar: true,
+                position: 'top-end',
+                toast: true
+            });
+        };
+
+        @if(session('success'))
+            Toast.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: "{{ session('success') }}"
+            });
+        @endif
+
+        @if(session('error'))
+            Toast.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: "{{ session('error') }}"
+            });
+        @endif
+
+        @if(session('warning'))
+            Toast.fire({
+                icon: 'warning',
+                title: 'Peringatan!',
+                text: "{{ session('warning') }}"
+            });
+        @endif
+    </script>
+
     <!-- Lottie -->
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 

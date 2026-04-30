@@ -152,27 +152,7 @@
 
     <div class="flex-1 flex flex-col min-w-0 transition-colors duration-300">
         
-        <header class="bg-white dark:bg-slate-900 border-b dark:border-slate-800 h-16 flex items-center justify-between px-4 lg:px-8 shrink-0 z-10 transition-colors duration-300">
-            <div class="flex items-center gap-4">
-                <button @click="sidebarOpen = true" class="lg:hidden p-2 text-gray-500 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition">
-                    <i class="fa-solid fa-bars text-lg"></i>
-                </button>
-                <h1 class="text-sm font-semibold text-gray-600 dark:text-white truncate">Cadangan</h1>
-            </div>
-
-            <div class="flex items-center gap-3 lg:gap-4">
-                @include('components.notif-superadmin')
-                <div class="flex items-center gap-3 pl-2 lg:pl-4 border-l border-gray-100 dark:border-slate-800">
-                    <div class="text-right hidden sm:block">
-                        <p class="text-xs font-bold text-gray-800 dark:text-white leading-tight">Superadmin</p>
-                        <p class="text-[10px] text-gray-500 dark:text-gray-300 font-medium italic">Utama</p>
-                    </div>
-                    <div class="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden border border-gray-100 dark:border-slate-800 flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-user text-gray-500 dark:text-white text-xs"></i>
-                    </div>
-                </div>
-            </div>
-        </header>
+        @include('components.header-superadmin', ['title' => 'Cadangan'])
 
         <main class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar">
             <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">

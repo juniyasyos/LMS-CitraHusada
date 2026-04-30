@@ -62,31 +62,14 @@
     <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition:enter="transition opacity-100 ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:leave="transition opacity-100 ease-in duration-200" x-transition:leave-end="opacity-0" class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden" x-cloak></div>
 
     <div class="flex-1 flex flex-col min-w-0 transition-colors duration-300">
-        <header class="bg-white dark:bg-slate-900 border-b dark:border-slate-800 h-16 flex items-center justify-between px-4 lg:px-8 shrink-0 z-10 transition-colors duration-300">
-            <div class="flex items-center gap-4">
-                <button @click="sidebarOpen = true" class="lg:hidden p-2 text-gray-500 dark:text-white"><i class="fa-solid fa-bars text-lg"></i></button>
-                <h1 class="text-sm font-semibold text-gray-600 dark:text-white truncate">Detail Isi Pelatihan</h1>
-            </div>
-            <div class="flex items-center gap-3 lg:gap-4">
-                @include('components.notif-superadmin')
-                <div class="flex items-center gap-3 pl-2 lg:pl-4 border-l border-gray-100 dark:border-slate-800">
-                    <div class="text-right hidden sm:block">
-                        <p class="text-xs font-bold text-gray-800 dark:text-white leading-tight">Superadmin</p>
-                        <p class="text-[10px] text-gray-500 dark:text-gray-300 font-medium italic">Utama</p>
-                    </div>
-                    <div class="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden border border-gray-100 dark:border-slate-800 flex items-center justify-center">
-                        <i class="fa-solid fa-user text-gray-500 dark:text-white text-xs"></i>
-                    </div>
-                </div>
-            </div>
-        </header>
+        @include('components.header-superadmin', ['title' => 'Daftar materi dan kuis'])
 
         <main class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar">
             {{-- Breadcrumb --}}
             <nav class="mb-6 text-[14px] font-medium">
                 <ol class="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                    <li><a href="{{ route('manajemen-pelatihan') }}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Manajemen Pelatihan</a></li>
-                    <li class="flex items-center gap-2"><span class="text-gray-300 dark:text-gray-600"> > </span><span class="text-gray-800 dark:text-white font-semibold">Isi Pelatihan</span></li>
+                    <li><a href="{{ route('manajemen-pelatihan') }}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Manajemen Media</a></li>
+                    <li class="flex items-center gap-2"><span class="text-gray-300 dark:text-gray-600"> > </span><span class="text-gray-800 dark:text-white font-semibold">Daftar materi dan kuis</span></li>
                 </ol>
             </nav>
 
@@ -105,16 +88,7 @@
                 </div>
             </div>
 
-            @if(session('success'))
-                <div class="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 text-xs font-bold rounded-xl flex items-center gap-3">
-                    <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
-                </div>
-            @endif
-            @if(session('error'))
-                <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 text-red-600 dark:text-red-400 text-xs font-bold rounded-xl flex items-center gap-3">
-                    <i class="fa-solid fa-circle-xmark"></i> {{ session('error') }}
-                </div>
-            @endif
+
 
             {{-- Combined Table --}}
             <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden mb-10 transition-colors">
@@ -122,7 +96,7 @@
                     <thead class="text-gray-500 dark:text-white font-bold border-b dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50">
                         <tr>
                             <th class="py-4 px-6 uppercase tracking-wider">No</th>
-                            <th class="py-4 px-6 uppercase tracking-wider">Daftar Kuis dan Materi</th>
+                            <th class="py-4 px-6 uppercase tracking-wider">Daftar materi dan kuis</th>
                             <th class="py-4 px-6 uppercase tracking-wider text-center">Jumlah Pengerjaan</th>
                             <th class="py-4 px-6 uppercase tracking-wider">Keterangan</th>
                             <th class="py-4 px-6 uppercase tracking-wider text-right">Aksi</th>
@@ -156,20 +130,20 @@
                             <td class="py-5 px-6 text-right">
                                 <div class="flex justify-end gap-4">
                                     @if($item->type === 'materi')
-                                                                                <button @click="editMateri({{ json_encode($item) }})" class="text-gray-400 hover:text-blue-600 transition" title="Edit Materi">
+                                        <button @click="editMateri({{ json_encode($item) }})" class="hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-500 rounded-lg transition-all active:scale-90" title="Edit Materi">
                                             <i class="fa-solid fa-pen"></i>
                                         </button>
                                         <form action="{{ route('pelatihan.destroySubMateri', $item->sub_materi_id) }}" method="POST" onsubmit="return confirm('Hapus materi ini?')">
                                             @csrf @method('DELETE')
-                                            <button type="submit" class="text-gray-400 hover:text-red-600 transition"><i class="fa-solid fa-trash-can"></i></button>
+                                            <button type="submit" class="hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 rounded-lg transition-all active:scale-90"><i class="fa-solid fa-trash-can"></i></button>
                                         </form>
                                     @else
-                                        <button @click="editKuis({{ json_encode($item) }})" class="text-gray-400 hover:text-emerald-600 transition" title="Edit Kuis">
+                                        <button @click="editKuis({{ json_encode($item) }})" class="hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-emerald-500 rounded-lg transition-all active:scale-90" title="Edit Kuis">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </button>
                                         <form action="{{ route('pelatihan.destroyPostTest', $item->post_test_id) }}" method="POST" onsubmit="return confirm('Hapus kuis ini?')">
                                             @csrf @method('DELETE')
-                                            <button type="submit" class="text-gray-400 hover:text-red-600 transition"><i class="fa-solid fa-trash-can"></i></button>
+                                            <button type="submit" class="hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 rounded-lg transition-all active:scale-90"><i class="fa-solid fa-trash-can"></i></button>
                                         </form>
                                     @endif
                                 </div>

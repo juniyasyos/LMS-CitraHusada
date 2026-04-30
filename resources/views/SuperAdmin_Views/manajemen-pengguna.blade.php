@@ -26,33 +26,7 @@
     <div class="flex-1 flex flex-col min-w-0 transition-colors duration-300">
         
         {{-- Header Responsive --}}
-        <header class="bg-white dark:bg-slate-900 border-b dark:border-slate-800 h-16 flex items-center justify-between px-4 lg:px-8 shrink-0 z-10 transition-colors duration-300">
-            <div class="flex items-center gap-4">
-                {{-- Hamburger Button Mobile --}}
-                <button @click="sidebarOpen = true" class="lg:hidden p-2 text-gray-500 dark:text-white">
-                    <i class="fa-solid fa-bars text-lg"></i>
-                </button>
-                <h1 class="text-sm font-semibold text-gray-600 dark:text-white truncate">Manajemen Pengguna</h1>
-            </div>
-
-            <div class="flex items-center gap-3 lg:gap-6">
-                <div class="flex items-center gap-2 lg:gap-4">
-                    <div class="">
-                        @include('components.notif-superadmin')
-                    </div>
-                    
-                    <div class="flex items-center gap-3 pl-2 lg:pl-4 border-l border-gray-100 dark:border-slate-800">
-                        <div class="text-right hidden md:block">
-                            <p class="text-xs font-bold text-gray-800 dark:text-white leading-tight">Superadmin</p>
-                            <p class="text-[10px] text-gray-500 dark:text-gray-300 font-medium">Utama</p>
-                        </div>
-                        <div class="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden border border-gray-100 dark:border-slate-800 flex items-center justify-center">
-                            <i class="fa-solid fa-user text-gray-500 dark:text-white text-xs"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
+        @include('components.header-superadmin', ['title' => 'Manajemen Pengguna'])
 
         <main class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar">
             <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
@@ -66,35 +40,7 @@
                 </a>
             </div>
 
-            @if(session('success'))
-                <script>
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: "{{ session('success') }}",
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true
-                    });
-                </script>
-            @endif
 
-            @if(session('error'))
-                <script>
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal!',
-                        text: "{{ session('error') }}",
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true
-                    });
-                </script>
-            @endif
 
             <form action="{{ route('manajemen-pengguna') }}" method="GET" id="filterForm" class="mb-6 flex flex-wrap items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm transition-colors duration-300">
                 <div class="flex items-center gap-4">
@@ -331,7 +277,7 @@
 
                     <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t dark:border-slate-800">
                         <button type="button" @click="openEdit = false" class="w-full sm:w-auto px-8 py-2.5 border border-gray-200 dark:border-slate-700 text-gray-500 dark:text-white text-xs font-bold rounded-lg hover:bg-gray-50 transition">Batal</button>
-                        <button type="submit" class="w-full sm:w-auto px-8 py-2.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-100 transition active:scale-95">Simpan Perubahan</button>
+                        <button type="submit" class="w-full sm:w-auto px-8 py-2.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 shadow-blue-100 transition active:scale-95">Simpan Perubahan</button>
                     </div>
                 </div>
             </form>

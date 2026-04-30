@@ -75,7 +75,7 @@ class BackupController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Pencadangan sedang diproses di latar belakang. Segarkan halaman dalam beberapa saat untuk melihat hasilnya.'
+                'message' => 'Proses pencadangan sistem sedang berjalan di latar belakang.'
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -116,7 +116,7 @@ class BackupController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Pengaturan cadangan berhasil diperbarui.'
+            'message' => 'Pengaturan cadangan diperbarui'
         ]);
     }
 

@@ -23,27 +23,7 @@
     <div class="flex-1 flex flex-col min-w-0 transition-colors duration-300">
         
         {{-- Header --}}
-        <header class="bg-white dark:bg-slate-900 border-b dark:border-slate-800 h-16 flex items-center justify-between px-4 lg:px-8 shrink-0 z-10">
-            <div class="flex items-center gap-4">
-                <button @click="sidebarOpen = true" class="lg:hidden p-2 text-gray-500 dark:text-white">
-                    <i class="fa-solid fa-bars text-lg"></i>
-                </button>
-                <h1 class="text-sm font-semibold text-gray-600 dark:text-white truncate">Manajemen Pengguna</h1>
-            </div>
-
-            <div class="flex items-center gap-4">
-                @include('components.notif-superadmin')
-                <div class="flex items-center gap-3 pl-4 border-l border-gray-100 dark:border-slate-800">
-                    <div class="text-right hidden sm:block">
-                        <p class="text-xs font-bold text-gray-800 dark:text-white leading-tight">Superadmin</p>
-                        <p class="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Administrator Utama</p>
-                    </div>
-                    <div class="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden border dark:border-slate-800 flex items-center justify-center">
-                        <i class="fa-solid fa-user text-gray-500 dark:text-white text-xs"></i>
-                    </div>
-                </div>
-            </div>
-        </header>
+        @include('components.header-superadmin', ['title' => 'Manajemen Pengguna'])
 
         <main class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar">
             
@@ -84,7 +64,7 @@
                     <div>
                         <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2">Password</label>
                         <div class="relative group">
-                            <input type="text" name="password" value="{{ old('password', '123') }}"
+                            <input type="text" name="password" value="{{ old('password') }}" placeholder="Masukkan Password"
                                 class="w-full bg-slate-100 dark:bg-slate-800 border @error('password') border-red-500 @else border-transparent @enderror dark:border-slate-700 rounded-lg h-12 px-4 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm dark:text-white">
                             @error('password') <p class="text-red-500 text-[10px] mt-1 font-bold">{{ $message }}</p> @enderror
                         </div>

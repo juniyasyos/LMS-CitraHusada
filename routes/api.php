@@ -37,7 +37,7 @@ Route::get('/debug-users', function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    
+
     // Global User Endpoint
     Route::post('/logout', [AuthController::class, 'logoutApi']);
     Route::get('/check-auth', function (Request $request) {
@@ -52,21 +52,22 @@ Route::middleware('auth:sanctum')->group(function () {
     // API UNTUK KARYAWAN (role_id = 4)
     // ============================================
     Route::middleware('role:4')->group(function () {
-        // Profile & Progress
-        Route::get('/profile', [PembelajaranController::class, 'getProfile']);
-        
-        // Materi
-        Route::get('/materi-user', [MateriUserController::class, 'index']);
-        Route::get('/materi-user/{id}', [MateriUserController::class, 'show']);
-        Route::get('/materi-lanjutkan/{id}', [MateriUserController::class, 'lanjutkan']);
-        Route::post('/progress/update', [MateriUserController::class, 'updateProgress']);
-        
-        // Kuis / Post-Test
-        Route::get('/post-test-soal/{materiId}', [MateriUserController::class, 'getSoalPostTest']);
-        Route::post('/post-test-start', [MateriUserController::class, 'startPostTest']);
-        Route::post('/post-test-submit', [MateriUserController::class, 'submitPostTest']);
+
     });
 
+    // Profile & Progress
+    Route::get('/profile', [PembelajaranController::class, 'getProfile']);
+
+    // Materi
+    Route::get('/materi-user', [MateriUserController::class, 'index']);
+    Route::get('/materi-user/{id}', [MateriUserController::class, 'show']);
+    Route::get('/materi-lanjutkan/{id}', [MateriUserController::class, 'lanjutkan']);
+    Route::post('/progress/update', [MateriUserController::class, 'updateProgress']);
+
+    // Kuis / Post-Test
+    Route::get('/post-test-soal/{materiId}', [MateriUserController::class, 'getSoalPostTest']);
+    Route::post('/post-test-start', [MateriUserController::class, 'startPostTest']);
+    Route::post('/post-test-submit', [MateriUserController::class, 'submitPostTest']);
     // ============================================
     // ROUTE NOTIFIKASI (Global untuk Semua Role yang Login)
     // ============================================
@@ -87,7 +88,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Manajemen Users
         Route::get('/manajemen-pengguna', [\App\Http\Controllers\ManajemenPenggunaController::class, 'getData'])->name('api.manajemen-pengguna');
-        
+
         // Master Data Jenis Tenaga
         Route::post('/jenis-tenaga', [JenisTenagaController::class, 'store']);
         Route::put('/jenis-tenaga/{jenisTenaga}', [JenisTenagaController::class, 'update']);
