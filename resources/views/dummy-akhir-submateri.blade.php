@@ -1,0 +1,168 @@
+@extends('components.layout')
+@section('title', 'lanjutkan-materi')
+
+@section('content')
+
+<!-- POPUP -->
+<div x-data="{ open: true }" x-init="setTimeout(() => open = false, 2000)">
+
+    <div 
+        x-show="open"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 scale-90"
+        x-transition:enter-end="opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100 scale-100"
+        x-transition:leave-end="opacity-0 scale-90"
+        class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+    >
+        <!-- MODAL -->
+        <div class="bg-white rounded-2xl shadow-lg w-[90%] max-w-md p-6 relative">
+
+            <!-- CLOSE -->
+            <button 
+                @click="open = false"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+            >
+                ✕
+            </button>
+
+            <!-- ICON -->
+            <div class="flex justify-center">
+                <lottie-player 
+                    src="https://assets5.lottiefiles.com/packages/lf20_jbrw3hcz.json"  
+                    background="transparent"  
+                    speed="1"  
+                    style="width: 200px; height: 200px;"  
+                    loop  
+                    autoplay>
+                </lottie-player>
+            </div>
+
+            <!-- TEXT -->
+            <div class="text-center">
+                <p class="font-semibold mb-2">
+                    Keren! Kamu sudah menyelesaikan materi ini.
+                </p>
+
+                <p class="text-gray-500 text-sm">
+                    Lanjut ke kuis untuk melihat <br>
+                    seberapa paham kamu dengan materi tadi.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+<div class="hidden lg:block">
+    @include('components.header')
+</div>
+
+<div class="flex flex-col lg:flex-row min-h-screen">
+
+    <!-- SIDEBAR -->
+    <aside class="order-3 lg:order-1 w-full lg:w-72 bg-white border-t lg:border-t-0 lg:border-r p-4 lg:p-6">
+
+        <h2 class="font-bold text-base lg:text-lg mb-4">
+            Progress Belajar
+        </h2>
+
+        <!-- PROGRESS -->
+        <div class="mb-6">
+            <div class="flex justify-between text-sm mb-1">
+                <span>Progress</span>
+                <span class="font-medium text-blue-600">85%</span>
+            </div>
+
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-blue-600 h-2 rounded-full" style="width: 85%"></div>
+            </div>
+        </div>
+
+        <h2 class="font-semibold text-sm lg:text-md mb-3">
+            Daftar Materi
+        </h2>
+
+        <div class="space-y-2 text-sm">
+
+            <a href="" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100">
+                <i class="fa-solid fa-circle-check text-green-500"></i>
+                <span>Introduction</span>
+            </a>
+
+            <a href="" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100">
+                <i class="fa-solid fa-circle-check text-green-500"></i>
+                <span>Konsep Keselamatan Pasien</span>
+            </a>
+
+            <a href="" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100">
+                <i class="fa-solid fa-circle-check text-green-500"></i>
+                <span>Standar Pelayanan Rumah Sakit</span>
+            </a>
+
+            <a href="" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100">
+                <i class="fa-solid fa-circle-check text-green-500"></i>
+                <span>Studi Kasus</span>
+            </a>
+
+            <a href="" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100">
+                <i class="fa-solid fa-circle-check text-green-500"></i>
+                <span>Kesimpulan</span>
+            </a>
+
+            <a href="/final-kuis"
+            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 text-gray-500 font-medium">
+                <i class="fa-solid fa-lock text-gray-400"></i>
+                <span>Final Kuis</span>
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="order-1 lg:order-2 flex-1 p-4 sm:p-6 lg:p-8">
+
+        <a href="/detail-materi"
+        class="inline-flex items-center gap-2 text-gray-600 hover:text-red-500 mb-6 transition">
+            <i class="fas fa-times text-lg"></i>
+            <span>Kembali</span>
+        </a>
+
+        <h1 class="text-lg sm:text-xl lg:text-2xl font-bold mb-6">
+            Introduction Keselamatan Pasien
+        </h1>
+
+        <div class="bg-black rounded-xl overflow-hidden mb-6">
+            <video controls class="w-full">
+                <source src="/video/materi.mp4" type="video/mp4">
+                Browser anda tidak mendukung video.
+            </video>
+        </div>
+
+        <div class="bg-white border rounded-xl p-4 sm:p-6">
+
+            <h2 class="text-base lg:text-lg font-semibold mb-3">
+                Tentang Materi
+            </h2>
+
+            <p class="text-gray-600 leading-relaxed text-sm sm:text-base">
+                Materi ini menjelaskan dasar-dasar keselamatan pasien di lingkungan rumah sakit. 
+                Keselamatan pasien merupakan sistem yang bertujuan untuk membuat asuhan pasien 
+                lebih aman dengan mencegah terjadinya cedera akibat kesalahan tindakan medis. 
+                Dalam materi ini akan dibahas mengenai konsep keselamatan pasien, standar 
+                penerapan di rumah sakit, serta contoh kasus yang sering terjadi dalam 
+                pelayanan kesehatan.
+            </p>
+
+        </div>
+
+    </main>
+
+</div>
+
+@endsection
