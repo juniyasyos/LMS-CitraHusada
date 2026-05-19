@@ -1,0 +1,305 @@
+@extends('components.layout')
+@section('title', 'Sertifikat Saya')
+
+@section('content')
+<div class="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300" 
+    x-data="{ 
+        sidebarOpen: false, 
+        darkMode: localStorage.getItem('theme') === 'dark', 
+        activeTab: 'internal',
+        openUploadSertifikat: false,
+        openPreviewSertifikat: false,
+        sertifikatSide: 'depan'
+    }">
+    
+    {{-- Sidebar --}}
+    <aside id="sidebar"
+        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+        class="fixed inset-y-0 left-0 z-[60] w-64 bg-white dark:bg-slate-900 border-r dark:border-slate-800 transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0 flex-shrink-0 overflow-y-auto">
+        @include('components.nav')
+    </aside>
+
+    {{-- Overlay Mobile --}}
+    <div x-show="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm lg:hidden" x-cloak></div>
+
+    <div class="flex-1 flex flex-col min-w-0 transition-colors duration-300">
+        {{-- Header --}}
+        <header class="bg-white dark:bg-slate-900 border-b dark:border-slate-800 h-16 flex items-center justify-between px-4 lg:px-8 flex-shrink-0 z-40">
+            <div class="flex items-center gap-4">
+                <button @click="sidebarOpen = true" class="lg:hidden p-2 text-gray-500 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+                <h1 class="text-sm font-semibold text-gray-600 dark:text-white truncate">Sertifikat Saya</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                @include('components.notif-superadmin')
+                <div class="flex items-center gap-3 pl-4 border-l dark:border-slate-800">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-xs font-bold text-gray-800 dark:text-white leading-tight">Agung Sunaryo</p>
+                        <p class="text-[10px] text-gray-500 dark:text-gray-400 font-medium">TIK Unit</p>
+                    </div>
+                    <div class="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded-full flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-user text-gray-500 dark:text-white text-xs"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar">
+            {{-- Title Section --}}
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                <div>
+                    <h2 class="text-lg lg:text-xl font-bold text-gray-800 dark:text-white">Sertifikat Saya</h2>
+                    <p class="text-xs lg:text-sm text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">Selamat! Anda telah berhasil lulus penilaian untuk Advanced Cardiology: Acute Coronary Syndrome (ACS) Management. Sertifikat ini merupakan catatan permanen dari pengembangan profesional Anda.</p>
+                </div>
+                <button @click="openUploadSertifikat = true" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 text-xs font-bold shadow-lg shadow-blue-100 dark:shadow-none transition active:scale-95 whitespace-nowrap">
+                    Upload Sertifikat Eksternal
+                </button>
+            </div>
+
+            {{-- Toggle Navigasi --}}
+            <div class="w-full">
+                <div class="flex p-1 bg-gray-100 dark:bg-slate-800 rounded-xl mb-6 border dark:border-slate-700">
+                    <button @click="activeTab = 'internal'"
+                        :class="activeTab === 'internal' ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'"
+                        class="flex-1 py-2.5 text-xs font-bold rounded-lg transition-all duration-300 uppercase">
+                        Sertifikat Internal
+                    </button>
+                    <button @click="activeTab = 'external'"
+                        :class="activeTab === 'external' ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'"
+                        class="flex-1 py-2.5 text-xs font-bold rounded-lg transition-all duration-300 uppercase">
+                        Sertifikat Eksternal
+                    </button>
+                </div>
+            </div>
+
+            {{-- Table Container --}}
+            <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-4 lg:p-8 mb-10 transition-colors duration-300">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <h3 class="font-bold text-gray-800 dark:text-white transition-colors uppercase tracking-widest text-xs" 
+                        x-text="activeTab === 'internal' ? 'Daftar Sertifikat Internal' : 'Daftar Sertifikat Eksternal'"></h3>
+                    <div class="relative w-full sm:w-64">
+                        <input type="text" placeholder="Cari sertifikat..." class="w-full pl-3 pr-8 py-2 border-gray-200 dark:border-slate-700 rounded-lg text-xs bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
+                        <i class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-gray-400 dark:text-white text-xs"></i>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border dark:border-slate-800 rounded-lg transition-colors">
+                    {{-- 1. TABEL INTERNAL --}}
+                    <div x-show="activeTab === 'internal'" x-transition:enter="transition opacity-0" x-transition:enter-end="opacity-100">
+                        <table class="w-full text-left text-xs min-w-[600px]">
+                            <thead class="bg-gray-50 dark:bg-slate-800/50 text-gray-500 dark:text-white font-bold border-b dark:border-slate-800">
+                                <tr>
+                                    <th class="py-4 px-6 uppercase tracking-wider">Nama Sertifikat Pelatihan</th>
+                                    <th class="py-4 px-6 uppercase tracking-wider text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 dark:divide-slate-800 text-gray-700 dark:text-white">
+                                @foreach(range(1, 5) as $i)
+                                <tr class="hover:bg-gray-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                                    <td class="py-5 px-6">
+                                        {{-- Ditambahkan @click untuk preview --}}
+                                        <div class="flex items-center gap-4 cursor-pointer group" @click="openPreviewSertifikat = true; sertifikatSide = 'depan'">
+                                            <div class="w-9 h-9 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-lg flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-900/30">
+                                                <i class="fa-solid fa-building-circle-check"></i>
+                                            </div>
+                                            <span class="font-bold uppercase tracking-tight group-hover:text-blue-600 transition-colors">Advanced Cardiology Management - Batch {{ $i }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-5 px-6 text-right">
+                                        <button class="text-blue-600 hover:text-blue-700 transition p-2">
+                                            <i class="fa-solid fa-download"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {{-- 2. TABEL EKSTERNAL --}}
+                    <div x-show="activeTab === 'external'" x-cloak x-transition:enter="transition opacity-0" x-transition:enter-end="opacity-100">
+                        <table class="w-full text-left text-xs min-w-[700px]">
+                            <thead class="bg-gray-50 dark:bg-slate-800/50 text-gray-500 dark:text-white font-bold border-b dark:border-slate-800">
+                                <tr>
+                                    <th class="py-4 px-6 uppercase tracking-wider">Nama Sertifikat</th>
+                                    <th class="py-4 px-4 uppercase tracking-wider text-center">Status Verifikasi</th>
+                                    <th class="py-4 px-6 uppercase tracking-wider text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 dark:divide-slate-800 text-gray-700 dark:text-white transition-colors">
+                                @php
+                                    $externals = [
+                                        ['name' => 'Seminar Internasional Bedah Saraf', 'status' => 'Disetujui', 'color' => 'emerald'],
+                                        ['name' => 'Workshop Manajemen Farmasi Klinik', 'status' => 'Tidak Disetujui', 'color' => 'red', 'note' => 'Dokumen tidak terbaca jelas'],
+                                    ];
+                                @endphp
+                                @foreach($externals as $ext)
+                                <tr class="hover:bg-gray-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                                    <td class="py-5 px-6">
+                                        {{-- Ditambahkan @click untuk preview (hanya jika disetujui contohnya) --}}
+                                        <div class="flex flex-col gap-1 min-w-0 cursor-pointer group" @click="openPreviewSertifikat = true; sertifikatSide = 'depan'">
+                                            <span class="font-bold uppercase tracking-tight truncate group-hover:text-blue-600 transition-colors">{{ $ext['name'] }}</span>
+                                            @if(isset($ext['note']))
+                                                <span class="text-[10px] text-gray-500 font-medium italic">Catatan: {{ $ext['note'] }}</span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="py-5 px-4 text-center">
+                                        <span class="px-3 py-1 rounded-full text-[9px] font-bold border uppercase 
+                                            {{ $ext['color'] === 'emerald' ? 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-950/20' : '' }}
+                                            {{ $ext['color'] === 'red' ? 'bg-red-50 text-red-600 border-red-100 dark:bg-red-950/20' : '' }}">
+                                            {{ $ext['status'] }}
+                                        </span>
+                                    </td>
+                                    <td class="py-5 px-6 text-right">
+                                        @if($ext['status'] === 'Disetujui')
+                                            <button class="text-blue-600 p-2 transition">
+                                                <i class="fa-solid fa-download"></i>
+                                            </button>
+                                        @else
+                                            <button class="text-gray-300 p-2 cursor-not-allowed">
+                                                <i class="fa-solid fa-download"></i>
+                                            </button>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    {{-- MODAL PREVIEW SERTIFIKAT (DEPAN/BELAKANG) --}}
+    <div x-show="openPreviewSertifikat" 
+        class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        x-cloak>
+        
+        <div @click.away="openPreviewSertifikat = false" 
+            class="bg-white dark:bg-slate-900 w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 border dark:border-slate-800">
+            
+            <div class="flex items-center justify-between px-8 py-5 border-b dark:border-slate-800">
+                <h3 class="text-sm font-bold text-gray-800 dark:text-white uppercase tracking-tight">Pratinjau Sertifikat</h3>
+                <button @click="openPreviewSertifikat = false" class="text-gray-400 hover:text-red-500 transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-6 lg:p-12 relative flex items-center justify-center bg-gray-50 dark:bg-slate-950/30">
+                {{-- Tombol Navigasi Kiri --}}
+                <button @click="sertifikatSide = 'depan'" 
+                    x-show="sertifikatSide === 'belakang'"
+                    class="absolute left-4 lg:left-8 z-10 w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow-md flex items-center justify-center text-gray-500 hover:text-blue-600 transition-all active:scale-90">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+
+                {{-- Gambar Sertifikat --}}
+                <div class="relative w-full max-w-2xl flex justify-center">
+                    <img x-show="sertifikatSide === 'depan'" src="{{ asset('images/sertif-depan.png') }}" 
+                        class="w-full h-auto rounded-lg shadow-sm border dark:border-slate-800"
+                        x-transition:enter="transition ease-out duration-500"
+                        x-transition:enter-start="opacity-0 transform -translate-x-4"
+                        x-transition:enter-end="opacity-100 transform translate-x-0">
+                    
+                    <img x-show="sertifikatSide === 'belakang'" src="{{ asset('images/sertif-belakang.png') }}" 
+                        class="w-full h-auto rounded-lg shadow-sm border dark:border-slate-800"
+                        x-transition:enter="transition ease-out duration-500"
+                        x-transition:enter-start="opacity-0 transform translate-x-4"
+                        x-transition:enter-end="opacity-100 transform translate-x-0">
+                </div>
+
+                {{-- Tombol Navigasi Kanan --}}
+                <button @click="sertifikatSide = 'belakang'" 
+                    x-show="sertifikatSide === 'depan'"
+                    class="absolute right-4 lg:right-8 z-10 w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow-md flex items-center justify-center text-gray-500 hover:text-blue-600 transition-all active:scale-90">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            {{-- Indikator Halaman --}}
+            <div class="py-4 border-t dark:border-slate-800 flex justify-center gap-2">
+                <div class="h-1.5 rounded-full transition-all duration-300" :class="sertifikatSide === 'depan' ? 'w-8 bg-blue-600' : 'w-2 bg-gray-300 dark:bg-slate-700'"></div>
+                <div class="h-1.5 rounded-full transition-all duration-300" :class="sertifikatSide === 'belakang' ? 'w-8 bg-blue-600' : 'w-2 bg-gray-300 dark:bg-slate-700'"></div>
+            </div>
+        </div>
+    </div>
+
+    {{-- MODAL POP UP: UPLOAD SERTIFIKAT EKSTERNAL --}}
+    <div x-show="openUploadSertifikat" 
+        class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        x-cloak>
+        
+        <div @click.away="openUploadSertifikat = false" 
+            class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 border dark:border-slate-800"
+            x-transition:enter="transition ease-out duration-300 transform"
+            x-transition:enter-start="scale-95"
+            x-transition:enter-end="scale-100">
+            
+            <div class="flex items-center justify-between px-8 py-5 border-b dark:border-slate-800">
+                <h3 class="text-sm font-bold text-gray-800 dark:text-white uppercase tracking-tight">Upload Sertifikat Eksternal</h3>
+                <button @click="openUploadSertifikat = false" class="text-gray-400 hover:text-red-500 transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-10">
+                <div class="border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-2xl p-12 flex flex-col items-center justify-center bg-slate-50/30 dark:bg-slate-800/20 hover:bg-white dark:hover:bg-slate-800/50 transition-colors group cursor-pointer relative text-center">
+                    <input type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept=".pdf">
+                    
+                    <div class="space-y-4">
+                        <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mx-auto transition-transform group-hover:scale-110">
+                            <i class="fa-solid fa-file-arrow-up text-blue-600 dark:text-blue-400 text-xl"></i>
+                        </div>
+                        
+                        <div class="space-y-1">
+                            <p class="text-xs font-bold text-gray-700 dark:text-white uppercase tracking-wider">
+                                Click or drag and drop to upload
+                            </p>
+                            <p class="text-[10px] text-gray-400 uppercase font-medium">
+                                Maksimal ukuran file 5MB
+                            </p>
+                        </div>
+
+                        <p class="text-[10px] text-blue-600 dark:text-blue-400 font-bold uppercase tracking-widest border border-blue-100 dark:border-blue-900/50 px-2 py-0.5 rounded inline-block">
+                            Accepted: PDF
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 mt-10">
+                    <button @click="openUploadSertifikat = false" 
+                        class="px-8 py-2.5 border-2 border-gray-100 dark:border-slate-700 rounded-xl text-[10px] font-bold text-gray-400 hover:text-gray-600 dark:hover:text-white transition uppercase tracking-widest">
+                        Batal
+                    </button>
+                    <button class="px-10 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-bold shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-95 uppercase tracking-widest">
+                        Upload
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    [x-cloak] { display: none !important; }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
+</style>
+@endsection
