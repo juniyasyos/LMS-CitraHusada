@@ -13,9 +13,15 @@ class CheckRole
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if (! $request->user() || $request->user()->role_id != $role) {
+        // Bypass role verification if the user is impersonating someone else.
+        // The PreventImpersonateAdmin middleware will handle the administrative route blocking.
+        if ($request->user() && session()->has('impersonate_by')) {
+            return $next($request);
+        }
+
+        if (! $request->user() || !in_array($request->user()->role_id, $roles)) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Forbidden Access.'], 403);
             }

@@ -16,18 +16,31 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Seed roles
+        // Seed master data
         $this->call(RoleSeeder::class);
-
-        // Call seeder untuk jenis tenaga
         $this->call(JenisTenagaSeeder::class);
-
-        // Call seeder untuk unit kerja
-        $this->call(UnitKerjaSeeder::class);
+        $this->call(UnitKerjasSeeder::class); // Menggunakan UnitKerjasSeeder hasil export DB
+        $this->call(KategoriSeeder::class);
+        $this->call(BackupSettingSeeder::class);
 
         // create default admin user
         $this->call(UserSeeder::class);
 
-        $this->call([NotificationSeeder::class,]);
+        // Seed data pelatihan & sub-data dari database asli
+        $this->call([
+            MaterisSeeder::class,
+            SubMaterisSeeder::class,
+            PostTestsSeeder::class,
+            SoalsSeeder::class,
+            MateriJenisTenagasSeeder::class,
+            MateriUnitKerjasSeeder::class,
+            SkorUsersSeeder::class,
+        ]);
+
+        // Optional default data
+        $this->call([
+            NotificationSeeder::class,
+            MotivationQuoteSeeder::class,
+        ]);
     }
 }

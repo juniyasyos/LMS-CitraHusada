@@ -1,23 +1,11 @@
 <?php
 
-/**
- * Migrasi: membuat tabel pivot `materi_unit_kerjas`.
- *
- * Menghubungkan materi dengan unit kerja yang berhak mengaksesnya.
- * Dua foreign key berperilaku cascade delete.
- */
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Buat tabel pivot untuk relasi materi <-> unit kerja.
-     *
-     * @return void
-     */
     public function up(): void
     {
         Schema::create('materi_unit_kerjas', function (Blueprint $table) {
@@ -31,11 +19,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Hapus tabel pivot saat rollback.
-     *
-     * @return void
-     */
     public function down(): void
     {
         Schema::dropIfExists('materi_unit_kerjas');

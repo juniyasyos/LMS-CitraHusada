@@ -4,7 +4,7 @@
 @section('content')
     {{-- Menambahkan state sidebarOpen untuk kontrol menu mobile --}}
     <div class="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300"
-        x-data="{ sidebarOpen: false, darkMode: localStorage.getItem('theme') === 'dark' }">
+        x-data="leaderboardData()" x-init="initData()">
 
         {{-- Sidebar Responsive Logic --}}
         <aside id="sidebar" :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
@@ -61,21 +61,23 @@
                                             class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                                             Status JPL</p>
                                     </div>
-                                    <a href="{{ route('detail-leaderboard', ['status' => 'terpenuhi']) }}"
-                                        class="flex items-center justify-between w-full px-3 py-2 text-[11px] font-bold rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 transition group {{ request('status') == 'terpenuhi' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-300' }}">
+                                    <button @click.prevent="setStatusFilter('terpenuhi')"
+                                        class="flex items-center justify-between w-full px-3 py-2 text-[11px] font-bold rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 transition group"
+                                        :class="filters.status == 'terpenuhi' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-300'">
                                         Terpenuhi
                                         <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                                    </a>
-                                    <a href="{{ route('detail-leaderboard', ['status' => 'belum_terpenuhi']) }}"
-                                        class="flex items-center justify-between w-full px-3 py-2 text-[11px] font-bold rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/30 hover:text-amber-600 transition group {{ request('status') == 'belum_terpenuhi' ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400' : 'text-gray-600 dark:text-gray-300' }}">
+                                    </button>
+                                    <button @click.prevent="setStatusFilter('belum_terpenuhi')"
+                                        class="flex items-center justify-between w-full px-3 py-2 text-[11px] font-bold rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/30 hover:text-amber-600 transition group"
+                                        :class="filters.status == 'belum_terpenuhi' ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400' : 'text-gray-600 dark:text-gray-300'">
                                         Belum Terpenuhi
                                         <div class="w-2 h-2 rounded-full bg-amber-500"></div>
-                                    </a>
+                                    </button>
                                 </div>
                                 <div class="border-t border-gray-50 dark:border-slate-700 p-2">
-                                    <a href="{{ route('detail-leaderboard') }}"
+                                    <button @click.prevent="setStatusFilter('')"
                                         class="block text-center w-full py-1 text-[10px] font-bold text-red-400 hover:text-red-600 transition">Reset
-                                        Filter</a>
+                                        Filter</button>
                                 </div>
                             </div>
                         </div>
@@ -94,103 +96,93 @@
                                     <th class="py-4 px-6 uppercase tracking-wider text-center">Status</th>
                                 </tr>
                             </thead>
-                            <tbody
-                                class="divide-y divide-gray-100 dark:divide-slate-800 text-gray-700 dark:text-white font-medium">
-                                @forelse($leaderboard as $user)
-                                    <tr
-                                        class="hover:bg-gray-50 dark:hover:bg-slate-800 transition border-b border-gray-50 dark:border-slate-800 last:border-0">
-                                        <td class="py-5 px-6">
-                                            <div class="flex items-center gap-3">
-                                                <div
-                                                    class="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded flex items-center justify-center font-bold text-gray-500 dark:text-white text-[10px] uppercase transition-colors shrink-0">
-                                                    {{ substr($user->nama, 0, 1) }}{{ substr(strrchr($user->nama, " "), 1, 1) }}
-                                                </div>
-                                                <div class="truncate">
-                                                    <p
-                                                        class="font-bold text-gray-800 dark:text-white transition-colors truncate">
-                                                        {{ $user->nama }}</p>
-                                                    <p class="text-[10px] text-gray-400 dark:text-gray-300">NIP:
-                                                        {{ $user->nik }}</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="py-5 px-4 text-gray-500 dark:text-gray-300 leading-tight transition-colors">
-                                            {{ $user->unitKerja->unit_kerja ?? '-' }}</td>
-                                        <td
-                                            class="py-5 px-4 text-center font-bold text-gray-800 dark:text-white transition-colors">
-                                            {{ $user->pelatihan_selesai }}</td>
-                                        <td
-                                            class="py-5 px-4 text-center font-bold text-gray-800 dark:text-white transition-colors">
-                                            {{ $user->total_jpl ?? 0 }}</td>
-                                        <td class="py-5 px-6 text-center">
-                                            <span
-                                                class="px-3 py-1 rounded-full text-[9px] font-bold transition-colors {{ ($user->total_jpl ?? 0) >= 20 ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800' : 'bg-amber-50 dark:bg-amber-900/30 text-amber-500 dark:text-amber-400 border border-amber-100 dark:border-amber-800' }}">
-                                                {{ ($user->total_jpl ?? 0) >= 20 ? 'TERPENUHI' : 'BELUM TERPENUHI' }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                @empty
+                            <tbody class="divide-y divide-gray-100 dark:divide-slate-800 text-gray-700 dark:text-white font-medium">
+                                <template x-if="isLoading">
                                     <tr>
-                                        <td colspan="5" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">Belum
-                                            ada data pelatihan karyawan.</td>
+                                        <td colspan="5" class="py-10 text-center">
+                                            <i class="fa-solid fa-spinner fa-spin text-3xl text-blue-500 mb-2"></i>
+                                            <p class="text-xs text-gray-500">Memuat data...</p>
+                                        </td>
                                     </tr>
-                                @endforelse
+                                </template>
+                                <template x-if="!isLoading && users.length === 0">
+                                    <tr>
+                                        <td colspan="5" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">Belum ada data pelatihan karyawan.</td>
+                                    </tr>
+                                </template>
+                                <template x-if="!isLoading && users.length > 0">
+                                    <template x-for="user in users" :key="user.user_id">
+                                        <tr class="hover:bg-gray-50 dark:hover:bg-slate-800 transition border-b border-gray-50 dark:border-slate-800 last:border-0">
+                                            <td class="py-5 px-6">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded flex items-center justify-center font-bold text-gray-500 dark:text-white text-[10px] uppercase transition-colors shrink-0" x-text="getInitials(user.nama)"></div>
+                                                    <div class="truncate">
+                                                        <p class="font-bold text-gray-800 dark:text-white transition-colors truncate" x-text="user.nama"></p>
+                                                        <p class="text-[10px] text-gray-400 dark:text-gray-300">NIP: <span x-text="user.nik"></span></p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="py-5 px-4 text-gray-500 dark:text-gray-300 leading-tight transition-colors" x-text="user.unit_kerja ? user.unit_kerja.unit_kerja : '-'"></td>
+                                            <td class="py-5 px-4 text-center font-bold text-gray-800 dark:text-white transition-colors" x-text="user.pelatihan_selesai"></td>
+                                            <td class="py-5 px-4 text-center font-bold text-gray-800 dark:text-white transition-colors" x-text="user.total_jpl || 0"></td>
+                                            <td class="py-5 px-6 text-center">
+                                                <span class="px-3 py-1 rounded-full text-[9px] font-bold transition-colors"
+                                                    :class="(user.total_jpl || 0) >= 20 ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800' : 'bg-amber-50 dark:bg-amber-900/30 text-amber-500 dark:text-amber-400 border border-amber-100 dark:border-amber-800'"
+                                                    x-text="(user.total_jpl || 0) >= 20 ? 'TERPENUHI' : 'BELUM TERPENUHI'">
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </template>
                             </tbody>
                         </table>
                     </div>
 
-                    {{-- Pagination & Controls --}}
                     <div class="p-4 lg:p-6 border-t dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
                         <div class="flex items-center gap-4 w-full sm:w-auto">
                             <div class="flex items-center gap-2">
                                 <label for="per_page" class="text-xs font-bold text-gray-500 dark:text-gray-400">Tampilkan</label>
-                                <select id="per_page" onchange="updateLeaderboardQuery('per_page', this.value)"
-                                    {{ request('all') == 'true' ? 'disabled' : '' }}
+                                <select id="per_page" x-model="filters.per_page" @change="fetchData(1)"
+                                    :disabled="filters.all === 'true'"
                                     class="text-xs font-bold text-gray-600 dark:text-gray-300 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all disabled:opacity-50">
-                                    <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
-                                    <option value="20" {{ request('per_page') == 20 ? 'selected' : '' }}>20</option>
-                                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
-                                    <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
                                 </select>
                             </div>
                             
                             <div class="flex items-center gap-2">
                                 <input type="checkbox" id="show_all" 
-                                    onchange="updateLeaderboardQuery('all', this.checked ? 'true' : 'false')"
-                                    {{ request('all') == 'true' ? 'checked' : '' }}
+                                    x-model="filters.all" true-value="true" false-value="false" @change="fetchData(1)"
                                     class="w-3.5 h-3.5 text-blue-600 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 rounded focus:ring-blue-500/20 transition-all cursor-pointer">
                                 <label for="show_all" class="text-xs font-bold text-gray-500 dark:text-gray-400 cursor-pointer">Tampilkan Semua</label>
                             </div>
                         </div>
 
-                        @if(method_exists($leaderboard, 'links') && $leaderboard->hasPages() && request('all') != 'true')
-                            <div class="w-full sm:w-auto">
-                                {{ $leaderboard->links() }}
+                        <div class="w-full sm:w-auto" x-show="pagination.links && filters.all !== 'true'">
+                            <div class="flex flex-wrap items-center justify-center gap-1">
+                                <template x-for="(link, index) in pagination.links" :key="index">
+                                    <button @click.prevent="if(link.url) fetchData(new URL(link.url).searchParams.get('page'))"
+                                        x-html="link.label"
+                                        :disabled="!link.url || link.active"
+                                        :class="[
+                                            'px-3 py-1.5 text-[10px] sm:text-xs font-medium rounded-md transition-colors',
+                                            link.active ? 'bg-blue-600 text-white shadow-md' : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700',
+                                            !link.url ? 'opacity-50 cursor-not-allowed' : ''
+                                        ]"></button>
+                                </template>
                             </div>
-                        @endif
+                        </div>
                     </div>
                 </div>
 
-                <script>
-                    function updateLeaderboardQuery(key, value) {
-                        const url = new URL(window.location.href);
-                        url.searchParams.set(key, value);
-                        if (key === 'all' && value === 'false') {
-                            url.searchParams.delete('all');
-                        }
-                        // Reset page when filter changes
-                        url.searchParams.delete('page');
-                        window.location.href = url.toString();
-                    }
-                </script>
-
-                {{-- Export Buttons - Responsive Stack --}}
                 <div class="flex flex-col sm:flex-row justify-end gap-3 mb-8 transition-colors">
-                    <a href="{{ route('leaderboard.export.excel', request()->query()) }}" onclick="showExportNotification()"
+                    <a :href="'{{ route('leaderboard.export.excel') }}' + getQueryString()" onclick="showExportNotification && typeof showExportNotification === 'function' ? showExportNotification() : null"
                         class="flex items-center justify-center gap-2 px-5 py-2.5 border-2 border-blue-600 text-blue-600 bg-white dark:bg-slate-900 rounded-lg text-[11px] font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 transition active:scale-95">
                         <i class="fa-solid fa-file-excel"></i> Export Excel
                     </a>
-                    <a href="{{ route('leaderboard.export.pdf', request()->query()) }}" onclick="showExportNotification()"
+                    <a :href="'{{ route('leaderboard.export.pdf') }}' + getQueryString()" onclick="showExportNotification && typeof showExportNotification === 'function' ? showExportNotification() : null"
                         class="flex items-center justify-center gap-2 px-5 py-2.5 border-2 border-red-500 text-red-500 bg-white dark:bg-slate-900 rounded-lg text-[11px] font-bold hover:bg-red-50 dark:hover:bg-red-900/20 transition active:scale-95">
                         <i class="fa-solid fa-file-pdf"></i> Export PDF
                     </a>
@@ -238,7 +230,6 @@
             background: #334155;
         }
 
-        /* Utility untuk mobile kecil */
         @media (max-width: 480px) {
             .xs\:hidden {
                 display: none;
@@ -253,4 +244,77 @@
             display: none !important;
         }
     </style>
+
+    <script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('leaderboardData', () => ({
+            sidebarOpen: false, 
+            darkMode: localStorage.getItem('theme') === 'dark',
+            isLoading: true,
+            users: [],
+            pagination: {},
+            filters: {
+                status: new URLSearchParams(window.location.search).get('status') || '',
+                per_page: new URLSearchParams(window.location.search).get('per_page') || '10',
+                all: new URLSearchParams(window.location.search).get('all') || 'false'
+            },
+
+            async initData() {
+                await this.fetchData();
+            },
+
+            async fetchData(page = 1) {
+                this.isLoading = true;
+                try {
+                    const url = new URL('/api/admin/leaderboard/data', window.location.origin);
+                    url.searchParams.append('page', page);
+                    if (this.filters.status) url.searchParams.append('status', this.filters.status);
+                    url.searchParams.append('per_page', this.filters.per_page);
+                    if (this.filters.all === 'true') url.searchParams.append('all', 'true');
+
+                    // Update url state safely
+                    const params = new URLSearchParams(url.search);
+                    params.delete('page');
+                    window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
+
+                    const response = await fetch(url.toString(), {
+                        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    const data = await response.json();
+                    
+                    this.users = data.data;
+                    this.pagination = {
+                        current_page: data.current_page,
+                        last_page: data.last_page,
+                        links: data.links
+                    };
+                } catch (error) {
+                    console.error(error);
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+
+            setStatusFilter(status) {
+                this.filters.status = status;
+                this.fetchData(1);
+            },
+
+            getInitials(name) {
+                if (!name) return '';
+                const parts = name.trim().split(' ');
+                if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+                return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+            },
+
+            getQueryString() {
+                const params = new URLSearchParams();
+                if (this.filters.status) params.append('status', this.filters.status);
+                if (this.filters.all === 'true') params.append('all', 'true');
+                const str = params.toString();
+                return str ? '?' + str : '';
+            }
+        }));
+    });
+    </script>
 @endsection

@@ -21,6 +21,7 @@
 
     <nav class="flex-1 p-4 space-y-1 overflow-y-auto custom-scrollbar">
 
+        @if(auth()->user()->role_id == 1 && !session()->has('impersonate_by'))
         <!-- BERANDA -->
         <a href="/beranda-superadmin" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
         {{ request()->is('SuperAdmin_Views.beranda-superadmin') ? $active : $inactive }}">
@@ -69,6 +70,7 @@
             <i class="fa-solid fa-clock-rotate-left text-sm"></i>
             Log Aktivitas
         </a>
+        @endif
 
     </nav>
 
@@ -106,11 +108,13 @@
             </button>
         </div>
 
+        @if(auth()->user()->role_id == 1 && !session()->has('impersonate_by'))
         <a href="/cadangan" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
         {{ request()->is('SuperAdmin_Views.cadangan') ? $active : $inactive }}">
             <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
             Cadangan
         </a>
+        @endif
 
         <a href="#" onclick="window.handleLogout(event)"
             class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200">

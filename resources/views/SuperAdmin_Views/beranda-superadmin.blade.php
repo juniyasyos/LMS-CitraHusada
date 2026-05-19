@@ -37,27 +37,65 @@
             </div>
 
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4 mb-8">
-                    @php
-                        $stats = [
-                            ['label' => 'Total Pengguna', 'value' => number_format($totalPengguna), 'sub' => 'Karyawan terdaftar aktif', 'icon' => 'fa-users', 'color' => 'text-blue-600'],
-                            ['label' => 'Total Unit Kerja', 'value' => number_format($totalUnitKerja), 'sub' => 'Departemen terintegrasi', 'icon' => 'fa-building', 'color' => 'text-emerald-600'],
-                            ['label' => 'Total Jenis Tenaga', 'value' => number_format($totalJenisTenaga), 'sub' => 'Kategori profesi', 'icon' => 'fa-id-card-clip', 'color' => 'text-indigo-600'],
-                            ['label' => 'Total Pelatihan', 'value' => number_format($totalPelatihan), 'sub' => 'Modul pelatihan tersedia', 'icon' => 'fa-book-open', 'color' => 'text-purple-600'],
-                            ['label' => 'Pelatihan Aktif', 'value' => number_format($pelatihanAktif), 'sub' => 'Sedang berjalan saat ini', 'icon' => 'fa-clock', 'color' => 'text-orange-600'],
-                            ['label' => 'Pelatihan Selesai', 'value' => number_format($pelatihanSelesai), 'sub' => 'Melewati batas waktu', 'icon' => 'fa-certificate', 'color' => 'text-pink-600'],
-                        ];
-                    @endphp
-
-                    @foreach($stats as $stat)
-                        <div class="bg-white dark:bg-slate-900 p-4 lg:p-5 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md group">
-                            <div class="flex justify-between items-start mb-3">
-                                <p class="text-[10px] lg:text-[10px] font-bold text-gray-400 dark:text-white uppercase tracking-wider">{{ $stat['label'] }}</p>
-                                <i class="fa-solid {{ $stat['icon'] }} {{ $stat['color'] }} opacity-20 dark:opacity-60 text-xs lg:text-sm group-hover:opacity-100 transition-opacity"></i>
-                            </div>
-                            <h3 class="text-lg lg:text-2xl font-bold text-gray-800 dark:text-white">{{ $stat['value'] }}</h3>
-                            <p class="text-[9px] lg:text-[10px] text-gray-400 dark:text-gray-200 mt-1 font-medium leading-tight truncate">{{ $stat['sub'] }}</p>
+                    <!-- Total Pengguna -->
+                    <div class="bg-white dark:bg-slate-900 p-4 lg:p-5 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md group">
+                        <div class="flex justify-between items-start mb-3">
+                            <p class="text-[10px] lg:text-[10px] font-bold text-gray-400 dark:text-white uppercase tracking-wider">Total Pengguna</p>
+                            <i class="fa-solid fa-users text-blue-600 opacity-20 dark:opacity-60 text-xs lg:text-sm group-hover:opacity-100 transition-opacity"></i>
                         </div>
-                    @endforeach
+                        <h3 id="valTotalPengguna" class="text-lg lg:text-2xl font-bold text-gray-800 dark:text-white"><i class="fa-solid fa-spinner fa-spin text-sm"></i></h3>
+                        <p class="text-[9px] lg:text-[10px] text-gray-400 dark:text-gray-200 mt-1 font-medium leading-tight truncate">Karyawan terdaftar aktif</p>
+                    </div>
+
+                    <!-- Total Unit Kerja -->
+                    <div class="bg-white dark:bg-slate-900 p-4 lg:p-5 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md group">
+                        <div class="flex justify-between items-start mb-3">
+                            <p class="text-[10px] lg:text-[10px] font-bold text-gray-400 dark:text-white uppercase tracking-wider">Total Unit Kerja</p>
+                            <i class="fa-solid fa-building text-emerald-600 opacity-20 dark:opacity-60 text-xs lg:text-sm group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                        <h3 id="valTotalUnitKerja" class="text-lg lg:text-2xl font-bold text-gray-800 dark:text-white"><i class="fa-solid fa-spinner fa-spin text-sm"></i></h3>
+                        <p class="text-[9px] lg:text-[10px] text-gray-400 dark:text-gray-200 mt-1 font-medium leading-tight truncate">Departemen terintegrasi</p>
+                    </div>
+
+                    <!-- Total Jenis Tenaga -->
+                    <div class="bg-white dark:bg-slate-900 p-4 lg:p-5 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md group">
+                        <div class="flex justify-between items-start mb-3">
+                            <p class="text-[10px] lg:text-[10px] font-bold text-gray-400 dark:text-white uppercase tracking-wider">Total Jenis Tenaga</p>
+                            <i class="fa-solid fa-id-card-clip text-indigo-600 opacity-20 dark:opacity-60 text-xs lg:text-sm group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                        <h3 id="valTotalJenisTenaga" class="text-lg lg:text-2xl font-bold text-gray-800 dark:text-white"><i class="fa-solid fa-spinner fa-spin text-sm"></i></h3>
+                        <p class="text-[9px] lg:text-[10px] text-gray-400 dark:text-gray-200 mt-1 font-medium leading-tight truncate">Kategori profesi</p>
+                    </div>
+
+                    <!-- Total Pelatihan -->
+                    <div class="bg-white dark:bg-slate-900 p-4 lg:p-5 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md group">
+                        <div class="flex justify-between items-start mb-3">
+                            <p class="text-[10px] lg:text-[10px] font-bold text-gray-400 dark:text-white uppercase tracking-wider">Total Pelatihan</p>
+                            <i class="fa-solid fa-book-open text-purple-600 opacity-20 dark:opacity-60 text-xs lg:text-sm group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                        <h3 id="valTotalPelatihan" class="text-lg lg:text-2xl font-bold text-gray-800 dark:text-white"><i class="fa-solid fa-spinner fa-spin text-sm"></i></h3>
+                        <p class="text-[9px] lg:text-[10px] text-gray-400 dark:text-gray-200 mt-1 font-medium leading-tight truncate">Modul pelatihan tersedia</p>
+                    </div>
+
+                    <!-- Pelatihan Aktif -->
+                    <div class="bg-white dark:bg-slate-900 p-4 lg:p-5 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md group">
+                        <div class="flex justify-between items-start mb-3">
+                            <p class="text-[10px] lg:text-[10px] font-bold text-gray-400 dark:text-white uppercase tracking-wider">Pelatihan Aktif</p>
+                            <i class="fa-solid fa-clock text-orange-600 opacity-20 dark:opacity-60 text-xs lg:text-sm group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                        <h3 id="valPelatihanAktif" class="text-lg lg:text-2xl font-bold text-gray-800 dark:text-white"><i class="fa-solid fa-spinner fa-spin text-sm"></i></h3>
+                        <p class="text-[9px] lg:text-[10px] text-gray-400 dark:text-gray-200 mt-1 font-medium leading-tight truncate">Sedang berjalan saat ini</p>
+                    </div>
+
+                    <!-- Pelatihan Selesai -->
+                    <div class="bg-white dark:bg-slate-900 p-4 lg:p-5 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md group">
+                        <div class="flex justify-between items-start mb-3">
+                            <p class="text-[10px] lg:text-[10px] font-bold text-gray-400 dark:text-white uppercase tracking-wider">Pelatihan Selesai</p>
+                            <i class="fa-solid fa-certificate text-pink-600 opacity-20 dark:opacity-60 text-xs lg:text-sm group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                        <h3 id="valPelatihanSelesai" class="text-lg lg:text-2xl font-bold text-gray-800 dark:text-white"><i class="fa-solid fa-spinner fa-spin text-sm"></i></h3>
+                        <p class="text-[9px] lg:text-[10px] text-gray-400 dark:text-gray-200 mt-1 font-medium leading-tight truncate">Melewati batas waktu</p>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -103,64 +141,11 @@
                         <a href="{{ route('log-aktivitas') }}" class="text-[9px] lg:text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest hover:underline transition">Semua</a>
                     </div>
 
-                    <div class="space-y-5">
-                        @forelse($logAktivitas->take(3) as $log)
-                            @php
-                                $bgColor = 'bg-gray-50 dark:bg-slate-800';
-                                $iconColor = 'text-gray-500 dark:text-gray-400';
-                                $icon = 'fa-circle-info';
-                                $badgeColor = 'bg-gray-50 text-gray-500 dark:bg-slate-800 dark:text-gray-400';
-
-                                if ($log->tipe === 'Create') {
-                                    $bgColor = 'bg-blue-50 dark:bg-blue-900/30';
-                                    $iconColor = 'text-blue-500 dark:text-blue-400';
-                                    $icon = 'fa-plus';
-                                    $badgeColor = 'bg-blue-50 text-blue-500 dark:bg-blue-900/30 dark:text-blue-400';
-                                } elseif ($log->tipe === 'Update') {
-                                    $bgColor = 'bg-emerald-50 dark:bg-emerald-900/30';
-                                    $iconColor = 'text-emerald-500 dark:text-emerald-400';
-                                    $icon = 'fa-rotate';
-                                    $badgeColor = 'bg-emerald-50 text-emerald-500 dark:bg-emerald-900/30 dark:text-emerald-400';
-                                } elseif ($log->tipe === 'Delete') {
-                                    $bgColor = 'bg-rose-50 dark:bg-rose-900/30';
-                                    $iconColor = 'text-rose-500 dark:text-rose-400';
-                                    $icon = 'fa-trash';
-                                    $badgeColor = 'bg-rose-50 text-rose-500 dark:bg-rose-900/30 dark:text-rose-400';
-                                }
-                            @endphp
-                            <div class="flex gap-4 {{ $loop->first ? '' : 'border-t border-gray-50 dark:border-slate-800 pt-4' }}">
-                                <div class="w-8 h-8 rounded-lg {{ $bgColor }} flex items-center justify-center shrink-0 transition-colors">
-                                    <i class="fa-solid {{ $icon }} {{ $iconColor }} text-xs"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-xs text-gray-700 dark:text-white leading-snug">
-                                        <span class="font-bold">{{ $log->user->nama ?? 'Sistem' }}</span>
-                                        melakukan <span class="font-semibold px-1.5 py-0.5 rounded-md text-[10px] {{ $badgeColor }}">{{ $log->tipe }}</span>
-                                        pada tabel <span class="font-semibold text-gray-800 dark:text-gray-300">{{ $log->tabel }}</span>
-                                    </p>
-                                    <div class="text-[11px] text-gray-600 dark:text-gray-400 mt-1.5 p-2 bg-gray-50 dark:bg-slate-800/50 rounded border border-gray-100 dark:border-slate-700/50 transition-colors">
-                                        @if($log->tipe === 'Update' && str_contains($log->perubahan, ','))
-                                            @php
-                                                $parts = explode(',', $log->perubahan, 2);
-                                                $dataLama = trim($parts[0]);
-                                                $dataBaru = trim($parts[1] ?? '');
-                                            @endphp
-                                            <span class="line-through text-gray-400 dark:text-gray-500">{{ $dataLama }}</span>
-                                            <span class="font-bold text-amber-500 mx-1">menjadi</span>
-                                            <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $dataBaru }}</span>
-                                        @else
-                                            {{ $log->perubahan }}
-                                        @endif
-                                    </div>
-                                    <p class="text-[9px] lg:text-[10px] text-gray-400 dark:text-gray-500 mt-1 font-medium italic uppercase tracking-wider">
-                                        {{ $log->created_at->diffForHumans() }}</p>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="text-center text-gray-500 dark:text-gray-400 text-xs py-4">
-                                Belum ada aktivitas tercatat.
-                            </div>
-                        @endforelse
+                    <div class="space-y-5" id="logAktivitasContainer">
+                        <div class="text-center text-gray-500 dark:text-gray-400 text-xs py-4 flex flex-col items-center justify-center gap-2">
+                            <i class="fa-solid fa-spinner fa-spin text-lg"></i>
+                            Memuat aktivitas...
+                        </div>
                     </div>
                 </div>
             </main>
@@ -185,7 +170,106 @@
             const textColor = isDark ? '#f8fafc' : '#1f2937';
             const gridColor = isDark ? '#334155' : '#f3f4f6';
 
-            fetch("{{ route('api.dashboard.charts') }}")
+            // Fetch Main Dashboard Data
+            fetch("/api/admin/superadmin/dashboard", {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const stats = data.data.statistik_utama;
+                    const status = data.data.status_pelatihan;
+                    
+                    document.getElementById('valTotalPengguna').innerText = new Intl.NumberFormat('id-ID').format(stats.total_pengguna);
+                    document.getElementById('valTotalUnitKerja').innerText = new Intl.NumberFormat('id-ID').format(stats.total_unit_kerja);
+                    document.getElementById('valTotalJenisTenaga').innerText = new Intl.NumberFormat('id-ID').format(stats.total_jenis_tenaga);
+                    document.getElementById('valTotalPelatihan').innerText = new Intl.NumberFormat('id-ID').format(stats.total_pelatihan);
+                    document.getElementById('valPelatihanAktif').innerText = new Intl.NumberFormat('id-ID').format(status.aktif);
+                    document.getElementById('valPelatihanSelesai').innerText = new Intl.NumberFormat('id-ID').format(status.selesai);
+                    
+                    const logs = data.data.log_aktivitas;
+                    const container = document.getElementById('logAktivitasContainer');
+                    container.innerHTML = '';
+                    
+                    if (logs.length === 0) {
+                        container.innerHTML = '<div class="text-center text-gray-500 dark:text-gray-400 text-xs py-4">Belum ada aktivitas tercatat.</div>';
+                    } else {
+                        logs.forEach((log, index) => {
+                            let bgColor = 'bg-gray-50 dark:bg-slate-800';
+                            let iconColor = 'text-gray-500 dark:text-gray-400';
+                            let icon = 'fa-circle-info';
+                            let badgeColor = 'bg-gray-50 text-gray-500 dark:bg-slate-800 dark:text-gray-400';
+                            
+                            if (log.tipe === 'Create') {
+                                bgColor = 'bg-blue-50 dark:bg-blue-900/30';
+                                iconColor = 'text-blue-500 dark:text-blue-400';
+                                icon = 'fa-plus';
+                                badgeColor = 'bg-blue-50 text-blue-500 dark:bg-blue-900/30 dark:text-blue-400';
+                            } else if (log.tipe === 'Update') {
+                                bgColor = 'bg-emerald-50 dark:bg-emerald-900/30';
+                                iconColor = 'text-emerald-500 dark:text-emerald-400';
+                                icon = 'fa-rotate';
+                                badgeColor = 'bg-emerald-50 text-emerald-500 dark:bg-emerald-900/30 dark:text-emerald-400';
+                            } else if (log.tipe === 'Delete') {
+                                bgColor = 'bg-rose-50 dark:bg-rose-900/30';
+                                iconColor = 'text-rose-500 dark:text-rose-400';
+                                icon = 'fa-trash';
+                                badgeColor = 'bg-rose-50 text-rose-500 dark:bg-rose-900/30 dark:text-rose-400';
+                            }
+                            
+                            let userNama = log.user ? log.user.nama : 'Sistem';
+                            let isFirst = index === 0;
+                            
+                            // Simple relative time format or just date
+                            let dateObj = new Date(log.created_at);
+                            let dateStr = dateObj.toLocaleString('id-ID', {day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'});
+                            
+                            let perubahanHtml = log.perubahan;
+                            if (log.tipe === 'Update' && log.perubahan.includes(',')) {
+                                let parts = log.perubahan.split(',');
+                                let dataLama = parts[0].trim();
+                                let dataBaru = parts.slice(1).join(',').trim();
+                                perubahanHtml = `<span class="line-through text-gray-400 dark:text-gray-500">${dataLama}</span>
+                                                 <span class="font-bold text-amber-500 mx-1">menjadi</span>
+                                                 <span class="font-semibold text-gray-800 dark:text-gray-200">${dataBaru}</span>`;
+                            }
+                            
+                            container.innerHTML += `
+                                <div class="flex gap-4 ${isFirst ? '' : 'border-t border-gray-50 dark:border-slate-800 pt-4'}">
+                                    <div class="w-8 h-8 rounded-lg ${bgColor} flex items-center justify-center shrink-0 transition-colors">
+                                        <i class="fa-solid ${icon} ${iconColor} text-xs"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-xs text-gray-700 dark:text-white leading-snug">
+                                            <span class="font-bold">${userNama}</span>
+                                            melakukan <span class="font-semibold px-1.5 py-0.5 rounded-md text-[10px] ${badgeColor}">${log.tipe}</span>
+                                            pada tabel <span class="font-semibold text-gray-800 dark:text-gray-300">${log.tabel}</span>
+                                        </p>
+                                        <div class="text-[11px] text-gray-600 dark:text-gray-400 mt-1.5 p-2 bg-gray-50 dark:bg-slate-800/50 rounded border border-gray-100 dark:border-slate-700/50 transition-colors">
+                                            ${perubahanHtml}
+                                        </div>
+                                        <p class="text-[9px] lg:text-[10px] text-gray-400 dark:text-gray-500 mt-1 font-medium italic uppercase tracking-wider">
+                                            ${dateStr}
+                                        </p>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                }
+            })
+            .catch(error => console.error("Error loading dashboard data:", error));
+
+            // Fetch Chart Data
+            fetch("/api/admin/superadmin/dashboard/charts", {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
                 .then(response => response.json())
                 .then(data => {
                     const ctxKeaktifan = document.getElementById('keaktifanChart').getContext('2d');

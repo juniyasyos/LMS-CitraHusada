@@ -142,7 +142,7 @@
             Toast.fire({
                 icon: 'success',
                 title: 'Berhasil!',
-                text: "{{ session('success') }}"
+                text: {!! json_encode(session('success')) !!}
             });
         @endif
 
@@ -150,7 +150,7 @@
             Toast.fire({
                 icon: 'error',
                 title: 'Gagal!',
-                text: "{{ session('error') }}"
+                text: {!! json_encode(session('error')) !!}
             });
         @endif
 
@@ -158,9 +158,10 @@
             Toast.fire({
                 icon: 'warning',
                 title: 'Peringatan!',
-                text: "{{ session('warning') }}"
+                text: {!! json_encode(session('warning')) !!}
             });
         @endif
+
     </script>
 
     <!-- Lottie -->

@@ -11,7 +11,10 @@ return [
 
         'source' => [
             'files' => [
-                'include' => [],
+                'include' => [
+                    storage_path('app/public'),
+                    public_path(),
+                ],
                 'exclude' => [],
                 'follow_links' => false,
                 'ignore_unreadable_directories' => false,

@@ -25,10 +25,10 @@ window.axios.interceptors.request.use(function (config) {
 
 // Axios response interceptor to handle 401 (Expired/Invalid Token)
 window.axios.interceptors.response.use(
-    function(response) {
+    function (response) {
         return response;
     },
-    function(error) {
+    function (error) {
         if (error.response && error.response.status === 401 && !isLoginPage) {
             // Remove token and clear session on server side failure
             localStorage.removeItem('token');
@@ -40,20 +40,55 @@ window.axios.interceptors.response.use(
 );
 
 // Global Logout Function
-window.handleLogout = async function(event) {
+window.handleLogout = async function (event) {
     if (event) event.preventDefault();
 
-    if (!confirm('Apakah Anda yakin ingin keluar?')) {
-        return;
-    }
+    const result = await Swal.fire({
+        title: 'Sudah yakin keluar?',
+        text: "Anda harus login kembali untuk mengakses fitur LMS.",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Ya, Keluar!',
+        cancelButtonText: 'Batal',
+        reverseButtons: true,
+        customClass: {
+            popup: 'rounded-2xl dark:bg-slate-800 dark:text-white',
+            confirmButton: 'rounded-lg px-6 py-2.5 text-xs font-bold',
+            cancelButton: 'rounded-lg px-6 py-2.5 text-xs font-bold'
+        }
+    });
 
-    try {
-        await window.axios.post('/api/logout');
-    } catch (error) {
-        console.error('Logout error:', error);
-    } finally {
-        localStorage.removeItem('token');
-        sessionStorage.removeItem('token');
-        window.location.href = '/';
+    if (result.isConfirmed) {
+        try {
+            // Coba logout via API jika ada token
+            if (getToken()) {
+                await window.axios.post('/api/logout');
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            // Hapus token lokal
+            localStorage.removeItem('token');
+            sessionStorage.removeItem('token');
+
+            // Jalankan form logout session (untuk Superadmin/Web)
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/logout';
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            if (csrfToken) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = '_token';
+                input.value = csrfToken;
+                form.appendChild(input);
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+        }
     }
 };

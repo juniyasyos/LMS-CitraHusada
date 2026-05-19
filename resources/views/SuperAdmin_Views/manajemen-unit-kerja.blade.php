@@ -4,14 +4,7 @@
 @section('content')
 {{-- State Management dengan Alpine.js --}}
 <div class="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300" 
-     x-data="{ 
-        openTambah: false, 
-        openEdit: false, 
-        sidebarOpen: false, 
-        darkMode: localStorage.getItem('theme') === 'dark',
-        openDropdown: false,
-        editData: { id: '', name: '', desc: '' }
-     }">
+     x-data="manajemenUnitKerjaData()">
     
     {{-- SIDEBAR RESPONSIVE --}}
     <aside 
@@ -36,14 +29,12 @@
 
         <main class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar">
             
-
-
             {{-- TITLE SECTION DENGAN SWITCHER --}}
             <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
                 <div class="relative">
                     <button @click="openDropdown = !openDropdown" class="flex items-center gap-2 group">
                         <h2 class="text-lg lg:text-xl font-bold text-gray-800 dark:text-white transition-colors">
-                            {{ $title }}
+                            <span x-text="type === 'unit' ? 'Daftar Unit Kerja' : 'Daftar Jenis Tenaga'"></span>
                         </h2>
                         <i class="fa-solid fa-chevron-down text-xs text-gray-400 group-hover:text-blue-500 transition-colors mt-1"></i>
                     </button>
@@ -54,123 +45,120 @@
                          x-transition:enter-start="opacity-0 scale-95"
                          x-transition:enter-end="opacity-100 scale-100"
                          class="absolute left-0 mt-2 w-56 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-xl shadow-xl z-20 overflow-hidden">
-                        <a href="{{ route('manajemen-unit-kerja', ['type' => 'unit']) }}" 
-                           class="block w-full text-left px-4 py-3 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 transition-colors {{ $type === 'unit' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600' : '' }}">
+                         
+                        <button @click="switchType('unit')" 
+                           class="block w-full text-left px-4 py-3 text-xs font-bold transition-colors"
+                           :class="type === 'unit' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600' : 'text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600'">
                             Daftar Unit Kerja
-                        </a>
-                        <a href="{{ route('manajemen-unit-kerja', ['type' => 'tenaga']) }}" 
-                           class="block w-full text-left px-4 py-3 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 transition-colors {{ $type === 'tenaga' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600' : '' }}">
+                        </button>
+                        <button @click="switchType('tenaga')" 
+                           class="block w-full text-left px-4 py-3 text-xs font-bold transition-colors"
+                           :class="type === 'tenaga' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600' : 'text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600'">
                             Daftar Jenis Tenaga
-                        </a>
+                        </button>
                     </div>
 
                     <p class="text-xs lg:text-sm text-gray-500 dark:text-gray-300 mt-1 leading-relaxed max-w-2xl">
-                        @if($type === 'unit')
-                            Kelola struktur organisasi rumah sakit untuk penugasan pelatihan yang tepat secara sistematis.
-                        @else
-                            Kelola klasifikasi jenis tenaga medis dan staf rumah sakit untuk pemetaan kompetensi.
-                        @endif
+                        <template x-if="type === 'unit'">
+                            <span>Kelola struktur organisasi rumah sakit untuk penugasan pelatihan yang tepat secara sistematis.</span>
+                        </template>
+                        <template x-if="type === 'tenaga'">
+                            <span>Kelola klasifikasi jenis tenaga medis dan staf rumah sakit untuk pemetaan kompetensi.</span>
+                        </template>
                     </p>
                 </div>
 
-                <button @click="openTambah = true" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-bold transition shadow-sm active:scale-95">
+                <button @click="openTambah = true; errors = {}" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-bold transition shadow-sm active:scale-95">
                     <i class="fa-solid fa-plus text-xs"></i>
-                    <span>{{ $type === 'unit' ? 'Tambah Unit' : 'Tambah Tenaga' }}</span>
+                    <span x-text="type === 'unit' ? 'Tambah Unit' : 'Tambah Tenaga'"></span>
                 </button>
             </div>
 
             {{-- TOOLBAR & SEARCH --}}
             <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <p class="text-xs lg:text-sm text-gray-500 dark:text-gray-200 italic font-medium transition-colors">
-                    <span class="font-bold text-gray-700 dark:text-white transition-colors">Informasi {{ $type === 'unit' ? 'Unit' : 'Tenaga' }}:</span> 
-                    Total <span class="font-bold text-blue-600">{{ $total }}</span> data terdaftar.
+                    <span class="font-bold text-gray-700 dark:text-white transition-colors" x-text="'Informasi ' + (type === 'unit' ? 'Unit' : 'Tenaga') + ':'"></span> 
+                    Total <span class="font-bold text-blue-600" x-text="total"></span> data terdaftar.
                 </p>
                 <div class="relative w-full sm:w-72">
-                    <form action="{{ route('manajemen-unit-kerja') }}" method="GET" id="searchForm">
-                        <input type="hidden" name="type" value="{{ $type }}">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 dark:text-gray-500">
-                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
-                        </span>
-                        <input type="text" name="search" id="searchInput" value="{{ request('search') }}"
-                            class="block w-full pl-9 pr-3 py-2.5 border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-xs text-gray-700 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:dark:text-gray-500" 
-                            placeholder="Cari data...">
-                    </form>
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 dark:text-gray-500">
+                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                    </span>
+                    <input type="text" x-model="search" @input.debounce.500ms="fetchData()"
+                        class="block w-full pl-9 pr-3 py-2.5 border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-xs text-gray-700 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:dark:text-gray-500" 
+                        placeholder="Cari data...">
                 </div>
             </div>
 
             {{-- TABLE WRAPPER --}}
-            <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-x-auto mb-8 transition-colors duration-300">
+            <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-x-auto mb-8 transition-colors duration-300 relative min-h-[300px]">
+                
+                {{-- LOADING INDICATOR --}}
+                <div x-show="isLoading" class="absolute inset-0 z-10 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm flex items-center justify-center">
+                    <i class="fa-solid fa-circle-notch fa-spin text-3xl text-blue-500"></i>
+                </div>
+
                 <table class="w-full text-left text-xs min-w-[800px]">
                     <thead class="text-gray-500 dark:text-white font-bold border-b dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50 transition-colors uppercase tracking-wider">
                         <tr>
-                            <th class="py-4 px-6">{{ $type === 'unit' ? 'Nama Unit Kerja' : 'Jenis Tenaga' }}</th>
+                            <th class="py-4 px-6" x-text="type === 'unit' ? 'Nama Unit Kerja' : 'Jenis Tenaga'"></th>
                             <th class="py-4 px-4 text-center">Jumlah Karyawan</th>
                             <th class="py-4 px-4">Keterangan</th>
                             <th class="py-4 px-6 text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-slate-800 text-gray-700 dark:text-white transition-colors">
-                        @forelse($data as $item)
-                        @php
-                            $id = $type === 'unit' ? $item->unit_kerja_id : $item->jenis_tenaga_id;
-                            $name = $type === 'unit' ? $item->unit_kerja : $item->jenis_tenaga;
-                        @endphp
-                        <tr class="hover:bg-gray-50 dark:hover:bg-slate-800 transition duration-150">
-                            <td class="py-5 px-6">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 {{ $type === 'unit' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-500' : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500' }} rounded-lg flex items-center justify-center shrink-0 shadow-inner">
-                                        <i class="fa-solid {{ $type === 'unit' ? 'fa-building' : 'fa-user-doctor' }} text-lg"></i>
+                        
+                        <template x-for="item in data" :key="type === 'unit' ? item.unit_kerja_id : item.jenis_tenaga_id">
+                            <tr class="hover:bg-gray-50 dark:hover:bg-slate-800 transition duration-150">
+                                <td class="py-5 px-6">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 shadow-inner"
+                                            :class="type === 'unit' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-500' : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500'">
+                                            <i class="fa-solid text-lg" :class="type === 'unit' ? 'fa-building' : 'fa-user-doctor'"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-gray-800 dark:text-white leading-tight text-sm tracking-tight" x-text="type === 'unit' ? item.unit_kerja : item.jenis_tenaga"></p>
+                                            <p class="text-gray-400 dark:text-gray-500 mt-1 font-mono text-[10px] italic" x-text="'ID: ' + (type === 'unit' ? item.unit_kerja_id : item.jenis_tenaga_id)"></p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p class="font-bold text-gray-800 dark:text-white leading-tight text-sm tracking-tight">{{ $name }}</p>
-                                        <p class="text-gray-400 dark:text-gray-500 mt-1 font-mono text-[10px] italic">ID: {{ $id }}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="py-5 px-4 text-center">
-                                <span class="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-200 px-3 py-1.5 rounded-full font-bold text-[10px] whitespace-nowrap shadow-sm">
-                                    {{ $item->users_count }} Personel
-                                </span>
-                            </td>
-                            <td class="py-5 px-4 text-gray-500 dark:text-gray-400 max-w-xs truncate italic">
-                                {{ $item->deskripsi ?? 'Tidak ada deskripsi tambahan.' }}
-                            </td>
-                            <td class="py-5 px-6 text-right">
-                                <div class="flex justify-end gap-5 text-gray-400 dark:text-white">
-                                    {{-- Edit Button --}}
-                                    <button @click="openEdit = true; editData = { id: '{{ $id }}', name: '{{ $name }}', desc: '{{ $item->deskripsi }}' }" 
-                                            class="hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-500 rounded-lg transition-all active:scale-90" title="Edit Data">
-                                        <i class="fa-solid fa-pen"></i>
-                                    </button>
+                                </td>
+                                <td class="py-5 px-4 text-center">
+                                    <span class="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-200 px-3 py-1.5 rounded-full font-bold text-[10px] whitespace-nowrap shadow-sm" x-text="item.users_count + ' Personel'">
+                                    </span>
+                                </td>
+                                <td class="py-5 px-4 text-gray-500 dark:text-gray-400 max-w-xs truncate italic" x-text="item.deskripsi || 'Tidak ada deskripsi tambahan.'">
+                                </td>
+                                <td class="py-5 px-6 text-right">
+                                    <div class="flex justify-end gap-5 text-gray-400 dark:text-white">
+                                        {{-- Edit Button --}}
+                                        <button @click="openEditModal(item)" 
+                                                class="hover:bg-blue-50 dark:hover:bg-blue-900/20 text-gray-500 rounded-lg transition-all active:scale-90" title="Edit Data">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
 
-                                    {{-- Delete Button --}}
-                                    <form action="{{ route('manajemen-unit-kerja.destroy', $id) }}" method="POST" class="inline-block delete-form">
-                                        @csrf @method('DELETE')
-                                        <input type="hidden" name="type" value="{{ $type }}">
-                                        <button type="button" onclick="confirmDelete(this)" class="hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 rounded-lg transition-all active:scale-90" title="Hapus Data">
+                                        {{-- Delete Button --}}
+                                        <button type="button" @click="confirmDelete(type === 'unit' ? item.unit_kerja_id : item.jenis_tenaga_id)" 
+                                                class="hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-500 rounded-lg transition-all active:scale-90" title="Hapus Data">
                                             <i class="fa-solid fa-trash-can"></i>
                                         </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="4" class="py-12 text-center text-gray-400 dark:text-gray-500 italic font-medium">
-                                <div class="flex flex-col items-center gap-2">
-                                    <i class="fa-solid fa-inbox text-4xl opacity-20"></i>
-                                    <p>Data tidak ditemukan</p>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforelse
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        
+                        <template x-if="!isLoading && data.length === 0">
+                            <tr>
+                                <td colspan="4" class="py-12 text-center text-gray-400 dark:text-gray-500 italic font-medium">
+                                    <div class="flex flex-col items-center gap-2">
+                                        <i class="fa-solid fa-inbox text-4xl opacity-20"></i>
+                                        <p>Data tidak ditemukan</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
                     </tbody>
                 </table>
-            </div>
-
-            {{-- PAGINATION --}}
-            <div class="mt-4 mb-8">
-                {{ $data->links('vendor.pagination.custom-tailwind') }}
             </div>
 
             {{-- TIPS SECTION --}}
@@ -208,7 +196,7 @@
 
     {{-- MODAL TAMBAH --}}
     <div x-show="openTambah" 
-         class="fixed inset-0 z-60 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" 
+         class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" 
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
@@ -219,31 +207,35 @@
         <div @click.away="openTambah = false" class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden transition-all duration-300">
             <div class="flex justify-between items-center px-8 py-6 border-b border-gray-100 dark:border-slate-800">
                 <h2 class="text-base font-bold text-gray-800 dark:text-white">
-                    Tambah {{ $type === 'unit' ? 'Unit Kerja' : 'Jenis Tenaga' }} Baru
+                    Tambah <span x-text="type === 'unit' ? 'Unit Kerja' : 'Jenis Tenaga'"></span> Baru
                 </h2>
                 <button @click="openTambah = false" class="text-gray-400 hover:text-gray-800 dark:hover:text-white transition">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
             <div class="p-8">
-                <form action="{{ route('manajemen-unit-kerja.store') }}" method="POST" class="space-y-6">
-                    @csrf
-                    <input type="hidden" name="type" value="{{ $type }}">
+                <form @submit.prevent="submitForm" class="space-y-6">
                     <div>
                         <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">
-                            Nama {{ $type === 'unit' ? 'Unit Kerja' : 'Jenis Tenaga' }}
+                            Nama <span x-text="type === 'unit' ? 'Unit Kerja' : 'Jenis Tenaga'"></span>
                         </label>
-                        <input type="text" name="nama" required placeholder="Masukkan nama..." 
-                               class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl h-12 px-4 text-sm text-gray-700 dark:text-white outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all">
+                        <input type="text" x-model="formData.nama" required placeholder="Masukkan nama..." 
+                               class="w-full bg-white dark:bg-slate-800 border rounded-xl h-12 px-4 text-sm text-gray-700 dark:text-white outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
+                               :class="errors.nama ? 'border-red-500' : 'border-gray-200 dark:border-slate-700'">
+                        <template x-if="errors.nama">
+                            <p class="text-red-500 text-[10px] mt-1 font-bold" x-text="errors.nama[0]"></p>
+                        </template>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">Keterangan / Deskripsi</label>
-                        <textarea name="deskripsi" rows="4" placeholder="Berikan deskripsi singkat..." 
+                        <textarea x-model="formData.deskripsi" rows="4" placeholder="Berikan deskripsi singkat..." 
                                   class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4 text-sm text-gray-700 dark:text-white resize-none outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all"></textarea>
                     </div>
                     <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4">
                         <button @click="openTambah = false" type="button" class="w-full sm:w-auto px-8 py-2.5 border border-gray-200 dark:border-slate-700 text-gray-500 dark:text-white font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition text-xs">Batal</button>
-                        <button type="submit" class="w-full sm:w-auto px-8 py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-blue-100 transition text-xs active:scale-95">Simpan Data</button>
+                        <button type="submit" :disabled="isSubmitting" class="w-full sm:w-auto px-8 py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-blue-100 transition text-xs active:scale-95 disabled:opacity-50">
+                            <span x-text="isSubmitting ? 'Menyimpan...' : 'Simpan Data'"></span>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -252,7 +244,7 @@
 
     {{-- MODAL EDIT --}}
     <div x-show="openEdit" 
-         class="fixed inset-0 z-60 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" 
+         class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" 
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
@@ -263,31 +255,35 @@
         <div @click.away="openEdit = false" class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden transition-all duration-300">
             <div class="flex justify-between items-center px-8 py-6 border-b border-gray-100 dark:border-slate-800">
                 <h2 class="text-base font-bold text-gray-800 dark:text-white">
-                    Edit {{ $type === 'unit' ? 'Unit Kerja' : 'Jenis Tenaga' }}
+                    Edit <span x-text="type === 'unit' ? 'Unit Kerja' : 'Jenis Tenaga'"></span>
                 </h2>
                 <button @click="openEdit = false" class="text-gray-400 hover:text-gray-800 dark:hover:text-white transition">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
             <div class="p-8">
-                <form :action="'/manajemen-unit-kerja/' + editData.id" method="POST" class="space-y-6">
-                    @csrf @method('PUT')
-                    <input type="hidden" name="type" value="{{ $type }}">
+                <form @submit.prevent="submitEdit" class="space-y-6">
                     <div>
                         <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">
-                            Nama {{ $type === 'unit' ? 'Unit Kerja' : 'Jenis Tenaga' }}
+                            Nama <span x-text="type === 'unit' ? 'Unit Kerja' : 'Jenis Tenaga'"></span>
                         </label>
-                        <input type="text" name="nama" x-model="editData.name" required
-                               class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl h-12 px-4 text-sm text-gray-700 dark:text-white outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all">
+                        <input type="text" x-model="editData.name" required
+                               class="w-full bg-white dark:bg-slate-800 border rounded-xl h-12 px-4 text-sm text-gray-700 dark:text-white outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
+                               :class="errors.nama ? 'border-red-500' : 'border-gray-200 dark:border-slate-700'">
+                        <template x-if="errors.nama">
+                            <p class="text-red-500 text-[10px] mt-1 font-bold" x-text="errors.nama[0]"></p>
+                        </template>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">Keterangan / Deskripsi</label>
-                        <textarea name="deskripsi" rows="4" x-model="editData.desc"
+                        <textarea rows="4" x-model="editData.desc"
                                   class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4 text-sm text-gray-700 dark:text-white resize-none outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all"></textarea>
                     </div>
                     <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4">
                         <button @click="openEdit = false" type="button" class="w-full sm:w-auto px-8 py-2.5 border border-gray-200 dark:border-slate-700 text-gray-500 dark:text-white font-bold rounded-lg text-xs">Batal</button>
-                        <button type="submit" class="w-full sm:w-auto px-8 py-2.5 bg-blue-600 text-white font-bold rounded-lg shadow-blue-100 transition text-xs active:scale-95">Simpan Perubahan</button>
+                        <button type="submit" :disabled="isSubmitting" class="w-full sm:w-auto px-8 py-2.5 bg-blue-600 text-white font-bold rounded-lg shadow-blue-100 transition text-xs active:scale-95 disabled:opacity-50">
+                            <span x-text="isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'"></span>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -304,39 +300,223 @@
 </style>
 
 <script>
-    // Search Debounce
-    let searchInput = document.getElementById('searchInput');
-    let timeout = null;
-    searchInput.addEventListener('input', function() {
-        clearTimeout(timeout);
-        timeout = setTimeout(function() {
-            document.getElementById('searchForm').submit();
-        }, 800);
-    });
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('manajemenUnitKerjaData', () => ({
+            openTambah: false,
+            openEdit: false,
+            sidebarOpen: false,
+            darkMode: localStorage.getItem('theme') === 'dark',
+            openDropdown: false,
+            type: new URLSearchParams(window.location.search).get('type') || 'unit',
+            search: new URLSearchParams(window.location.search).get('search') || '',
+            data: [],
+            total: 0,
+            editData: { id: '', name: '', desc: '' },
+            formData: { nama: '', deskripsi: '' },
+            isSubmitting: false,
+            isLoading: false,
+            errors: {},
 
-    // Delete Confirmation
-    function confirmDelete(button) {
-        const form = button.closest('form');
-        Swal.fire({
-            title: 'Apakah Anda yakin?',
-            text: "Data yang dihapus mungkin memengaruhi penugasan karyawan!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#64748b',
-            confirmButtonText: 'Ya, Hapus!',
-            cancelButtonText: 'Batal',
-            reverseButtons: true,
-            customClass: {
-                popup: 'rounded-2xl',
-                confirmButton: 'rounded-lg px-6 py-2.5 text-xs font-bold',
-                cancelButton: 'rounded-lg px-6 py-2.5 text-xs font-bold'
+            init() {
+                this.fetchData();
+            },
+
+            switchType(newType) {
+                this.type = newType;
+                this.search = '';
+                const url = new URL(window.location.href);
+                url.searchParams.set('type', newType);
+                url.searchParams.delete('search');
+                window.history.pushState({}, '', url);
+                this.fetchData();
+                this.openDropdown = false;
+            },
+
+            async fetchData() {
+                this.isLoading = true;
+                try {
+                    let url = `/api/admin/unit-kerja-management?type=${this.type}`;
+                    if (this.search) url += `&search=${this.search}`;
+                    
+                    const response = await fetch(url, {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        this.data = result.data;
+                        this.total = result.total;
+                    }
+                } catch (error) {
+                    console.error(error);
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+
+            openEditModal(item) {
+                this.errors = {};
+                this.editData = {
+                    id: this.type === 'unit' ? item.unit_kerja_id : item.jenis_tenaga_id,
+                    name: this.type === 'unit' ? item.unit_kerja : item.jenis_tenaga,
+                    desc: item.deskripsi || ''
+                };
+                this.openEdit = true;
+            },
+
+            async submitForm() {
+                this.isSubmitting = true;
+                this.errors = {};
+                try {
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                    const response = await fetch('/api/admin/unit-kerja-management/store', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({
+                            type: this.type,
+                            nama: this.formData.nama,
+                            deskripsi: this.formData.deskripsi
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    if (response.ok && result.success) {
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: result.message
+                        });
+                        this.openTambah = false;
+                        this.formData.nama = '';
+                        this.formData.deskripsi = '';
+                        this.fetchData();
+                    } else if (response.status === 422) {
+                        this.errors = result.errors;
+                    } else {
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: result.message || 'Gagal menyimpan data'
+                        });
+                    }
+                } catch (error) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: 'Terjadi kesalahan sistem'
+                    });
+                } finally {
+                    this.isSubmitting = false;
+                }
+            },
+
+            async submitEdit() {
+                this.isSubmitting = true;
+                this.errors = {};
+                try {
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                    const response = await fetch(`/api/admin/unit-kerja-management/update/${this.editData.id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({
+                            type: this.type,
+                            nama: this.editData.name,
+                            deskripsi: this.editData.desc
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    if (response.ok && result.success) {
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: result.message
+                        });
+                        this.openEdit = false;
+                        this.fetchData();
+                    } else if (response.status === 422) {
+                        this.errors = result.errors;
+                    } else {
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: result.message || 'Gagal memperbarui data'
+                        });
+                    }
+                } catch (error) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: 'Terjadi kesalahan sistem'
+                    });
+                } finally {
+                    this.isSubmitting = false;
+                }
+            },
+
+            async confirmDelete(id) {
+                const result = await Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Data yang dihapus mungkin memengaruhi penugasan karyawan!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true,
+                    customClass: {
+                        popup: 'rounded-2xl dark:bg-slate-800 dark:text-white',
+                        confirmButton: 'rounded-lg px-6 py-2.5 text-xs font-bold',
+                        cancelButton: 'rounded-lg px-6 py-2.5 text-xs font-bold'
+                    }
+                });
+
+                if (result.isConfirmed) {
+                    try {
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                        const response = await fetch(`/api/admin/unit-kerja-management/destroy/${id}?type=${this.type}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            }
+                        });
+                        
+                        const data = await response.json();
+                        if (response.ok && data.success) {
+                            Toast.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: data.message
+                            });
+                            this.fetchData();
+                        } else {
+                            Toast.fire({
+                                icon: 'error',
+                                title: 'Gagal!',
+                                text: data.message || 'Gagal menghapus data'
+                            });
+                        }
+                    } catch (error) {
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: 'Terjadi kesalahan sistem'
+                        });
+                    }
+                }
             }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                form.submit();
-            }
-        });
-    }
+        }));
+    });
 </script>
 @endsection

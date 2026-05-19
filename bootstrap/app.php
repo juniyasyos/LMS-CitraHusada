@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
+            'no.impersonate' => \App\Http\Middleware\PreventImpersonateAdmin::class,
         ]);
 
         // Add session middleware to API routes for session-based authentication

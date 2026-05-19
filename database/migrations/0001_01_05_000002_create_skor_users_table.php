@@ -1,14 +1,16 @@
 <?php
 
+/**
+ * Tabel skor_users (consolidated).
+ * Includes: percobaan column (used by MateriUserController).
+ */
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('skor_users', function (Blueprint $table) {
@@ -17,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('post_test_id');
             $table->unsignedInteger('skor');
             $table->integer('waktu_pengerjaan')->default(0);
+            $table->integer('percobaan')->default(0);
             $table->dateTime('waktu_mulai_pengerjaan')->nullable();
             $table->dateTime('waktu_selesai_pengerjaan')->nullable();
             $table->timestamps();
@@ -26,11 +29,8 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('skor_user');
+        Schema::dropIfExists('skor_users');
     }
 };

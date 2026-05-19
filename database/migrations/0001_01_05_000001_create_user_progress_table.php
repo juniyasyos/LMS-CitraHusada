@@ -1,18 +1,20 @@
 <?php
 
+/**
+ * Tabel user_progress (consolidated).
+ * Merged from: create_user_progress + alter_status_enum (added 'Sesi Berakhir').
+ */
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('user_progress', function (Blueprint $table) {
-           $table->bigIncrements('progress_id');
+            $table->bigIncrements('progress_id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('materi_id');
             $table->unsignedInteger('urutan_selesai')->default(0);
@@ -33,9 +35,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('user_progress');

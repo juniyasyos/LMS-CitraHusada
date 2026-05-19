@@ -2,12 +2,20 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\JenisTenagaController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\PembelajaranController;
-use App\Http\Controllers\MateriUserController;
-use App\Http\Controllers\NotificationController;
+// use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\PembelajaranController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\MateriUserController;
+use App\Http\Controllers\Api\DashboardSuperadminController;
+use App\Http\Controllers\Api\BackupController;
+use App\Http\Controllers\Api\KategoriController;
+use App\Http\Controllers\Api\LaporanMonitoringController;
+use App\Http\Controllers\Api\LeaderboardController;
+use App\Http\Controllers\Api\ManajemenPenggunaController;
+use App\Http\Controllers\Api\UnitKerjaController;
+use App\Http\Controllers\Api\LogAktivitasController;
+use App\Http\Controllers\Api\ManajemenPelatihanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,8 +31,8 @@ use App\Http\Controllers\NotificationController;
 // Public API routes
 Route::post('/login', [AuthController::class, 'loginApi']);
 
-Route::get('/jenis-tenaga', [JenisTenagaController::class, 'index']); // Misal tenaga publik
-Route::get('/jenis-tenaga/{jenisTenaga}', [JenisTenagaController::class, 'show']);
+// Public API routes
+Route::post('/login', [AuthController::class, 'loginApi']);
 
 // Debug: Check users for API test page
 Route::get('/debug-users', function () {
@@ -51,9 +59,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // ============================================
     // API UNTUK KARYAWAN (role_id = 4)
     // ============================================
-    Route::middleware('role:4')->group(function () {
-
-    });
+    // Route::middleware('role:4')->group(function () {
+    // });
 
     // Profile & Progress
     Route::get('/profile', [PembelajaranController::class, 'getProfile']);
@@ -82,16 +89,83 @@ Route::middleware('auth:sanctum')->group(function () {
     // ============================================
     // API UNTUK SUPERADMIN (role_id = 1)
     // ============================================
-    Route::middleware('role:1')->prefix('admin')->group(function () {
-        // Dashboard Statistik
-        Route::get('/dashboard/charts', [\App\Http\Controllers\DashboardSuperadminController::class, 'getChartData'])->name('api.dashboard.charts');
+    Route::middleware(['role:1', 'no.impersonate'])->prefix('admin')->group(function () {
+        // Dashboard
+        // Route::get('/dashboard/charts', [\App\Http\Controllers\DashboardSuperadminController::class, 'getChartData'])->name('api.dashboard.charts');
+        Route::get('/superadmin/dashboard', [DashboardSuperadminController::class, 'index']);
+        Route::get('/superadmin/dashboard/charts', [DashboardSuperadminController::class, 'getChartData']);
 
-        // Manajemen Users
-        Route::get('/manajemen-pengguna', [\App\Http\Controllers\ManajemenPenggunaController::class, 'getData'])->name('api.manajemen-pengguna');
+        // Manajemen Pengguna
+        Route::prefix('manajemen-pengguna')->group(function () {
+            // Read Data
+            Route::get('/', [ManajemenPenggunaController::class, 'getData']);
 
-        // Master Data Jenis Tenaga
-        Route::post('/jenis-tenaga', [JenisTenagaController::class, 'store']);
-        Route::put('/jenis-tenaga/{jenisTenaga}', [JenisTenagaController::class, 'update']);
-        Route::delete('/jenis-tenaga/{jenisTenaga}', [JenisTenagaController::class, 'destroy']);
+            // Create, Update, Delete
+            Route::post('/store', [ManajemenPenggunaController::class, 'store']);
+            Route::put('/update/{id}', [ManajemenPenggunaController::class, 'update']);
+            Route::delete('/destroy/{id}', [ManajemenPenggunaController::class, 'destroy']);
+        });
+
+        // Unit Kerja dan Jenis Tenaga
+        Route::prefix('unit-kerja-management')->group(function () {
+            Route::get('/', [UnitKerjaController::class, 'index']);      // Ambil data
+            Route::post('/store', [UnitKerjaController::class, 'store']);     // Tambah data
+            Route::put('/update/{id}', [UnitKerjaController::class, 'update']); // Update data
+            Route::delete('/destroy/{id}', [UnitKerjaController::class, 'destroy']); // Hapus data
+        });
+
+        // Manajemen Pelatihan
+        Route::prefix('manajemen-pelatihan')->group(function () {
+            Route::get('/data', [ManajemenPelatihanController::class, 'getData']);
+            Route::post('/', [ManajemenPelatihanController::class, 'store']);
+            Route::put('/{id}', [ManajemenPelatihanController::class, 'update']);
+            Route::delete('/{id}', [ManajemenPelatihanController::class, 'destroy']);
+
+            Route::get('/arsip/data', [ManajemenPelatihanController::class, 'getArchiveData']);
+            Route::post('/arsip/{id}/restore', [ManajemenPelatihanController::class, 'unarchive']);
+            Route::delete('/arsip/{id}', [ManajemenPelatihanController::class, 'destroyFromArchive']);
+
+            Route::get('/sampah/data', [ManajemenPelatihanController::class, 'getTrashData']);
+            Route::post('/sampah/{id}/restore', [ManajemenPelatihanController::class, 'restore']);
+            Route::delete('/sampah/{id}/force', [ManajemenPelatihanController::class, 'forceDestroy']);
+
+            Route::get('/content/{id}/data', [ManajemenPelatihanController::class, 'getContentData']);
+            Route::post('/content/{id}/sub-materi', [ManajemenPelatihanController::class, 'storeSubMateri']);
+            Route::put('/sub-materi/{id}', [ManajemenPelatihanController::class, 'updateSubMateri']);
+            Route::delete('/sub-materi/{id}', [ManajemenPelatihanController::class, 'destroySubMateri']);
+
+            Route::post('/content/{id}/quiz', [ManajemenPelatihanController::class, 'storePostTest']);
+            Route::put('/post-test/{id}', [ManajemenPelatihanController::class, 'updatePostTest']);
+            Route::delete('/post-test/{id}', [ManajemenPelatihanController::class, 'destroyPostTest']);
+        });
+
+        // Kategori
+        Route::prefix('kategori')->group(function () {
+            Route::get('/data', [KategoriController::class, 'getKategoriData']);
+            Route::post('/store', [KategoriController::class, 'store']);
+            Route::put('/update/{id}', [KategoriController::class, 'update']);
+            Route::delete('/destroy/{id}', [KategoriController::class, 'destroy']);
+        });
+
+        //Laporan Monitoring
+        Route::get('/laporan-monitoring/data', [LaporanMonitoringController::class, 'getMonitoringData']);
+
+        //Backup/Cadangan
+        Route::prefix('backup')->group(function () {
+            Route::get('/data', [BackupController::class, 'getBackupData'])->name('api.backup.data');
+            Route::post('/run', [BackupController::class, 'runBackup'])->name('api.backup.run');
+            Route::post('/settings', [BackupController::class, 'updateSettings'])->name('api.backup.settings');
+            Route::post('/delete-selected', [BackupController::class, 'deleteSelected'])->name('api.backup.delete-selected');
+            Route::post('/reset', [BackupController::class, 'reset'])->name('api.backup.reset');
+        });
+
+
+        //Log Aktivitas
+        Route::get('/log-aktivitas', [LogAktivitasController::class, 'index']);
+
+        //Detail Leaderboard
+        Route::get('/leaderboard/data', [LeaderboardController::class, 'getLeaderboardDataApi']);
+
+
     });
 });

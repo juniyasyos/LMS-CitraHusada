@@ -21,7 +21,6 @@ class Materi extends Model
         'tanggal_selesai',
         'jam_pelajaran',
         'kategori_id',
-        'arsip',
     ];
 
     protected $casts = [

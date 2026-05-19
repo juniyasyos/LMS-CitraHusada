@@ -1,11 +1,8 @@
 <?php
 
 /**
- * Migrasi: membuat tabel `sub_materis`.
- *
- * Setiap sub-materi terhubung ke materi induk. Menyimpan judul dan
- * file opsional dari sub-materi. Foreign key dengan cascading delete
- * memastikan sub-materi dihapus ketika materi induk dihapus.
+ * Tabel sub_materis (consolidated).
+ * Added: deskripsi column (used by controller & model).
  */
 
 use Illuminate\Database\Migrations\Migration;
@@ -14,17 +11,13 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Buat tabel `sub_materis`.
-     *
-     * @return void
-     */
     public function up(): void
     {
         Schema::create('sub_materis', function (Blueprint $table) {
             $table->bigIncrements('sub_materi_id');
             $table->unsignedBigInteger('materi_id');
             $table->string('judul');
+            $table->text('deskripsi')->nullable();
             $table->string('file_materi');
             $table->unsignedInteger('urutan_sub_materi');
             $table->timestamps();
@@ -33,11 +26,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Hapus tabel `sub_materis`.
-     *
-     * @return void
-     */
     public function down(): void
     {
         Schema::dropIfExists('sub_materis');

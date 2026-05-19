@@ -11,7 +11,7 @@ Artisan::command('inspire', function () {
 
 // Auto-cleanup: Hapus permanen pelatihan yang sudah di sampah > 30 hari
 Schedule::call(function () {
-    \App\Http\Controllers\ManajemenPelatihanController::autoCleanTrash();
+    \App\Http\Controllers\Api\ManajemenPelatihanController::autoCleanTrash();
 })->daily()->description('Auto-delete trashed pelatihan older than 30 days');
 
 // Dynamic Backup Schedule
@@ -24,7 +24,7 @@ try {
 
             // Map frequency to schedule methods
             if (in_array($frequency, ['daily', 'weekly', 'monthly', 'yearly'])) {
-                Schedule::command('backup:run --only-db')
+                Schedule::command('backup:run')
                     ->$frequency()
                     ->at($time)
                     ->description('Dynamic backup based on superadmin settings');

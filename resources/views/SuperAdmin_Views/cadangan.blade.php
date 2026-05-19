@@ -4,140 +4,8 @@
 
 {{-- Menambahkan state untuk dropdown pengaturan, modal reset, mode hapus, dan toggle status --}}
 <div class="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300" 
-    x-data="{ 
-        sidebarOpen: false, 
-        darkMode: localStorage.getItem('theme') === 'dark',
-        openPengaturan: false,
-        openModalReset: false,
-        isSelectionMode: false,
-        backupActive: {{ $settings->is_active ? 'true' : 'false' }},
-        frequency: '{{ $settings->frequency }}',
-        executionTime: '{{ $settings->execution_time }}',
-        selectedIds: [],
-        isBackingUp: false,
-        
-        async runBackup() {
-            if (this.isBackingUp) return;
-            this.isBackingUp = true;
-            
-            try {
-                const response = await fetch('{{ route('cadangan.run') }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-                        'Accept': 'application/json'
-                    }
-                });
-                const data = await response.json();
-                
-                if (data.status === 'success') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil',
-                        text: data.message,
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal',
-                        text: data.message
-                    });
-                }
-            } catch (error) {
-                console.error(error);
-            } finally {
-                this.isBackingUp = false;
-                // Optional: Refresh table after some delay
-                setTimeout(() => window.location.reload(), 3000);
-            }
-        },
-
-        async saveSettings() {
-            try {
-                const response = await fetch('{{ route('cadangan.settings') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        is_active: this.backupActive ? 1 : 0,
-                        frequency: this.frequency,
-                        execution_time: this.executionTime
-                    })
-                });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Tersimpan',
-                        text: data.message,
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                    this.openPengaturan = false;
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        },
-
-        async deleteSelected() {
-            if (this.selectedIds.length === 0) return;
-            
-            const result = await Swal.fire({
-                title: 'Hapus Terpilih?',
-                text: `Anda akan menghapus ${this.selectedIds.length} riwayat cadangan.`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal'
-            });
-
-            if (result.isConfirmed) {
-                try {
-                    const response = await fetch('{{ route('cadangan.delete-selected') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({ ids: this.selectedIds })
-                    });
-                    const data = await response.json();
-                    if (data.status === 'success') {
-                        window.location.reload();
-                    }
-                } catch (error) {
-                    console.error(error);
-                }
-            }
-        },
-
-        async confirmReset() {
-            try {
-                const response = await fetch('{{ route('cadangan.reset') }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-                        'Accept': 'application/json'
-                    }
-                });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    window.location.reload();
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        }
-    }">
+    x-data="backupData()"
+    x-init="initData()">
     
     {{-- Script SweetAlert2 --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -216,36 +84,36 @@
                         <i class="fa-solid fa-clock text-xs"></i>
                         <span class="text-[9px] lg:text-[11px] font-bold uppercase tracking-wider">Total Riwayat</span>
                     </div>
-                    <p class="text-lg lg:text-xl font-bold text-gray-800 dark:text-white transition-colors">{{ $totalLogs }}</p>
+                    <p class="text-lg lg:text-xl font-bold text-gray-800 dark:text-white transition-colors" x-text="stats.total"><i class="fa-solid fa-spinner fa-spin text-sm"></i></p>
                 </div>
                 <div class="bg-white dark:bg-slate-900 p-4 lg:p-5 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
                     <div class="flex items-center gap-2 lg:gap-3 text-gray-400 dark:text-gray-300 mb-2 transition-colors">
                         <i class="fa-solid fa-circle-check text-xs"></i>
                         <span class="text-[9px] lg:text-[11px] font-bold uppercase tracking-wider">Berhasil</span>
                     </div>
-                    <p class="text-lg lg:text-xl font-bold text-emerald-600 dark:text-emerald-400 transition-colors">{{ $successCount }}</p>
+                    <p class="text-lg lg:text-xl font-bold text-emerald-600 dark:text-emerald-400 transition-colors" x-text="stats.success"><i class="fa-solid fa-spinner fa-spin text-sm"></i></p>
                 </div>
                 <div class="bg-white dark:bg-slate-900 p-4 lg:p-5 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
                     <div class="flex items-center gap-2 lg:gap-3 text-gray-400 dark:text-gray-300 mb-2 transition-colors">
                         <i class="fa-solid fa-circle-xmark text-xs"></i>
                         <span class="text-[9px] lg:text-[11px] font-bold uppercase tracking-wider">Gagal</span>
                     </div>
-                    <p class="text-lg lg:text-xl font-bold text-red-600 dark:text-red-400 transition-colors">{{ $failedCount }}</p>
+                    <p class="text-lg lg:text-xl font-bold text-red-600 dark:text-red-400 transition-colors" x-text="stats.failed"><i class="fa-solid fa-spinner fa-spin text-sm"></i></p>
                 </div>
                 <div class="bg-white dark:bg-slate-900 p-4 lg:p-5 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
                     <div class="flex items-center gap-2 lg:gap-3 text-gray-400 dark:text-gray-300 mb-2 transition-colors">
                         <i class="fa-solid fa-database text-xs"></i>
                         <span class="text-[9px] lg:text-[11px] font-bold uppercase tracking-wider">Sisa Disk</span>
                     </div>
-                    <p class="text-sm font-bold text-gray-800 dark:text-white transition-colors truncate">{{ $freeSpaceFormatted }}</p>
+                    <p class="text-sm font-bold text-gray-800 dark:text-white transition-colors truncate" x-text="stats.free_space"><i class="fa-solid fa-spinner fa-spin text-sm"></i></p>
                 </div>
             </div>
 
             <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 min-h-[400px] flex flex-col mb-10 transition-colors duration-300 overflow-hidden">
                 <div class="p-6 border-b dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
                     <h3 class="font-bold text-gray-800 dark:text-white transition-colors">Daftar Cadangan</h3>
-                    <form action="{{ route('cadangan') }}" method="GET" class="relative w-full sm:w-64">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari..." class="w-full pl-3 pr-8 py-2 border border-gray-200 dark:border-slate-700 rounded-lg text-xs bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:dark:text-gray-400">
+                    <form @submit.prevent="fetchData()" class="relative w-full sm:w-64">
+                        <input type="text" x-model="searchQuery" placeholder="Cari..." class="w-full pl-3 pr-8 py-2 border border-gray-200 dark:border-slate-700 rounded-lg text-xs bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:dark:text-gray-400">
                         <button type="submit" class="absolute right-3 top-2.5 text-gray-400 dark:text-white text-xs">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
@@ -263,60 +131,62 @@
                         <button @click="isSelectionMode = !isSelectionMode; if(!isSelectionMode) selectedIds = []" :class="isSelectionMode ? 'bg-amber-500 text-white border-amber-500' : 'border-2 border-amber-300 text-amber-600 bg-amber-50 dark:bg-amber-950/20'" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] lg:text-[11px] font-bold transition active:scale-95">
                             <i class="fa-solid fa-trash-can"></i> <span x-text="isSelectionMode ? 'Batal Pilih' : 'Bersihkan'"></span>
                         </button>
-                        <button @click="window.location.reload()" class="flex items-center gap-2 px-3 py-1.5 border-2 border-emerald-400 text-emerald-600 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg text-[10px] lg:text-[11px] font-bold hover:bg-emerald-100 transition active:scale-95">
-                            <i class="fa-solid fa-arrows-rotate"></i> Segarkan
+                        <button @click="fetchData()" class="flex items-center gap-2 px-3 py-1.5 border-2 border-emerald-400 text-emerald-600 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg text-[10px] lg:text-[11px] font-bold hover:bg-emerald-100 transition active:scale-95">
+                            <i class="fa-solid fa-arrows-rotate" :class="isLoading ? 'fa-spin' : ''"></i> Segarkan
                         </button>
                     </div>
                 </div>
 
                 <div class="flex-1 transition-colors relative overflow-x-auto">
-                    @if($logs->isEmpty())
-                    <div class="flex flex-col items-center justify-center p-8 lg:p-12 h-full">
-                        <div class="text-gray-200 dark:text-gray-700 mb-4 transition-colors">
-                            <i class="fa-solid fa-folder-open text-7xl lg:text-8xl"></i>
+                    <template x-if="isLoading">
+                        <div class="flex flex-col items-center justify-center p-8 lg:p-12 h-full">
+                            <i class="fa-solid fa-spinner fa-spin text-3xl text-blue-500 mb-4"></i>
+                            <p class="text-xs text-gray-500">Memuat data...</p>
                         </div>
-                        <p class="text-xs lg:text-sm text-gray-400 dark:text-gray-400 font-medium tracking-wide transition-colors">Belum ada riwayat cadangan</p>
-                    </div>
-                    @else
-                    <table class="w-full text-left border-collapse min-w-[600px]">
-                        <thead>
-                            <tr class="bg-gray-50 dark:bg-slate-800/50 text-[10px] lg:text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                                <th x-show="isSelectionMode" class="px-6 py-4 w-10" x-transition>
-                                    <input type="checkbox" @change="if($el.checked) selectedIds = {{ $logs->pluck('id') }}; else selectedIds = []" class="rounded dark:bg-slate-900 border-gray-300 dark:border-slate-700 text-blue-600">
-                                </th>
-                                <th class="px-6 py-4">Nama File</th>
-                                <th class="px-6 py-4">Ukuran</th>
-                                <th class="px-6 py-4">Status</th>
-                                <th class="px-6 py-4 text-right">Tanggal</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y dark:divide-slate-800">
-                            @foreach($logs as $log)
-                            <tr class="text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                                <td x-show="isSelectionMode" class="px-6 py-4" x-transition>
-                                    <input type="checkbox" :value="{{ $log->id }}" x-model="selectedIds" class="rounded dark:bg-slate-900 border-gray-300 dark:border-slate-700 text-blue-600">
-                                </td>
-                                <td class="px-6 py-4 font-medium max-w-[200px] truncate">
-                                    {{ basename($log->filename) ?: 'N/A' }}
-                                </td>
-                                <td class="px-6 py-4">
-                                    {{ $log->size ? round($log->size / 1024 / 1024, 2) . ' MB' : '-' }}
-                                </td>
-                                <td class="px-6 py-4">
-                                    @if($log->status === 'success')
-                                    <span class="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full text-[10px] font-bold uppercase">Berhasil</span>
-                                    @else
-                                    <span class="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full text-[10px] font-bold uppercase">Gagal</span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 text-right tabular-nums text-gray-400 dark:text-gray-500">
-                                    {{ $log->created_at->translatedFormat('d M Y, H:i') }}
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                    @endif
+                    </template>
+                    <template x-if="!isLoading && logs.length === 0">
+                        <div class="flex flex-col items-center justify-center p-8 lg:p-12 h-full">
+                            <div class="text-gray-200 dark:text-gray-700 mb-4 transition-colors">
+                                <i class="fa-solid fa-folder-open text-7xl lg:text-8xl"></i>
+                            </div>
+                            <p class="text-xs lg:text-sm text-gray-400 dark:text-gray-400 font-medium tracking-wide transition-colors">Belum ada riwayat cadangan</p>
+                        </div>
+                    </template>
+                    <template x-if="!isLoading && logs.length > 0">
+                        <table class="w-full text-left border-collapse min-w-[600px]">
+                            <thead>
+                                <tr class="bg-gray-50 dark:bg-slate-800/50 text-[10px] lg:text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                                    <th x-show="isSelectionMode" class="px-6 py-4 w-10" x-transition>
+                                        <input type="checkbox" @change="if($el.checked) selectedIds = logs.map(l => l.id); else selectedIds = []" class="rounded dark:bg-slate-900 border-gray-300 dark:border-slate-700 text-blue-600">
+                                    </th>
+                                    <th class="px-6 py-4">Nama File</th>
+                                    <th class="px-6 py-4">Ukuran</th>
+                                    <th class="px-6 py-4">Status</th>
+                                    <th class="px-6 py-4 text-right">Tanggal</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y dark:divide-slate-800">
+                                <template x-for="log in logs" :key="log.id">
+                                    <tr class="text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                                        <td x-show="isSelectionMode" class="px-6 py-4" x-transition>
+                                            <input type="checkbox" :value="log.id" x-model="selectedIds" class="rounded dark:bg-slate-900 border-gray-300 dark:border-slate-700 text-blue-600">
+                                        </td>
+                                        <td class="px-6 py-4 font-medium max-w-[200px] truncate" x-text="log.filename ? log.filename.split('/').pop() : 'N/A'"></td>
+                                        <td class="px-6 py-4" x-text="log.size ? (log.size / 1024 / 1024).toFixed(2) + ' MB' : '-'"></td>
+                                        <td class="px-6 py-4">
+                                            <template x-if="log.status === 'success'">
+                                                <span class="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full text-[10px] font-bold uppercase">Berhasil</span>
+                                            </template>
+                                            <template x-if="log.status !== 'success'">
+                                                <span class="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full text-[10px] font-bold uppercase">Gagal</span>
+                                            </template>
+                                        </td>
+                                        <td class="px-6 py-4 text-right tabular-nums text-gray-400 dark:text-gray-500" x-text="log.date"></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </template>
                 </div>
 
                 {{-- Footer tombol hapus saat mode seleksi --}}
@@ -353,4 +223,172 @@
     .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
     [x-cloak] { display: none !important; }
 </style>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('backupData', () => ({
+        sidebarOpen: false, 
+        darkMode: localStorage.getItem('theme') === 'dark',
+        openPengaturan: false,
+        openModalReset: false,
+        isSelectionMode: false,
+        backupActive: false,
+        frequency: 'daily',
+        executionTime: '00:00',
+        selectedIds: [],
+        isBackingUp: false,
+        isLoading: true,
+        logs: [],
+        stats: { total: 0, success: 0, failed: 0, free_space: '0 B' },
+        searchQuery: '',
+
+        async initData() {
+            await this.fetchData();
+        },
+
+        async fetchData() {
+            this.isLoading = true;
+            try {
+                const url = new URL('/api/admin/backup/data', window.location.origin);
+                if (this.searchQuery) url.searchParams.append('search', this.searchQuery);
+                
+                const response = await fetch(url.toString(), {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await response.json();
+                this.logs = data.logs || [];
+                this.stats = data.stats || { total: 0, success: 0, failed: 0, free_space: '0 B' };
+                if (data.settings) {
+                    this.backupActive = !!data.settings.is_active;
+                    this.frequency = data.settings.frequency;
+                    this.executionTime = data.settings.execution_time;
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        async runBackup() {
+            if (this.isBackingUp) return;
+            this.isBackingUp = true;
+            
+            try {
+                const response = await fetch('/api/admin/backup/run', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: data.message
+                    });
+                } else {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: data.message
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                this.isBackingUp = false;
+                setTimeout(() => this.fetchData(), 3000);
+            }
+        },
+
+        async saveSettings() {
+            try {
+                const response = await fetch('/api/admin/backup/settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        is_active: this.backupActive ? 1 : 0,
+                        frequency: this.frequency,
+                        execution_time: this.executionTime
+                    })
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Tersimpan',
+                        text: data.message
+                    });
+                    this.openPengaturan = false;
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        },
+
+        async deleteSelected() {
+            if (this.selectedIds.length === 0) return;
+            
+            const result = await Swal.fire({
+                title: 'Hapus Terpilih?',
+                text: `Anda akan menghapus ${this.selectedIds.length} riwayat cadangan.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch('/api/admin/backup/delete-selected', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ ids: this.selectedIds })
+                    });
+                    const data = await response.json();
+                    if (data.status === 'success') {
+                        this.selectedIds = [];
+                        this.fetchData();
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        },
+
+        async confirmReset() {
+            try {
+                const response = await fetch('/api/admin/backup/reset', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    this.openModalReset = false;
+                    this.fetchData();
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    }));
+});
+</script>
 @endsection

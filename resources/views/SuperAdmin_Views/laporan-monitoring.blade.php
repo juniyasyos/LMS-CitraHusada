@@ -2,17 +2,8 @@
 @section('title', 'Laporan & Monitoring')
 
 @section('content')
-    <div class="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300" x-data="{ 
-            sidebarOpen: false, 
-            darkMode: localStorage.getItem('theme') === 'dark', 
-            openSertifikat: false,
-            activeTab: 'internal',
-            showDetail: false,
-            selectedUser: '',
-            selectedCourse: '',
-            selectedDate: '',
-            selectedCertId: ''
-        }">
+    <div class="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300" 
+         x-data="monitoringData()" x-init="initData()">
 
         <aside id="sidebar" :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
             class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 border-r dark:border-slate-800 transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0 shrink-0 overflow-y-auto">
@@ -50,8 +41,7 @@
                             <p
                                 class="text-[9px] lg:text-[10px] font-bold text-gray-400 dark:text-white uppercase tracking-wider transition-colors truncate">
                                 Total Peserta</p>
-                            <p class="text-base lg:text-lg font-bold text-gray-800 dark:text-white">
-                                {{ number_format($totalPeserta) }}</p>
+                            <p class="text-base lg:text-lg font-bold text-gray-800 dark:text-white" x-text="stats.total_peserta"><i class="fa-solid fa-spinner fa-spin text-sm"></i></p>
                         </div>
                     </div>
                     <div
@@ -64,8 +54,7 @@
                             <p
                                 class="text-[9px] lg:text-[10px] font-bold text-gray-400 dark:text-white uppercase tracking-wider transition-colors truncate">
                                 Penyelesaian</p>
-                            <p class="text-base lg:text-lg font-bold text-gray-800 dark:text-white">
-                                {{ $penyelesaianPercent }}%</p>
+                            <p class="text-base lg:text-lg font-bold text-gray-800 dark:text-white" x-text="stats.penyelesaian_percent + '%'"><i class="fa-solid fa-spinner fa-spin text-sm"></i></p>
                         </div>
                     </div>
                     <div
@@ -78,8 +67,7 @@
                             <p
                                 class="text-[9px] lg:text-[10px] font-bold text-gray-400 dark:text-white uppercase tracking-wider transition-colors truncate">
                                 Sertifikat</p>
-                            <p class="text-base lg:text-lg font-bold text-gray-800 dark:text-white">
-                                {{ number_format($totalSertifikat) }}</p>
+                            <p class="text-base lg:text-lg font-bold text-gray-800 dark:text-white" x-text="stats.total_sertifikat"><i class="fa-solid fa-spinner fa-spin text-sm"></i></p>
                         </div>
                     </div>
                     <div
@@ -92,7 +80,7 @@
                             <p
                                 class="text-[9px] lg:text-[10px] font-bold text-gray-400 dark:text-white uppercase tracking-wider transition-colors truncate">
                                 Rata-rata Nilai</p>
-                            <p class="text-base lg:text-lg font-bold text-gray-800 dark:text-white">{{ $rataRataNilai }}</p>
+                            <p class="text-base lg:text-lg font-bold text-gray-800 dark:text-white" x-text="stats.rata_rata_nilai"><i class="fa-solid fa-spinner fa-spin text-sm"></i></p>
                         </div>
                     </div>
                 </div>
@@ -121,13 +109,13 @@
 
                 <div
                     class="bg-white dark:bg-slate-900 p-4 lg:p-6 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm mb-8 transition-colors">
-                    <form action="{{ route('laporan.monitoring') }}" method="GET"
+                    <form @submit.prevent="fetchData(1)"
                         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
                         <div>
                             <label
                                 class="text-[11px] font-bold text-gray-500 dark:text-white uppercase mb-2 block tracking-tight">Cari
                                 Karyawan/Pelatihan</label>
-                            <input type="text" name="search" value="{{ request('search') }}"
+                            <input type="text" x-model="filters.search"
                                 placeholder="Nama, NIP, atau Pelatihan..."
                                 class="w-full border-gray-200 dark:border-slate-700 rounded-lg text-xs p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-white focus:outline-none transition-all">
                         </div>
@@ -135,11 +123,11 @@
                             <label
                                 class="text-[11px] font-bold text-gray-500 dark:text-white uppercase mb-2 block tracking-tight">Unit
                                 Kerja</label>
-                            <select name="unit_kerja"
+                            <select x-model="filters.unit_kerja"
                                 class="w-full border-gray-200 dark:border-slate-700 rounded-lg text-xs p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-white">
                                 <option value="">Semua Unit</option>
                                 @foreach($unitKerjas as $unit)
-                                    <option value="{{ $unit->unit_kerja_id }}" {{ request('unit_kerja') == $unit->unit_kerja_id ? 'selected' : '' }}>{{ $unit->unit_kerja }}</option>
+                                    <option value="{{ $unit->unit_kerja_id }}">{{ $unit->unit_kerja }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -147,15 +135,12 @@
                             <label
                                 class="text-[11px] font-bold text-gray-500 dark:text-white uppercase mb-2 block tracking-tight">Status
                                 Pelatihan</label>
-                            <select name="status"
+                            <select x-model="filters.status"
                                 class="w-full border-gray-200 dark:border-slate-700 rounded-lg text-xs p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-white">
                                 <option value="">Semua Status</option>
-                                <option value="Selesai" {{ request('status') == 'Selesai' ? 'selected' : '' }}>Selesai
-                                </option>
-                                <option value="Progres" {{ request('status') == 'Progres' ? 'selected' : '' }}>Progres
-                                </option>
-                                <option value="Belum Dimulai" {{ request('status') == 'Belum Dimulai' ? 'selected' : '' }}>
-                                    Belum Dimulai</option>
+                                <option value="Selesai">Selesai</option>
+                                <option value="Progres">Progres</option>
+                                <option value="Belum Dimulai">Belum Dimulai</option>
                             </select>
                         </div>
                         <button type="submit"
@@ -190,72 +175,70 @@
                             </thead>
                             <tbody
                                 class="divide-y divide-gray-100 dark:divide-slate-800 text-gray-700 dark:text-white transition-colors">
-                                @forelse($internalReports as $report)
-                                    <tr class="hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
-                                        <td class="py-4 px-6">
-                                            <div class="flex items-center gap-3">
-                                                <div
-                                                    class="w-8 h-8 bg-gray-100 dark:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-gray-400 dark:text-white text-[10px] border border-gray-200 dark:border-slate-600 uppercase">
-                                                    {{ substr($report->user->nama, 0, 2) }}
-                                                </div>
-                                                <div class="truncate max-w-[150px]">
-                                                    <p class="font-bold text-gray-800 dark:text-white truncate">
-                                                        {{ $report->user->nama }}</p>
-                                                    <p class="text-[10px] text-gray-400 dark:text-gray-300 italic">
-                                                        {{ $report->user->nik }}</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="py-4 px-4 text-gray-500 dark:text-gray-200">
-                                            {{ $report->user->unitKerja->unit_kerja ?? '-' }}</td>
-                                        <td class="py-4 px-4 font-bold text-gray-800 dark:text-white truncate max-w-[200px]">
-                                            {{ $report->materi->judul }}</td>
-                                        <td class="py-4 px-4">
-                                            @php
-                                                $totalSteps = $report->materi->subMateris->count() + $report->materi->postTests->count();
-                                                $percent = $totalSteps > 0 ? round(($report->urutan_selesai / $totalSteps) * 100) : 0;
-                                            @endphp
-                                            <div class="flex items-center gap-2 justify-center">
-                                                <p class="text-[10px] text-gray-400 dark:text-white w-8 font-bold">
-                                                    {{ $percent }}%</p>
-                                                <div
-                                                    class="w-20 bg-gray-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                                                    <div class="bg-blue-600 h-1.5 rounded-full transition-all duration-1000"
-                                                        style="width: {{ $percent }}%"></div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="py-4 px-4 text-center">
-                                            <span
-                                                class="font-bold text-[10px] px-2 py-1 rounded-full border
-                                                {{ $report->status == 'Selesai' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-blue-50 text-blue-600 border-blue-100' }}">
-                                                {{ $report->status }}
-                                            </span>
-                                        </td>
-                                        <td class="py-4 px-4 text-center font-bold dark:text-white italic">
-                                            {{ $report->skor_total !== null ? round($report->skor_total, 1) : '-' }}
-                                        </td>
-                                        <td class="py-4 px-6 text-center">
-                                            @if($report->status == 'Selesai')
-                                                <button @click="
-                                                        openSertifikat = true; 
-                                                        selectedUser = '{{ $report->user->name }}'; 
-                                                        selectedCourse = '{{ $report->materi->judul }}';
-                                                        selectedDate = '{{ $report->updated_at->format('M d, Y') }}';
-                                                    " class="text-blue-600 hover:text-blue-800 transition">
-                                                    <i class="fa-solid fa-eye"></i>
-                                                </button>
-                                            @else
-                                                <span class="text-gray-300 italic text-[9px]">Dalam Progres</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @empty
+                                <template x-if="isLoading">
                                     <tr>
-                                        <td colspan="7" class="py-12 text-center text-gray-400 italic">Data monitoring belum
-                                            tersedia.</td>
+                                        <td colspan="7" class="py-10 text-center">
+                                            <i class="fa-solid fa-spinner fa-spin text-3xl text-blue-500 mb-2"></i>
+                                            <p class="text-xs text-gray-500">Memuat data...</p>
+                                        </td>
                                     </tr>
-                                @endforelse
+                                </template>
+                                <template x-if="!isLoading && reports.length === 0">
+                                    <tr>
+                                        <td colspan="7" class="py-12 text-center text-gray-400 italic">Data monitoring belum tersedia.</td>
+                                    </tr>
+                                </template>
+                                <template x-if="!isLoading && reports.length > 0">
+                                    <template x-for="report in reports" :key="report.progress_id">
+                                        <tr class="hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+                                            <td class="py-4 px-6">
+                                                <div class="flex items-center gap-3">
+                                                    <div
+                                                        class="w-8 h-8 bg-gray-100 dark:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-gray-400 dark:text-white text-[10px] border border-gray-200 dark:border-slate-600 uppercase" x-text="report.user && report.user.nama ? report.user.nama.substring(0, 2) : '??'">
+                                                    </div>
+                                                    <div class="truncate max-w-[150px]">
+                                                        <p class="font-bold text-gray-800 dark:text-white truncate" x-text="report.user ? report.user.nama : '-'"></p>
+                                                        <p class="text-[10px] text-gray-400 dark:text-gray-300 italic" x-text="report.user ? report.user.nik : '-'"></p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="py-4 px-4 text-gray-500 dark:text-gray-200" x-text="(report.user && report.user.unit_kerja) ? report.user.unit_kerja.unit_kerja : '-'"></td>
+                                            <td class="py-4 px-4 font-bold text-gray-800 dark:text-white truncate max-w-[200px]" x-text="report.materi ? report.materi.judul : '-'"></td>
+                                            <td class="py-4 px-4">
+                                                <div class="flex items-center gap-2 justify-center">
+                                                    <p class="text-[10px] text-gray-400 dark:text-white w-8 font-bold" x-text="getPercent(report) + '%'"></p>
+                                                    <div
+                                                        class="w-20 bg-gray-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                                                        <div class="bg-blue-600 h-1.5 rounded-full transition-all duration-1000"
+                                                            :style="'width: ' + getPercent(report) + '%'"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="py-4 px-4 text-center">
+                                                <span
+                                                    class="font-bold text-[10px] px-2 py-1 rounded-full border" :class="report.status === 'Selesai' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-blue-50 text-blue-600 border-blue-100'" x-text="report.status">
+                                                </span>
+                                            </td>
+                                            <td class="py-4 px-4 text-center font-bold dark:text-white italic" x-text="report.skor_total !== null ? parseFloat(report.skor_total).toFixed(1) : '-'">
+                                            </td>
+                                            <td class="py-4 px-6 text-center">
+                                                <template x-if="report.status === 'Selesai'">
+                                                    <button @click="
+                                                            openSertifikat = true; 
+                                                            selectedUser = report.user.nama; 
+                                                            selectedCourse = report.materi.judul;
+                                                            selectedDate = formatDate(report.updated_at);
+                                                        " class="text-blue-600 hover:text-blue-800 transition">
+                                                        <i class="fa-solid fa-eye"></i>
+                                                    </button>
+                                                </template>
+                                                <template x-if="report.status !== 'Selesai'">
+                                                    <span class="text-gray-300 italic text-[9px]">Belum Lulus</span>
+                                                </template>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </template>
                             </tbody>
                         </table>
 
@@ -281,8 +264,21 @@
                         </table>
                     </div>
 
-                    <div class="mt-8">
-                        {{ $internalReports->links() }}
+                    <div class="mt-8 flex justify-center gap-2">
+                        <template x-if="pagination.links">
+                            <div class="flex flex-wrap items-center justify-center gap-1">
+                                <template x-for="(link, index) in pagination.links" :key="index">
+                                    <button @click="if(link.url) fetchData(new URL(link.url).searchParams.get('page'))"
+                                        x-html="link.label"
+                                        :disabled="!link.url || link.active"
+                                        :class="[
+                                            'px-3 py-1.5 text-[10px] sm:text-xs font-medium rounded-md transition-colors',
+                                            link.active ? 'bg-blue-600 text-white shadow-md' : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700',
+                                            !link.url ? 'opacity-50 cursor-not-allowed' : ''
+                                        ]"></button>
+                                </template>
+                            </div>
+                        </template>
                     </div>
 
                     <div class="flex flex-col xl:flex-row justify-between items-center mt-8 gap-6 transition-colors">
@@ -290,11 +286,11 @@
                             Laporan Otomatis Citra Husada</p>
                         <div class="flex flex-col sm:flex-row items-center gap-4 order-1 xl:order-2 w-full sm:w-auto">
                             <div class="flex gap-2 w-full sm:w-auto transition-colors">
-                                <a href="{{ route('laporan.monitoring.excel', request()->all()) }}" onclick="showExportNotification()"
+                                <a :href="'{{ route('laporan.monitoring.excel') }}' + getQueryString()" onclick="showExportNotification && typeof showExportNotification === 'function' ? showExportNotification() : null"
                                     class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border-2 border-blue-600 text-blue-600 rounded-lg text-[10px] lg:text-[11px] font-bold active:scale-95 transition-all">
                                     <i class="fa-solid fa-file-excel"></i> Export Excel
                                 </a>
-                                <a href="{{ route('laporan.monitoring.pdf', request()->all()) }}" onclick="showExportNotification()"
+                                <a :href="'{{ route('laporan.monitoring.pdf') }}' + getQueryString()" onclick="showExportNotification && typeof showExportNotification === 'function' ? showExportNotification() : null"
                                     class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border-2 border-red-500 text-red-500 rounded-lg text-[10px] lg:text-[11px] font-bold active:scale-95 transition-all">
                                     <i class="fa-solid fa-file-pdf"></i> Export PDF
                                 </a>
@@ -415,4 +411,91 @@
             }
         }
     </style>
+
+    <script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('monitoringData', () => ({
+            sidebarOpen: false, 
+            darkMode: localStorage.getItem('theme') === 'dark', 
+            openSertifikat: false,
+            activeTab: 'internal',
+            showDetail: false,
+            selectedUser: '',
+            selectedCourse: '',
+            selectedDate: '',
+            selectedCertId: '',
+            isLoading: true,
+            stats: {
+                total_peserta: 0,
+                penyelesaian_percent: 0,
+                total_sertifikat: 0,
+                rata_rata_nilai: 0
+            },
+            reports: [],
+            pagination: {},
+            filters: {
+                search: new URLSearchParams(window.location.search).get('search') || '',
+                unit_kerja: new URLSearchParams(window.location.search).get('unit_kerja') || '',
+                status: new URLSearchParams(window.location.search).get('status') || ''
+            },
+
+            async initData() {
+                await this.fetchData();
+            },
+
+            async fetchData(page = 1) {
+                this.isLoading = true;
+                try {
+                    const url = new URL('/api/admin/laporan-monitoring/data', window.location.origin);
+                    url.searchParams.append('page', page);
+                    if (this.filters.search) url.searchParams.append('search', this.filters.search);
+                    if (this.filters.unit_kerja) url.searchParams.append('unit_kerja', this.filters.unit_kerja);
+                    if (this.filters.status) url.searchParams.append('status', this.filters.status);
+
+                    const params = new URLSearchParams(url.search);
+                    params.delete('page');
+                    window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
+
+                    const response = await fetch(url.toString(), {
+                        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    const data = await response.json();
+                    
+                    this.stats = data.stats;
+                    this.reports = data.reports.data;
+                    this.pagination = {
+                        current_page: data.reports.current_page,
+                        last_page: data.reports.last_page,
+                        links: data.reports.links
+                    };
+                } catch (error) {
+                    console.error(error);
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+
+            getPercent(report) {
+                if (!report.materi) return 0;
+                const totalSteps = (report.materi.sub_materis_count || 0) + (report.materi.post_tests_count || 0);
+                if (totalSteps > 0) return Math.round((report.urutan_selesai / totalSteps) * 100);
+                return 0;
+            },
+
+            formatDate(dateStr) {
+                if (!dateStr) return '-';
+                return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            },
+
+            getQueryString() {
+                const params = new URLSearchParams();
+                if (this.filters.search) params.append('search', this.filters.search);
+                if (this.filters.unit_kerja) params.append('unit_kerja', this.filters.unit_kerja);
+                if (this.filters.status) params.append('status', this.filters.status);
+                const str = params.toString();
+                return str ? '?' + str : '';
+            }
+        }));
+    });
+    </script>
 @endsection
