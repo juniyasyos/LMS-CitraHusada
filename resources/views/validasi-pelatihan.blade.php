@@ -69,8 +69,7 @@
                         </div>
                     </div>
                     <div class="text-center">
-                        <span class="px-6 py-1 bg-slate-100 dark:bg-slate-800 text-gray-500 dark:text-gray-300 border dark:border-slate-700 rounded-full text-[10px] font-bold uppercase tracking-widest">Pending</span>
-                        <p class="mt-2 text-xs font-bold text-gray-700 dark:text-white uppercase tracking-tighter">Skor: <span class="text-blue-600">92</span></p>
+                        <p class="mt-2 text-xl font-bold text-gray-700 dark:text-white uppercase tracking-tighter">Skor: <span class="text-blue-600">92</span></p>
                     </div>
                 </div>
             </div>
@@ -97,6 +96,24 @@
                         <div class="p-8 border-t dark:border-slate-800 text-center transition-colors">
                             <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[0.2em] mb-2">Total JPL</p>
                             <p class="text-lg font-bold text-gray-800 dark:text-white">12 Jam</p>
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-tight">
+                            Nomor Surat
+                        </label>
+                        <div class="relative group">
+                            {{-- Ikon Surat di sisi kiri (Opsional, agar lebih manis) --}}
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                <i class="fa-solid fa-file-signature text-xs"></i>
+                            </span>
+                            
+                            <input 
+                                type="text" 
+                                name="nomor_surat"
+                                placeholder="Contoh: 001/RSCH/PEL/IV/2026" 
+                                class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-11 pl-10 pr-4 focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 outline-none text-xs font-medium text-gray-800 dark:text-white transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600"
+                            >
                         </div>
                     </div>
                 </div>
