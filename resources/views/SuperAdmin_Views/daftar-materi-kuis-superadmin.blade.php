@@ -3,7 +3,7 @@
 
 @section('content')
     <div class="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300"
-        x-data="daftarMateriKuisData({{ $materiId }})" x-init="initData()">
+        x-data="daftarMateriKuisData({{ $materiId }}, {{ isset($readOnly) && $readOnly ? 'true' : 'false' }})" x-init="initData()">
 
         <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
             class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 border-r dark:border-slate-800 transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0 shrink-0 overflow-y-auto">
@@ -22,9 +22,15 @@
                 {{-- Breadcrumb --}}
                 <nav class="mb-6 text-[14px] font-medium">
                     <ol class="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                        <li><a href="{{ route('manajemen-pelatihan') }}"
-                                class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Manajemen Media</a>
-                        </li>
+                        @if(isset($readOnly) && $readOnly)
+                            <li><a href="{{ route('pelatihan.arsip') }}"
+                                    class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Arsip</a>
+                            </li>
+                        @else
+                            <li><a href="{{ route('manajemen-pelatihan') }}"
+                                    class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Manajemen Media</a>
+                            </li>
+                        @endif
                         <li class="flex items-center gap-2"><span class="text-gray-300 dark:text-gray-600"> > </span><span
                                 class="text-gray-800 dark:text-white font-semibold">Daftar materi dan kuis</span></li>
                     </ol>
@@ -36,7 +42,7 @@
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1"
                             x-text="materiInfo.subjudul || 'Manajemen Konten Pembelajaran'"></p>
                     </div>
-                    <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex flex-wrap items-center gap-3" x-show="!readOnly">
                         <button @click="openTambahKuisModal()"
                             class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 text-xs font-bold transition shadow-sm active:scale-95">
                             <i class="fa-solid fa-vial"></i> Tambah Kuis
@@ -62,8 +68,8 @@
                                 <th class="py-4 px-6 uppercase tracking-wider">No</th>
                                 <th class="py-4 px-6 uppercase tracking-wider">Daftar materi dan kuis</th>
                                 <th class="py-4 px-6 uppercase tracking-wider text-center">Jumlah Pengerjaan</th>
-                                <th class="py-4 px-6 uppercase tracking-wider">Keterangan</th>
-                                <th class="py-4 px-6 uppercase tracking-wider text-right">Aksi</th>
+                                <th class="py-4 px-6 uppercase tracking-wider" x-show="!readOnly">Keterangan</th>
+                                <th class="py-4 px-6 uppercase tracking-wider text-right" x-show="!readOnly">Aksi</th>
                             </tr>
                         </thead>
                         <tbody
@@ -82,9 +88,16 @@
                                             <div>
                                                 <p class="font-bold text-gray-800 dark:text-white text-sm"
                                                     x-text="item.judul"></p>
-                                                <p class="text-[10px] uppercase font-bold tracking-widest mt-0.5"
-                                                    :class="item.type === 'materi' ? 'text-blue-500' : 'text-emerald-500'"
-                                                    x-text="item.type"></p>
+                                                <div class="flex items-center gap-2 mt-0.5">
+                                                    <p class="text-[10px] uppercase font-bold tracking-widest"
+                                                        :class="item.type === 'materi' ? 'text-blue-500' : 'text-emerald-500'"
+                                                        x-text="item.type"></p>
+                                                    <template x-if="item.type === 'kuis' && item.pretest">
+                                                        <span class="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider">
+                                                            Pretest
+                                                        </span>
+                                                    </template>
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
@@ -95,10 +108,10 @@
                                                 x-text="item.jumlah_pengerjaan"></span> User
                                         </span>
                                     </td>
-                                    <td class="py-5 px-6 text-gray-500 dark:text-gray-400 max-w-xs truncate italic"
+                                    <td class="py-5 px-6 text-gray-500 dark:text-gray-400 max-w-xs truncate italic" x-show="!readOnly"
                                         x-text="item.type === 'materi' ? (item.deskripsi || 'Materi Pembelajaran') : '-'">
                                     </td>
-                                    <td class="py-5 px-6 text-right">
+                                    <td class="py-5 px-6 text-right" x-show="!readOnly">
                                         <div class="flex justify-end gap-4">
                                             <template x-if="item.type === 'materi'">
                                                 <div class="flex gap-4">
@@ -170,6 +183,11 @@
                                 class="w-full bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-lg p-4 text-sm dark:text-white resize-none outline-none focus:ring-2 focus:ring-blue-500/20"></textarea>
                         </div>
 
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase">Unggah File Materi <span class="text-red-500">*</span></label>
+                            <p class="text-xs text-gray-400 dark:text-gray-500 mb-3">Pilih salah satu: Video (MP4, MOV) atau Dokumen (PDF, PPT)</p>
+                        </div>
+
                         <div class="grid grid-cols-2 gap-4">
                             <label
                                 :class="formTambahMateri.uploadType === 'doc' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
@@ -201,7 +219,8 @@
                         <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4">
                             <button @click="openTambahMateri = false" type="button"
                                 class="w-full sm:w-auto px-8 py-2.5 border dark:border-slate-700 text-gray-500 dark:text-white font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition text-xs">Batal</button>
-                            <button type="submit" :disabled="isSubmitting"
+                            <button type="submit" :disabled="isSubmitting || !formTambahMateri.file"
+                                :class="!formTambahMateri.file ? 'opacity-50 cursor-not-allowed' : ''"
                                 class="w-full sm:w-auto px-8 py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition text-xs active:scale-95">Unggah
                                 Materi</button>
                         </div>
@@ -235,6 +254,11 @@
                                 Singkat</label>
                             <textarea x-model="selectedMateri.deskripsi" rows="3"
                                 class="w-full bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-lg p-4 text-sm dark:text-white resize-none outline-none focus:ring-2 focus:ring-blue-500/20"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase">Ganti File Materi <span class="text-gray-400 font-normal">(Opsional)</span></label>
+                            <p class="text-xs text-gray-400 dark:text-gray-500 mb-3">Pilih file baru jika ingin mengganti materi</p>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
@@ -294,25 +318,34 @@
 
                 <div class="p-8 overflow-y-auto custom-scrollbar flex-1">
                     <form @submit.prevent="submitTambahPostTest" class="space-y-8">
+                        <div>
+                            <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
+                                <div class="flex flex-col">
+                                    <span class="text-xs font-bold text-gray-700 dark:text-white uppercase">Pretest</span>
+                                    <span class="text-[10px] text-gray-400 dark:text-gray-500">Aktifkan jika kuis ini merupakan ujian pretest sebelum materi dimulai.</span>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" x-model="formTambahKuis.pretest" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-emerald-500"></div>
+                                </label>
+                            </div>
+                        </div>
                         <div
                             class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-gray-100 dark:border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="md:col-span-1">
                                 <label
-                                    class="block text-[10px] font-bold text-gray-400 dark:text-white uppercase mb-2">Judul
-                                    Kuis</label>
+                                    class="block text-[10px] font-bold text-gray-400 dark:text-white uppercase mb-2">Judul Kuis</label>
                                 <input type="text" x-model="formTambahKuis.judul" required
                                     class="w-full bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-lg h-10 px-4 text-sm dark:text-white outline-none focus:ring-2 focus:ring-emerald-500/20">
                             </div>
                             <div>
                                 <label
-                                    class="block text-[10px] font-bold text-gray-400 dark:text-white uppercase mb-2">Waktu
-                                    (Menit)</label>
+                                    class="block text-[10px] font-bold text-gray-400 dark:text-white uppercase mb-2">Waktu (Detik)</label>
                                 <input type="number" x-model="formTambahKuis.waktu_pengerjaan" required min="1"
                                     class="w-full bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-lg h-10 px-4 text-sm dark:text-white outline-none focus:ring-2 focus:ring-emerald-500/20">
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-gray-400 dark:text-white uppercase mb-2">Maks
-                                    Percobaan</label>
+                                <label class="block text-[10px] font-bold text-gray-400 dark:text-white uppercase mb-2">Maks Percobaan</label>
                                 <input type="number" x-model="formTambahKuis.ulang_post_test" required min="1"
                                     class="w-full bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-lg h-10 px-4 text-sm dark:text-white outline-none focus:ring-2 focus:ring-emerald-500/20">
                             </div>
@@ -423,6 +456,18 @@
 
                 <div class="p-8 overflow-y-auto custom-scrollbar flex-1">
                     <form @submit.prevent="submitEditPostTest" class="space-y-8">
+                        <div>
+                            <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
+                                <div class="flex flex-col">
+                                    <span class="text-xs font-bold text-gray-700 dark:text-white uppercase">Jadikan Pretest</span>
+                                    <span class="text-[10px] text-gray-400 dark:text-gray-500">Aktifkan jika kuis ini merupakan ujian pretest sebelum materi dimulai.</span>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" x-model="selectedKuis.pretest" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                        </div>
                         <div
                             class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-gray-100 dark:border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="md:col-span-1">
@@ -534,9 +579,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function daftarMateriKuisData(materiId) {
+        function daftarMateriKuisData(materiId, readOnly = false) {
             return {
                 materiId: materiId,
+                readOnly: readOnly,
                 sidebarOpen: false,
                 darkMode: localStorage.getItem('theme') === 'dark',
                 isLoading: true,
@@ -556,11 +602,12 @@
                     judul: '',
                     waktu_pengerjaan: '',
                     ulang_post_test: '',
+                    pretest: false,
                     questions: [{ soal: '', options: ['', ''], status_pilihan: 0, jawaban_benar: '' }]
                 },
 
                 selectedKuis: {
-                    id: '', judul: '', waktu_pengerjaan: '', ulang_post_test: '', questions: []
+                    id: '', judul: '', waktu_pengerjaan: '', ulang_post_test: '', pretest: false, questions: []
                 },
 
                 async initData() {
@@ -592,6 +639,16 @@
                 },
 
                 async submitTambahSubMateri() {
+                    // Validasi file wajib diisi
+                    if (!this.formTambahMateri.file) {
+                        Toast.fire({ 
+                            icon: 'warning', 
+                            title: 'File Belum Dipilih', 
+                            text: 'Mohon pilih file materi terlebih dahulu (Video atau Dokumen).' 
+                        });
+                        return;
+                    }
+
                     this.isSubmitting = true;
                     let formData = new FormData();
                     formData.append('judul', this.formTambahMateri.judul);
@@ -620,12 +677,23 @@
                         judul: item.judul,
                         deskripsi: item.deskripsi || '',
                         file: null,
+                        file_path: item.file_materi || null,
                         uploadType: null
                     };
                     this.openEditMateri = true;
                 },
 
                 async submitEditSubMateri() {
+                    // Validasi file wajib diisi saat edit (minimal saat pertama kali ditambah)
+                    if (!this.selectedMateri.file && !this.selectedMateri.file_path) {
+                        Toast.fire({ 
+                            icon: 'warning', 
+                            title: 'File Belum Dipilih', 
+                            text: 'Mohon pilih file materi terlebih dahulu untuk mengedit materi ini.' 
+                        });
+                        return;
+                    }
+
                     this.isSubmitting = true;
                     let formData = new FormData();
                     formData.append('_method', 'PUT');
@@ -672,6 +740,7 @@
                         judul: '',
                         waktu_pengerjaan: '',
                         ulang_post_test: '',
+                        pretest: false,
                         questions: [{ soal: '', options: ['', ''], status_pilihan: 0, jawaban_benar: '' }]
                     };
                     this.openTambahKuis = true;
@@ -711,6 +780,7 @@
                         judul: item.judul,
                         waktu_pengerjaan: item.waktu_pengerjaan,
                         ulang_post_test: item.ulang_post_test,
+                        pretest: !!item.pretest,
                         questions: item.soals.map(s => {
                             let opts = [];
                             if (s.pilihan_1) opts.push(s.pilihan_1);

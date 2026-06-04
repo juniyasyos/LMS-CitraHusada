@@ -5,16 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Sertifikat extends Model
+class SertifikatEksternal extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'sertifikat_id';
+    protected $table = 'sertifikat_eksternals';
+    protected $primaryKey = 'sertifikat_eksternal_id';
 
     protected $fillable = [
         'user_id',
-        'materi_id',
+        'judul',
         'image_path',
+        'jpl',
         'deskripsi',
         'status',
     ];
@@ -22,10 +24,5 @@ class Sertifikat extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
-    }
-
-    public function materi()
-    {
-        return $this->belongsTo(Materi::class, 'materi_id', 'materi_id');
     }
 }

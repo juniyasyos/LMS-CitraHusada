@@ -10,10 +10,12 @@ use App\Models\JenisTenaga;
 use App\Models\Materi;
 use App\Models\UserProgress;
 use App\Models\LogAktivitas;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\PelatihanExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
-// use Illuminate\Support\Facades\DB;
 
-class DashboardSuperadminController extends Controller
+class DashboardAdminController extends Controller
 {
     public function index()
     {
@@ -26,12 +28,6 @@ class DashboardSuperadminController extends Controller
             $today = Carbon::today();
             $pelatihanAktif = Materi::whereDate('tanggal_selesai', '>=', $today)->count();
             $pelatihanSelesai = Materi::whereDate('tanggal_selesai', '<', $today)->count();
-
-            // Ambil log aktivitas terbaru (misal batasi 10 agar response tidak terlalu berat)
-            $logAktivitas = LogAktivitas::with('user:user_id,nama') // Hanya ambil kolom yang perlu
-                ->latest()
-                ->take(3)
-                ->get();
 
             return response()->json([
                 'success' => true,
@@ -47,7 +43,6 @@ class DashboardSuperadminController extends Controller
                         'aktif' => $pelatihanAktif,
                         'selesai' => $pelatihanSelesai,
                     ],
-                    'log_aktivitas' => $logAktivitas,
                 ]
             ], 200);
 
@@ -91,22 +86,12 @@ class DashboardSuperadminController extends Controller
         // 2. Grafik Leaderboard Jam Pelajaran
         $colors = ['#3b82f6', '#10b981', '#f43f5e', '#f59e0b', '#8b5cf6'];
         $leaderboardData = UnitKerja::withCount([
-            'users as users_count' => function ($query) {
-                $query->whereRaw('
-                    (
-                        COALESCE(users.total_jpl, 0) +
-                        COALESCE((
-                            SELECT SUM(se.jpl)
-                            FROM sertifikat_eksternals se
-                            WHERE se.user_id = users.user_id
-                            AND se.status = "Disetujui"
-                        ), 0)
-                    ) >= 20
-                ');
+            'users' => function ($query) {
+                $query->where('total_jpl', '>=', 20);
             }
         ])
             ->having('users_count', '>', 0)
-            ->orderByDesc('users_count')
+            ->orderBy('users_count', 'desc')
             ->take(5)
             ->get()
             ->map(function ($unit, $index) use ($colors) {
@@ -117,7 +102,6 @@ class DashboardSuperadminController extends Controller
                 ];
             });
 
-        // Add dummy data if zero to prevent empty chart
         if ($leaderboardData->isEmpty()) {
             $leaderboardData = collect([
                 [
@@ -144,16 +128,30 @@ class DashboardSuperadminController extends Controller
             $perPage = $request->input('per_page', 10);
 
             $query = User::with('unitKerja')
-                ->withCount(['progresses' => function ($query) {
-                    $query->where('status', 'Selesai');
-                }])
+                ->withCount([
+                    'progresses' => function ($query) {
+                        $query->where('status', 'Selesai');
+                    }
+                ])
+                ->addSelect('users.*')
+                ->selectRaw('COALESCE(users.total_jpl, 0) + COALESCE((
+                    SELECT SUM(jpl) 
+                    FROM sertifikat_eksternals 
+                    WHERE sertifikat_eksternals.user_id = users.user_id AND sertifikat_eksternals.status = "Disetujui"
+                ), 0) as total_jpl')
                 ->when($search, function ($query, $search) {
                     return $query->where(function ($q) use ($search) {
                         $q->where('nama', 'like', "%{$search}%")
-                          ->orWhere('nik', 'like', "%{$search}%");
+                            ->orWhere('nik', 'like', "%{$search}%");
                     });
                 })
                 ->orderBy('total_jpl', 'desc');
+
+            if ($request->input('all') === 'true') {
+                return response()->json([
+                    'data' => $query->get()
+                ], 200);
+            }
 
             $data = $query->paginate($perPage);
 
@@ -165,6 +163,92 @@ class DashboardSuperadminController extends Controller
                 'message' => 'Gagal mengambil data progress karyawan',
                 'error' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function exportExcel(Request $request)
+    {
+        try {
+            $leaderboard = $this->applyFilters($request)->get();
+
+            $this->logActivity($request, 'Download', 'users', null, 'Melakukan ekspor data pelatihan ke Excel');
+
+            return Excel::download(new PelatihanExport($leaderboard), 'Statistik-Pelatihan-' . now()->format('Y-m-d') . '.xlsx');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal mengekspor Excel: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Private Helper: Logic filter yang digunakan bersama
+     */
+    private function applyFilters(Request $request)
+    {
+        $statusFilter = $request->query('status');
+        $search = $request->query('search');
+
+        $query = User::with('unitKerja')
+            ->withCount([
+                'progresses as pelatihan_selesai' => function ($query) {
+                    $query->where('status', 'Selesai');
+                }
+            ])
+            ->select('users.*')
+            ->selectRaw('COALESCE(users.total_jpl, 0) + COALESCE((
+                SELECT SUM(jpl) 
+                FROM sertifikat_eksternals 
+                WHERE sertifikat_eksternals.user_id = users.user_id AND sertifikat_eksternals.status = "Disetujui"
+            ), 0) as total_jpl');
+
+        // Filter Search
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'LIKE', "%{$search}%")
+                    ->orWhere('nik', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Filter Status JPL
+        if ($statusFilter == 'terpenuhi') {
+            $query->having('total_jpl', '>=', 20);
+        } elseif ($statusFilter == 'belum_terpenuhi') {
+            $query->having('total_jpl', '<', 20);
+        }
+
+        return $query->orderBy('total_jpl', 'desc');
+    }
+
+    public function exportPdf(Request $request)
+    {
+        try {
+            $users = $this->applyFilters($request)->get();
+
+            $this->logActivity($request, 'Download', 'users', null, 'Melakukan ekspor data pelatihan ke PDF');
+
+            $pdf = Pdf::loadView('exports.pelatihan_pdf', [
+                'users' => $users,
+                'date' => now()->translatedFormat('d F Y')
+            ])->setPaper('a4', 'landscape');
+
+            return $pdf->download('Statistik-Pelatihan-' . now()->format('Y-m-d') . '.pdf');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal mengekspor PDF: ' . $e->getMessage());
+        }
+    }
+
+    private function logActivity(Request $request, $type, $table, $subjectId, $description)
+    {
+        try {
+            LogAktivitas::create([
+                'user_id' => auth()->id(),
+                'tipe' => $type,
+                'tabel' => $table,
+                'subject_id' => $subjectId,
+                'perubahan' => $description,
+                'ip_address' => $request->ip(),
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Activity Log Failed: ' . $e->getMessage());
         }
     }
 }

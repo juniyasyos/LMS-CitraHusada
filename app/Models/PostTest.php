@@ -17,6 +17,11 @@ class PostTest extends Model
         'urutan_post_test',
         'waktu_pengerjaan', // dalam menit
         'ulang_post_test',
+        'pretest',
+    ];
+
+    protected $casts = [
+        'pretest' => 'boolean',
     ];
 
     public function materi()

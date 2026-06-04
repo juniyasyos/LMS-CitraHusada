@@ -50,7 +50,8 @@
                     <div x-show="!isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                         <template x-for="materi in materis" :key="materi.materi_id">
                             <div class="relative group" x-data="{ menuOpen: false }">
-                                <div class="block border border-gray-100 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900 opacity-75 hover:opacity-100 transition-opacity">
+                                <a :href="'/arsip-pelatihan/daftar-materi-kuis/' + materi.materi_id"
+                                    class="block border border-gray-100 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900 opacity-75 hover:opacity-100 transition-all hover:shadow-md active:scale-[0.98] cursor-pointer">
                                     <div class="p-6 flex items-center justify-center bg-gray-100 dark:bg-slate-800">
                                         <i class="fa-solid fa-folder text-gray-400 text-6xl lg:text-7xl"></i>
                                     </div>
@@ -61,7 +62,7 @@
                                             Kedaluwarsa: <span x-text="formatDate(materi.tanggal_selesai)"></span>
                                         </p>
                                     </div>
-                                </div>
+                                </a>
 
                                 <div class="absolute top-2 right-2 z-20">
                                     <button @click.prevent="menuOpen = !menuOpen"

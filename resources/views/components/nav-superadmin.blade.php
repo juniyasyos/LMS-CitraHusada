@@ -1,5 +1,4 @@
 <div class="flex flex-col h-full bg-white dark:bg-slate-900 transition-colors duration-300 overflow-x-hidden">
-
     @php
         // PERUBAHAN: Penyesuaian warna aktif/tidak aktif untuk mendukung dark mode dan penambahan shadow
         $active = 'bg-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-none';
@@ -21,54 +20,89 @@
 
     <nav class="flex-1 p-4 space-y-1 overflow-y-auto custom-scrollbar">
 
+        <!-- Superadmin -->
         @if(auth()->user()->role_id == 1 && !session()->has('impersonate_by'))
         <!-- BERANDA -->
         <a href="/beranda-superadmin" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
-        {{ request()->is('SuperAdmin_Views.beranda-superadmin') ? $active : $inactive }}">
+        {{ request()->is('beranda-superadmin*') ? $active : $inactive }}">
             <i class="fa-brands fa-microsoft text-sm"></i>
             Beranda
         </a>
 
         <!-- MANAJEMEN PENGGUNA -->
         <a href="/manajemen-pengguna" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
-        {{ request()->is('SuperAdmin_Views.manajemen-pengguna') ? $active : $inactive }}">
+        {{ request()->is('manajemen-pengguna*') ? $active : $inactive }}">
             <i class="fa-solid fa-users text-sm"></i>
             Manajemen Pengguna
         </a>
 
         <!-- UNIT KERJA -->
         <a href="/manajemen-unit-kerja" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
-        {{ request()->is('SuperAdmin_Views.manajemen-unit-kerja') ? $active : $inactive }}">
+        {{ request()->is('manajemen-unit-kerja*') ? $active : $inactive }}">
             <i class="fa-solid fa-building text-sm"></i>
             Manajemen Unit Kerja
         </a>
 
         <!-- MANAJEMEN PELATIHAN -->
         <a href="/manajemen-pelatihan" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
-        {{ request()->is('SuperAdmin_Views.manajemen-pelatihan') ? $active : $inactive }}">
+        {{ request()->is('manajemen-pelatihan*') ? $active : $inactive }}">
             <i class="fa-solid fa-circle-play text-sm"></i>
             Manajemen Media
         </a>
 
         <!-- KATEGORI -->
         <a href="/manajemen-kategori" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
-        {{ request()->is('SuperAdmin_Views.manajemen-kategori') ? $active : $inactive }}">
+        {{ request()->is('manajemen-kategori*') ? $active : $inactive }}">
             <i class="fa-solid fa-tags text-sm"></i>
             Manajemen Kategori
         </a>
 
         <!-- LAPORAN -->
         <a href="/laporan-monitoring" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
-        {{ request()->is('SuperAdmin_Views.laporan-monitoring') ? $active : $inactive }}">
+        {{ request()->is('laporan-monitoring*') ? $active : $inactive }}">
             <i class="fa-solid fa-file-lines text-sm"></i>
             Laporan & Monitoring
         </a>
 
         <!-- LOG -->
         <a href="/log-aktivitas" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
-        {{ request()->is('SuperAdmin_Views.log-aktivitas') ? $active : $inactive }}">
+        {{ request()->is('log-aktivitas*') ? $active : $inactive }}">
             <i class="fa-solid fa-clock-rotate-left text-sm"></i>
             Log Aktivitas
+        </a>
+        @endif
+        
+
+        <!-- Admin -->
+        @if(auth()->user()->role_id == 2 && !session()->has('impersonate_by'))
+        <!-- BERANDA -->
+        <a href="/beranda-admin" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
+        {{ request()->is('beranda-admin*') ? $active : $inactive }}">
+            <i class="fa-brands fa-microsoft text-sm"></i>
+            Beranda
+        </a>
+
+        <!-- LAPORAN -->
+        <a href="/laporan-monitoring" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
+        {{ request()->is('laporan-monitoring*') ? $active : $inactive }}">
+            <i class="fa-solid fa-file-lines text-sm"></i>
+            Laporan & Monitoring
+        </a>
+        @endif
+        
+        @if(auth()->user()->role_id == 3 && !session()->has('impersonate_by'))
+        <!-- BERANDA -->
+        <a href="/beranda-admin" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
+        {{ request()->is('beranda-admin*') ? $active : $inactive }}">
+            <i class="fa-brands fa-microsoft text-sm"></i>
+            Beranda
+        </a>
+
+        <!-- MANAJEMEN PELATIHAN -->
+        <a href="/manajemen-pelatihan" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
+        {{ request()->is('manajemen-pelatihan*') ? $active : $inactive }}">
+            <i class="fa-solid fa-circle-play text-sm"></i>
+            Manajemen Media
         </a>
         @endif
 
@@ -108,9 +142,15 @@
             </button>
         </div>
 
+        <a href="/pembelajaran"
+            class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 {{ request()->is('beralih-akun*') ? $active : $inactive }}">
+            <i class="fa-solid fa-user-gear text-sm"></i>
+            Beralih Akun
+        </a>
+        
         @if(auth()->user()->role_id == 1 && !session()->has('impersonate_by'))
         <a href="/cadangan" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
-        {{ request()->is('SuperAdmin_Views.cadangan') ? $active : $inactive }}">
+        {{ request()->is('cadangan*') ? $active : $inactive }}">
             <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
             Cadangan
         </a>

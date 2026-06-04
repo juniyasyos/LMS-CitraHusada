@@ -138,28 +138,30 @@
                             </div>
                         </div>
 
-                        {{-- Status Pengguna dengan Toggle --}}
+                        {{-- Status Pengguna dengan Button Group --}}
                         <div class="pt-4">
-                            <div
-                                class="flex items-center justify-between bg-gray-50 dark:bg-slate-800/40 p-4 rounded-xl border border-gray-100 dark:border-slate-800/60 transition-all">
-                                <div class="flex flex-col">
-                                    <span class="text-xs font-bold text-gray-700 dark:text-white">Status Pengguna</span>
-                                    <span class="text-[10px] font-medium transition-colors"
-                                        :class="form.status === 'Aktif' ? 'text-emerald-500' : 'text-rose-500'"
-                                        x-text="form.status === 'Aktif' ? 'Akun Aktif (Dapat mengakses sistem)' : 'Akun Nonaktif (Akses ditangguhkan)'"></span>
+                            <div class="flex items-center justify-between bg-gray-50 dark:bg-slate-800/40 p-4 rounded-xl border border-gray-100 dark:border-slate-800/60 transition-all">
+                                <span class="text-xs font-bold text-gray-700 dark:text-white">Status Pengguna</span>
+                                <div class="flex space-x-2">
+                                    <button type="button" 
+                                        @click="form.status = 'active'"
+                                        :class="form.status === 'active' || form.status === 'Aktif' ? 'bg-emerald-600 text-white' : 'bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300'"
+                                        class="py-1.5 px-3 text-xs font-bold rounded-lg transition-colors">
+                                        Active
+                                    </button>
+                                    <button type="button" 
+                                        @click="form.status = 'inactive'"
+                                        :class="form.status === 'inactive' || form.status === 'Tidak Aktif' ? 'bg-rose-600 text-white' : 'bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300'"
+                                        class="py-1.5 px-3 text-xs font-bold rounded-lg transition-colors">
+                                        Inactive
+                                    </button>
+                                    <button type="button" 
+                                        @click="form.status = 'suspended'"
+                                        :class="form.status === 'suspended' ? 'bg-amber-600 text-white' : 'bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300'"
+                                        class="py-1.5 px-3 text-xs font-bold rounded-lg transition-colors">
+                                        Suspended
+                                    </button>
                                 </div>
-
-                                {{-- Switch Toggle --}}
-                                <button type="button"
-                                    @click="form.status = (form.status === 'Aktif') ? 'Tidak Aktif' : 'Aktif'"
-                                    :class="form.status === 'Aktif' ? 'bg-blue-600' : 'bg-gray-300 dark:bg-slate-700'"
-                                    class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out focus:outline-none ring-offset-2 dark:ring-offset-slate-900 focus:ring-2 focus:ring-blue-500/40">
-
-                                    {{-- Dot Toggle --}}
-                                    <span :class="form.status === 'Aktif' ? 'translate-x-5' : 'translate-x-0'"
-                                        class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-300 ease-in-out">
-                                    </span>
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -227,7 +229,7 @@
                     unit_kerja_id: '',
                     jenis_tenaga_id: '',
                     role_id: '',
-                    status: 'Aktif'
+                    status: 'active'
                 },
                 errors: {},
 
@@ -253,22 +255,34 @@
                         const result = await response.json();
 
                         if (response.ok) {
-                            await Swal.fire({
-                                title: 'Berhasil',
-                                text: result.message || 'Pengguna berhasil ditambahkan',
+                            this.openEdit = false;
+                            Toast.fire({
                                 icon: 'success',
-                                confirmButtonColor: '#3085d6'
+                                title: 'Berhasil!',
+                                text: result.message || 'Data pengguna berhasil ditambahkan.',
                             });
                             window.location.href = '/manajemen-pengguna';
                         } else if (response.status === 422) {
                             this.errors = result.errors;
-                            Swal.fire('Validasi Gagal', 'Silakan periksa kembali isian Anda.', 'warning');
+                            Toast.fire({
+                                icon: 'warning',
+                                title: 'Validasi Gagal',
+                                text: 'Silakan periksa kembali isian Anda.'
+                            });
                         } else {
-                            Swal.fire('Error', result.message || 'Terjadi kesalahan sistem', 'error');
+                            Toast.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: result.message || 'Terjadi kesalahan sistem'
+                            });
                         }
                     } catch (error) {
                         console.error(error);
-                        Swal.fire('Error', 'Gagal terhubung ke server', 'error');
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Gagal terhubung ke server'
+                        });
                     } finally {
                         this.isSubmitting = false;
                     }

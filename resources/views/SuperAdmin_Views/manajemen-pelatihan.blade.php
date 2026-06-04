@@ -150,14 +150,19 @@
                     <div>
                         <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">Sub Judul</label>
                         <input type="text" x-model="formTambah.subjudul"
-                            class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all text-sm text-gray-700 dark:text-white">
+                        class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all text-sm text-gray-700 dark:text-white">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">Deskripsi Pelatihan</label>
                         <textarea x-model="formTambah.deskripsi" rows="3"
-                            class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-4 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all text-sm text-gray-700 dark:text-white resize-none"></textarea>
+                        class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-4 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all text-sm text-gray-700 dark:text-white resize-none"></textarea>
                     </div>
-
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">Nama Pemateri <span class="text-red-500">*</span></label>
+                        <input type="text" x-model="formTambah.nama_pemateri" required
+                            class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all text-sm text-gray-700 dark:text-white">
+                    </div>
+                    
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                             <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">JPL <span class="text-red-500">*</span></label>
@@ -182,15 +187,22 @@
                         </div>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">Kategori <span class="text-red-500">*</span></label>
-                        <select x-model="formTambah.kategori_id" required
-                            class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 text-sm dark:text-white outline-none focus:ring-2 focus:ring-blue-500/10 cursor-pointer">
-                            <option value="">Pilih Kategori</option>
-                            <template x-for="kat in kategoris" :key="kat.kategori_id">
-                                <option :value="kat.kategori_id" x-text="kat.nama_kategori"></option>
-                            </template>
-                        </select>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">Kategori <span class="text-red-500">*</span></label>
+                            <select x-model="formTambah.kategori_id" required
+                                class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 text-sm dark:text-white outline-none focus:ring-2 focus:ring-blue-500/10 cursor-pointer">
+                                <option value="">Pilih Kategori</option>
+                                <template x-for="kat in kategoris" :key="kat.kategori_id">
+                                    <option :value="kat.kategori_id" x-text="kat.nama_kategori"></option>
+                                </template>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">Nomor Sertifikat</label>
+                            <input type="text" x-model="formTambah.nomor_surat"
+                                class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all text-sm text-gray-700 dark:text-white">
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -205,7 +217,10 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">Unit Kerja Terkait</label>
+                            <div class="flex items-center justify-between gap-3 mb-2">
+                                <label class="block text-xs font-bold text-gray-500 dark:text-white uppercase tracking-tight">Unit Kerja Terkait</label>
+                                <button type="button" @click="selectAllUnitKerja('tambah')" class="text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-widest hover:text-blue-700 dark:hover:text-blue-300 transition">Pilih Semua</button>
+                            </div>
                             <div class="border border-gray-200 dark:border-slate-700 rounded-xl p-4 grid grid-cols-2 gap-2 bg-gray-50/30 dark:bg-slate-800/30 max-h-40 overflow-y-auto custom-scrollbar">
                                 <template x-for="uk in unitKerjas" :key="uk.unit_kerja_id">
                                     <label class="flex items-center gap-2 cursor-pointer group">
@@ -219,7 +234,10 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">Jenis Tenaga Terkait</label>
+                        <div class="flex items-center justify-between gap-3 mb-2">
+                            <label class="block text-xs font-bold text-gray-500 dark:text-white uppercase tracking-tight">Jenis Tenaga Terkait</label>
+                            <button type="button" @click="selectAllJenisTenaga('tambah')" class="text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-widest hover:text-blue-700 dark:hover:text-blue-300 transition">Pilih Semua</button>
+                        </div>
                         <div class="border border-gray-200 dark:border-slate-700 rounded-xl p-4 grid grid-cols-2 md:grid-cols-3 gap-2 bg-gray-50/30 dark:bg-slate-800/30 max-h-40 overflow-y-auto custom-scrollbar">
                             <template x-for="jt in jenisTenagas" :key="jt.jenis_tenaga_id">
                                 <label class="flex items-center gap-2 cursor-pointer group">
@@ -261,12 +279,17 @@
                     <div>
                         <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">Sub Judul</label>
                         <input type="text" x-model="selectedMateri.subjudul"
-                            class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all text-sm text-gray-700 dark:text-white">
+                        class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all text-sm text-gray-700 dark:text-white">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">Deskripsi Pelatihan</label>
                         <textarea x-model="selectedMateri.deskripsi" rows="3"
-                            class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-4 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all text-sm text-gray-700 dark:text-white resize-none"></textarea>
+                        class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-4 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all text-sm text-gray-700 dark:text-white resize-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">Nama Pemateri <span class="text-red-500">*</span></label>
+                        <input type="text" x-model="selectedMateri.nama_pemateri" required
+                            class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all text-sm text-gray-700 dark:text-white">
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -293,15 +316,22 @@
                         </div>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">Kategori <span class="text-red-500">*</span></label>
-                        <select x-model="selectedMateri.kategori_id" required
-                            class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 text-sm dark:text-white outline-none focus:ring-2 focus:ring-blue-500/10 cursor-pointer">
-                            <option value="">Pilih Kategori</option>
-                            <template x-for="kat in kategoris" :key="kat.kategori_id">
-                                <option :value="kat.kategori_id" x-text="kat.nama_kategori"></option>
-                            </template>
-                        </select>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">Kategori <span class="text-red-500">*</span></label>
+                            <select x-model="selectedMateri.kategori_id" required
+                                class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 text-sm dark:text-white outline-none focus:ring-2 focus:ring-blue-500/10 cursor-pointer">
+                                <option value="">Pilih Kategori</option>
+                                <template x-for="kat in kategoris" :key="kat.kategori_id">
+                                    <option :value="kat.kategori_id" x-text="kat.nama_kategori"></option>
+                                </template>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">Nomor Sertifikat</label>
+                            <input type="text" x-model="selectedMateri.nomor_surat"
+                                class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all text-sm text-gray-700 dark:text-white">
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -316,7 +346,10 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">Unit Kerja Terkait</label>
+                            <div class="flex items-center justify-between gap-3 mb-2">
+                                <label class="block text-xs font-bold text-gray-500 dark:text-white uppercase tracking-tight">Unit Kerja Terkait</label>
+                                <button type="button" @click="selectAllUnitKerja('edit')" class="text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-widest hover:text-blue-700 dark:hover:text-blue-300 transition">Pilih Semua</button>
+                            </div>
                             <div class="border border-gray-200 dark:border-slate-700 rounded-xl p-4 grid grid-cols-2 gap-2 bg-gray-50/30 dark:bg-slate-800/30 max-h-40 overflow-y-auto custom-scrollbar">
                                 <template x-for="uk in unitKerjas" :key="uk.unit_kerja_id">
                                     <label class="flex items-center gap-2 cursor-pointer group">
@@ -330,7 +363,10 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-gray-500 dark:text-white mb-2 uppercase tracking-tight">Jenis Tenaga Terkait</label>
+                        <div class="flex items-center justify-between gap-3 mb-2">
+                            <label class="block text-xs font-bold text-gray-500 dark:text-white uppercase tracking-tight">Jenis Tenaga Terkait</label>
+                            <button type="button" @click="selectAllJenisTenaga('edit')" class="text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-widest hover:text-blue-700 dark:hover:text-blue-300 transition">Pilih Semua</button>
+                        </div>
                         <div class="border border-gray-200 dark:border-slate-700 rounded-xl p-4 grid grid-cols-2 md:grid-cols-3 gap-2 bg-gray-50/30 dark:bg-slate-800/30 max-h-40 overflow-y-auto custom-scrollbar">
                             <template x-for="jt in jenisTenagas" :key="jt.jenis_tenaga_id">
                                 <label class="flex items-center gap-2 cursor-pointer group">
@@ -378,14 +414,14 @@
             isSubmitting: false,
 
             formTambah: {
-                judul: '', subjudul: '', deskripsi: '', jam_pelajaran: '',
-                tanggal_upload: '', tanggal_selesai: '', kategori_id: '',
+                judul: '', nama_pemateri: '', subjudul: '', deskripsi: '', jam_pelajaran: '',
+                tanggal_upload: '', tanggal_selesai: '', kategori_id: '', nomor_surat: '',
                 thumbnail: null, unit_kerja_ids: [], jenis_tenaga_ids: []
             },
             
             selectedMateri: {
-                id: '', judul: '', subjudul: '', deskripsi: '', jam_pelajaran: '',
-                tanggal_upload: '', tanggal_selesai: '', kategori_id: '',
+                id: '', judul: '', nama_pemateri: '', subjudul: '', deskripsi: '', jam_pelajaran: '',
+                tanggal_upload: '', tanggal_selesai: '', kategori_id: '', nomor_surat: '',
                 thumbnail: null, unit_kerja_ids: [], jenis_tenaga_ids: []
             },
             
@@ -401,8 +437,8 @@
 
             openTambah() {
                 this.formTambah = {
-                    judul: '', subjudul: '', deskripsi: '', jam_pelajaran: '',
-                    tanggal_upload: '', tanggal_selesai: '', kategori_id: '',
+                    judul: '', nama_pemateri: '', subjudul: '', deskripsi: '', jam_pelajaran: '',
+                    tanggal_upload: '', tanggal_selesai: '', kategori_id: '', nomor_surat: '',
                     thumbnail: null, unit_kerja_ids: [], jenis_tenaga_ids: []
                 };
                 this.openTambahFolder = true;
@@ -413,18 +449,46 @@
                 this.selectedMateri = {
                     id: materi.materi_id,
                     judul: materi.judul,
+                    nama_pemateri: materi.nama_pemateri || '',
                     subjudul: materi.subjudul || '',
                     deskripsi: materi.deskripsi || '',
                     jam_pelajaran: materi.jam_pelajaran,
                     tanggal_upload: materi.tanggal_upload,
                     tanggal_selesai: materi.tanggal_selesai,
                     kategori_id: materi.kategori_id,
+                    nomor_surat: materi.nomor_surat || '',
                     unit_kerja_ids: materi.unit_kerjas ? materi.unit_kerjas.map(u => u.unit_kerja_id) : [],
                     jenis_tenaga_ids: materi.jenis_tenagas ? materi.jenis_tenagas.map(j => j.jenis_tenaga_id) : [],
                     thumbnail: null
                 };
                 this.openEditFolder = true;
                 this.$nextTick(() => { this.initDatepickers(); });
+            },
+
+            selectAllUnitKerja(context) {
+                const allUnitKerjaIds = this.unitKerjas.map(uk => uk.unit_kerja_id);
+                if (context === 'tambah') {
+                    this.formTambah.unit_kerja_ids = this.formTambah.unit_kerja_ids.length === allUnitKerjaIds.length
+                        ? []
+                        : [...allUnitKerjaIds];
+                } else {
+                    this.selectedMateri.unit_kerja_ids = this.selectedMateri.unit_kerja_ids.length === allUnitKerjaIds.length
+                        ? []
+                        : [...allUnitKerjaIds];
+                }
+            },
+
+            selectAllJenisTenaga(context) {
+                const allJenisTenagaIds = this.jenisTenagas.map(jt => jt.jenis_tenaga_id);
+                if (context === 'tambah') {
+                    this.formTambah.jenis_tenaga_ids = this.formTambah.jenis_tenaga_ids.length === allJenisTenagaIds.length
+                        ? []
+                        : [...allJenisTenagaIds];
+                } else {
+                    this.selectedMateri.jenis_tenaga_ids = this.selectedMateri.jenis_tenaga_ids.length === allJenisTenagaIds.length
+                        ? []
+                        : [...allJenisTenagaIds];
+                }
             },
 
             async fetchData(page = 1) {
@@ -460,12 +524,14 @@
                 this.isSubmitting = true;
                 let formData = new FormData();
                 formData.append('judul', this.formTambah.judul);
+                formData.append('nama_pemateri', this.formTambah.nama_pemateri);
                 formData.append('subjudul', this.formTambah.subjudul);
                 formData.append('deskripsi', this.formTambah.deskripsi);
                 formData.append('jam_pelajaran', this.formTambah.jam_pelajaran);
                 formData.append('tanggal_upload', this.formTambah.tanggal_upload);
                 formData.append('tanggal_selesai', this.formTambah.tanggal_selesai);
                 formData.append('kategori_id', this.formTambah.kategori_id);
+                formData.append('nomor_surat', this.formTambah.nomor_surat);
                 if(this.formTambah.thumbnail) formData.append('thumbnail', this.formTambah.thumbnail);
                 
                 if(this.formTambah.unit_kerja_ids.length > 0) formData.append('unit_kerja_ids', this.formTambah.unit_kerja_ids.join(','));
@@ -502,12 +568,14 @@
                 let formData = new FormData();
                 formData.append('_method', 'PUT');
                 formData.append('judul', this.selectedMateri.judul);
+                formData.append('nama_pemateri', this.selectedMateri.nama_pemateri);
                 formData.append('subjudul', this.selectedMateri.subjudul);
                 formData.append('deskripsi', this.selectedMateri.deskripsi);
                 formData.append('jam_pelajaran', this.selectedMateri.jam_pelajaran);
                 formData.append('tanggal_upload', this.selectedMateri.tanggal_upload);
                 formData.append('tanggal_selesai', this.selectedMateri.tanggal_selesai);
                 formData.append('kategori_id', this.selectedMateri.kategori_id);
+                formData.append('nomor_surat', this.selectedMateri.nomor_surat);
                 if(this.selectedMateri.thumbnail) formData.append('thumbnail', this.selectedMateri.thumbnail);
                 
                 if(this.selectedMateri.unit_kerja_ids.length > 0) formData.append('unit_kerja_ids', this.selectedMateri.unit_kerja_ids.join(','));

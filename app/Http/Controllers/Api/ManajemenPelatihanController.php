@@ -30,7 +30,7 @@ class ManajemenPelatihanController extends Controller
         $sort = $request->input('sort', 'terbaru');
         $today = now()->startOfDay();
 
-        $query = Materi::with(['kategori', 'unitKerjas', 'jenisTenagas'])->withCount('subMateris');
+        $query = Materi::aktif()->with(['kategori', 'unitKerjas', 'jenisTenagas'])->withCount('subMateris');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -68,6 +68,7 @@ class ManajemenPelatihanController extends Controller
     {
         $request->validate([
             'judul' => 'required|string|max:255',
+            'nama_pemateri' => 'required|string|max:255',
             'subjudul' => 'nullable|string|max:255',
             'deskripsi' => 'nullable|string',
             'jam_pelajaran' => 'required|integer|min:1',
@@ -77,6 +78,7 @@ class ManajemenPelatihanController extends Controller
             'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
             'unit_kerja_ids' => 'nullable|string',
             'jenis_tenaga_ids' => 'nullable|string',
+            'nomor_surat' => 'nullable|string|max:255',
         ]);
 
         DB::beginTransaction();
@@ -88,6 +90,7 @@ class ManajemenPelatihanController extends Controller
 
             $materi = Materi::create([
                 'judul' => $request->judul,
+                'nama_pemateri' => $request->nama_pemateri,
                 'subjudul' => $request->subjudul,
                 'deskripsi' => $request->deskripsi,
                 'jam_pelajaran' => $request->jam_pelajaran,
@@ -95,6 +98,7 @@ class ManajemenPelatihanController extends Controller
                 'tanggal_selesai' => $request->tanggal_selesai,
                 'kategori_id' => $request->kategori_id,
                 'image_path' => $imagePath,
+                'nomor_surat' => $request->nomor_surat,
             ]);
 
             if ($request->filled('unit_kerja_ids')) {
@@ -118,6 +122,7 @@ class ManajemenPelatihanController extends Controller
     {
         $request->validate([
             'judul' => 'required|string|max:255',
+            'nama_pemateri' => 'required|string|max:255',
             'subjudul' => 'nullable|string|max:255',
             'deskripsi' => 'nullable|string',
             'jam_pelajaran' => 'required|integer|min:1',
@@ -127,6 +132,7 @@ class ManajemenPelatihanController extends Controller
             'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
             'unit_kerja_ids' => 'nullable|string',
             'jenis_tenaga_ids' => 'nullable|string',
+            'nomor_surat' => 'nullable|string|max:255',
         ]);
 
         $materi = Materi::find($id);
@@ -144,12 +150,14 @@ class ManajemenPelatihanController extends Controller
 
             $materi->update([
                 'judul' => $request->judul,
+                'nama_pemateri' => $request->nama_pemateri,
                 'subjudul' => $request->subjudul,
                 'deskripsi' => $request->deskripsi,
                 'jam_pelajaran' => $request->jam_pelajaran,
                 'tanggal_upload' => $request->tanggal_upload,
                 'tanggal_selesai' => $request->tanggal_selesai,
                 'kategori_id' => $request->kategori_id,
+                'nomor_surat' => $request->nomor_surat,
             ]);
 
             $unitKerjas = $request->filled('unit_kerja_ids') ? explode(',', $request->unit_kerja_ids) : [];
@@ -191,7 +199,7 @@ class ManajemenPelatihanController extends Controller
         $search = $request->input('search');
         $today = now()->startOfDay();
 
-        $query = Materi::where('tanggal_selesai', '<', $today)->with('kategori');
+        $query = Materi::aktif()->where('tanggal_selesai', '<', $today)->with('kategori');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -225,6 +233,20 @@ class ManajemenPelatihanController extends Controller
             'tanggal_upload' => $request->tanggal_upload,
             'tanggal_selesai' => $request->tanggal_selesai,
         ]);
+
+        // Update status user_progress yang sebelumnya "Sesi Berakhir" (jangan ubah "Selesai")
+        $sesiBerakhirProgresses = UserProgress::where('materi_id', $id)
+            ->where('status', 'Sesi Berakhir')
+            ->get();
+
+        foreach ($sesiBerakhirProgresses as $progress) {
+            if ($progress->urutan_selesai == 0) {
+                $progress->update(['status' => 'Belum Dimulai']);
+            } else {
+                $progress->update(['status' => 'Progres']);
+            }
+        }
+
         $this->logActivity($request, 'Update', 'materis', $id, "Memulihkan folder [{$materi->judul}] dari arsip (Periode baru: {$request->tanggal_upload} s/d {$request->tanggal_selesai})");
         return response()->json(['success' => true, 'message' => 'Data pelatihan berhasil dipulihkan.']);
     }
@@ -284,35 +306,45 @@ class ManajemenPelatihanController extends Controller
 
         DB::beginTransaction();
         try {
-            if ($materi->image_path)
+            // 1. Hapus file thumbnail fisik
+            if ($materi->image_path) {
                 Storage::disk('public')->delete($materi->image_path);
-
+            }
+            
+            // 2. Hapus file sub-materi fisik & null-kan path-nya
             foreach ($materi->subMateris as $subMateri) {
-                if ($subMateri->file_materi)
+                if ($subMateri->file_materi) {
                     Storage::disk('public')->delete($subMateri->file_materi);
-                $subMateri->delete();
+                }
+                $subMateri->update(['file_materi' => null]);
             }
 
-            foreach ($materi->postTests as $postTest) {
-                $postTest->soals()->delete();
-                $postTest->delete();
-            }
-
-            $materi->unitKerjas()->detach();
-            $materi->jenisTenagas()->detach();
-            $materi->forceDelete();
+            // 3. Kembalikan dari soft-delete (agar ID-nya hidup kembali untuk tabel sertifikat)
+            $materi->restore(); 
+            
+            // 4. Tandai sebagai sudah dibersihkan (is_cleaned) dan kosongkan link image
+            $materi->update([
+                'is_cleaned' => true,
+                'image_path' => null,
+            ]);
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Pelatihan dan komponen terkait telah dihapus permanen.']);
+            return response()->json(['success' => true, 'message' => 'File media berhasil dihapus. Data riwayat pelatihan berhasil diamankan di database.']);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Gagal menghapus secara permanen: ' . $e->getMessage()], 500);
+            return response()->json(['success' => false, 'message' => 'Gagal mengarsipkan data: ' . $e->getMessage()], 500);
         }
     }
 
     public function showMateriContent($materiId)
     {
         return view('SuperAdmin_Views.daftar-materi-kuis-superadmin', compact('materiId'));
+    }
+
+    public function showArchivedMateriContent($materiId)
+    {
+        $readOnly = true;
+        return view('SuperAdmin_Views.daftar-materi-kuis-superadmin', compact('materiId', 'readOnly'));
     }
 
     public function getContentData($materiId)
@@ -507,6 +539,7 @@ class ManajemenPelatihanController extends Controller
                 'urutan_post_test' => $newOrder,
                 'waktu_pengerjaan' => $request->waktu_pengerjaan,
                 'ulang_post_test' => $request->ulang_post_test,
+                'pretest' => $request->boolean('pretest'),
             ]);
 
             if ($questions && is_array($questions)) {
@@ -557,6 +590,7 @@ class ManajemenPelatihanController extends Controller
                 'judul' => $request->judul,
                 'waktu_pengerjaan' => $request->waktu_pengerjaan,
                 'ulang_post_test' => $request->ulang_post_test,
+                'pretest' => $request->boolean('pretest'),
             ]);
 
             $postTest->soals()->delete();

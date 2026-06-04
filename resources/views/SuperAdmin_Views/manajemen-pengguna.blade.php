@@ -126,10 +126,11 @@
                                             <span
                                                 class="px-3 py-1 rounded font-bold text-[10px] uppercase transition-colors"
                                                 :class="{
-                                                                'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400': user.status === 'Aktif',
-                                                                'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400': user.status === 'Tidak Aktif',
-                                                                'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300': user.status !== 'Aktif' && user.status !== 'Tidak Aktif'
-                                                            }" x-text="user.status || '-'"></span>
+                                                                'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400': user.status === 'active' || user.status === 'Aktif',
+                                                                'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400': user.status === 'inactive' || user.status === 'Tidak Aktif',
+                                                                'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400': user.status === 'suspended',
+                                                                'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300': user.status !== 'active' && user.status !== 'inactive' && user.status !== 'suspended' && user.status !== 'Aktif' && user.status !== 'Tidak Aktif'
+                                                            }" x-text="user.status === 'active' || user.status === 'Aktif' ? 'Aktif' : (user.status === 'inactive' || user.status === 'Tidak Aktif' ? 'Tidak Aktif' : (user.status === 'suspended' ? 'Suspended' : user.status))"></span>
                                         </td>
                                         <td class="py-5 px-6 text-right">
                                             <div class="flex justify-end gap-3">
@@ -303,21 +304,28 @@
                                     class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm dark:text-white">
                             </div>
 
-                            <div
-                                class="flex items-center justify-between bg-gray-50 dark:bg-slate-800/50 p-4 rounded-xl border border-gray-100 dark:border-slate-700">
-                                <div class="flex flex-col">
-                                    <span class="text-xs font-bold text-gray-700 dark:text-white">Status Pengguna</span>
-                                    <span class="text-[10px] text-gray-500 dark:text-gray-400"
-                                        x-text="editForm.status === 'Aktif' ? 'Akun ini aktif' : 'Akun ini dinonaktifkan'"></span>
+                            <div class="flex items-center justify-between bg-gray-50 dark:bg-slate-800/50 p-4 rounded-xl border border-gray-100 dark:border-slate-700">
+                                <span class="text-xs font-bold text-gray-700 dark:text-white">Status Pengguna</span>
+                                <div class="flex space-x-2">
+                                    <button type="button" 
+                                        @click="editForm.status = 'active'"
+                                        :class="editForm.status === 'active' || editForm.status === 'Aktif' ? 'bg-emerald-600 text-white' : 'bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300'"
+                                        class="py-1.5 px-3 text-xs font-bold rounded-lg transition-colors">
+                                        Active
+                                    </button>
+                                    <button type="button" 
+                                        @click="editForm.status = 'inactive'"
+                                        :class="editForm.status === 'inactive' || editForm.status === 'Tidak Aktif' ? 'bg-rose-600 text-white' : 'bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300'"
+                                        class="py-1.5 px-3 text-xs font-bold rounded-lg transition-colors">
+                                        Inactive
+                                    </button>
+                                    <button type="button" 
+                                        @click="editForm.status = 'suspended'"
+                                        :class="editForm.status === 'suspended' ? 'bg-amber-600 text-white' : 'bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300'"
+                                        class="py-1.5 px-3 text-xs font-bold rounded-lg transition-colors">
+                                        Suspended
+                                    </button>
                                 </div>
-
-                                <button type="button"
-                                    @click="editForm.status = (editForm.status === 'Aktif') ? 'Tidak Aktif' : 'Aktif'"
-                                    :class="editForm.status === 'Aktif' ? 'bg-blue-600' : 'bg-gray-300 dark:bg-slate-600'"
-                                    class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none">
-                                    <span :class="editForm.status === 'Aktif' ? 'translate-x-5' : 'translate-x-0'"
-                                        class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-                                </button>
                             </div>
                         </div>
 
@@ -382,7 +390,7 @@
                     unit_kerja_id: '',
                     jenis_tenaga_id: '',
                     role_id: '',
-                    status: 'Aktif',
+                    status: 'active',
                     password: ''
                 },
 

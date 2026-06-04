@@ -7,10 +7,14 @@ function getToken() {
 // Global Frontend Route Protection
 const token = getToken();
 const isLoginPage = window.location.pathname === '/' || window.location.pathname === '/login';
+const isServerLoggedIn = document.querySelector('meta[name="user-logged-in"]')?.getAttribute('content') === 'true';
 
-if (!token && !isLoginPage) {
+if (isLoginPage && !isServerLoggedIn) {
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
+} else if (!token && !isLoginPage && !isServerLoggedIn) {
     window.location.href = '/';
-} else if (token && isLoginPage) {
+} else if (token && isLoginPage && isServerLoggedIn) {
     window.location.href = '/pembelajaran';
 }
 

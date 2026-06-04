@@ -2,8 +2,13 @@
 @section('title', 'Laporan & Monitoring')
 
 @section('content')
+    <!-- Flatpickr CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
     <div class="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300" 
-         x-data="monitoringData()" x-init="initData()">
+         x-data="monitoringData()" x-init="initData(); initFlatpickr()">
 
         <aside id="sidebar" :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
             class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 border-r dark:border-slate-800 transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0 shrink-0 overflow-y-auto">
@@ -21,12 +26,20 @@
             @include('components.header-superadmin', ['title' => 'Laporan & Monitoring'])
 
             <main class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar">
-                <div class="mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                    <div>
                     <h2 class="text-lg lg:text-xl font-bold text-gray-800 dark:text-white transition-colors"
                         x-text="activeTab === 'internal' ? 'Monitoring Pelatihan Karyawan' : (showDetail ? 'Detail Sertifikat: ' + selectedUser : 'Sertifikat Eksternal')">
                     </h2>
-                    <p class="text-xs lg:text-sm text-gray-500 dark:text-gray-200 transition-colors leading-relaxed">Pantau
-                        kemajuan dan sertifikasi pelatihan seluruh staf rumah sakit secara real-time.</p>
+                    <p class="text-xs lg:text-sm text-gray-500 dark:text-gray-200 transition-colors leading-relaxed">Pantau kemajuan dan sertifikasi pelatihan seluruh staf rumah sakit secara real-time.</p>
+                    </div>
+
+                    @if(auth()->user()->role_id == 2)
+                        <a href="/kelola-ttd" class="bg-amber-400 hover:bg-amber-500 text-amber-950 px-5 py-2.5 rounded-xl items-center gap-2 text-xs font-bold shadow-sm transition active:scale-95 inline-flex">
+                            <i class="fa-solid fa-file-signature text-sm"></i>
+                            Kelola Tanda Tangan
+                        </a>
+                    @endif
                 </div>
 
                 <div x-show="activeTab === 'internal'" x-transition:enter="transition ease-out duration-300"
@@ -92,7 +105,7 @@
                             class="flex-1 py-2.5 text-xs font-bold rounded-lg transition-all duration-300">
                             Sertifikat Internal
                         </button>
-                        <button @click="activeTab = 'external'; showDetail = false"
+                        <button @click="activeTab = 'external'; showDetail = false; filters.status = ''"
                             :class="activeTab === 'external' ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'"
                             class="flex-1 py-2.5 text-xs font-bold rounded-lg transition-all duration-300">
                             Sertifikat Eksternal
@@ -113,11 +126,10 @@
                         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
                         <div>
                             <label
-                                class="text-[11px] font-bold text-gray-500 dark:text-white uppercase mb-2 block tracking-tight">Cari
-                                Karyawan/Pelatihan</label>
-                            <input type="text" x-model="filters.search"
-                                placeholder="Nama, NIP, atau Pelatihan..."
-                                class="w-full border-gray-200 dark:border-slate-700 rounded-lg text-xs p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-white focus:outline-none transition-all">
+                                class="text-[11px] font-bold text-gray-500 dark:text-white uppercase mb-2 block tracking-tight">Rentang Waktu</label>
+                            <input type="text" id="date_range_picker" x-model="filters.date_range"
+                                placeholder="Pilih Tanggal..."
+                                class="w-full border-gray-200 dark:border-slate-700 rounded-lg text-xs p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-white focus:outline-none transition-all cursor-pointer" readonly>
                         </div>
                         <div>
                             <label
@@ -131,10 +143,9 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div>
+                        <div x-show="activeTab === 'internal'">
                             <label
-                                class="text-[11px] font-bold text-gray-500 dark:text-white uppercase mb-2 block tracking-tight">Status
-                                Pelatihan</label>
+                                class="text-[11px] font-bold text-gray-500 dark:text-white uppercase mb-2 block tracking-tight">Status Pelatihan</label>
                             <select x-model="filters.status"
                                 class="w-full border-gray-200 dark:border-slate-700 rounded-lg text-xs p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-white">
                                 <option value="">Semua Status</option>
@@ -144,6 +155,7 @@
                             </select>
                         </div>
                         <button type="submit"
+                            :class="activeTab === 'external' ? 'sm:col-span-2' : ''"
                             class="bg-blue-700 hover:bg-blue-800 text-white py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 active:scale-95 shadow-lg shadow-blue-100 dark:shadow-none">
                             <i class="fa-solid fa-filter text-[10px]"></i>
                             Terapkan Filter
@@ -170,6 +182,9 @@
                                     <th class="py-4 px-4 uppercase tracking-wider text-center">Progres</th>
                                     <th class="py-4 px-4 uppercase tracking-wider text-center">Status</th>
                                     <th class="py-4 px-4 uppercase tracking-wider text-center">Nilai</th>
+                                    @if(auth()->check() && auth()->user()->role_id == 2)
+                                        <th class="py-4 px-4 uppercase tracking-wider text-center">Sertifikat</th>
+                                    @endif
                                     <th class="py-4 px-6 uppercase tracking-wider text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -221,16 +236,37 @@
                                             </td>
                                             <td class="py-4 px-4 text-center font-bold dark:text-white italic" x-text="report.skor_total !== null ? parseFloat(report.skor_total).toFixed(1) : '-'">
                                             </td>
+
+                                            @if(auth()->check() && auth()->user()->role_id == 2)
+                                                <td class="py-4 px-4 text-center font-bold dark:text-white italic">
+                                                    <template x-if="report.sertifikat_status">
+                                                        <span
+                                                            class="text-[9px] px-2 py-1 rounded-full border font-bold"
+                                                            :class="report.sertifikat_status === 'Disetujui'
+                                                                ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                                                                : 'bg-amber-50 text-amber-600 border-amber-100'"
+                                                            x-text="report.sertifikat_status">
+                                                        </span>
+                                                    </template>
+
+                                                    <template x-if="!report.sertifikat_status">
+                                                        <span class="text-gray-300 italic text-[9px]">
+                                                            Belum Disetujui
+                                                        </span>
+                                                    </template>
+                                                </td>
+                                            @endif
+
                                             <td class="py-4 px-6 text-center">
                                                 <template x-if="report.status === 'Selesai'">
-                                                    <button @click="
-                                                            openSertifikat = true; 
-                                                            selectedUser = report.user.nama; 
-                                                            selectedCourse = report.materi.judul;
-                                                            selectedDate = formatDate(report.updated_at);
-                                                        " class="text-blue-600 hover:text-blue-800 transition">
-                                                        <i class="fa-solid fa-eye"></i>
-                                                    </button>
+                                                    <div>
+                                                        <button @click="viewUserSertifikat(report.user_id, report.materi_id)" class="text-blue-600 hover:text-blue-800 transition">
+                                                            <i class="fa-solid fa-eye"></i>
+                                                        </button>
+                                                        @if(auth()->check() && auth()->user()->role_id == 2)
+                                                            <a :href="`validasi-pelatihan/${report.user_id}/${report.materi_id}`" class="hover:text-emerald-600 transition"><i class="fa-solid fa-file-circle-check"></i></a>
+                                                        @endif
+                                                    </div>
                                                 </template>
                                                 <template x-if="report.status !== 'Selesai'">
                                                     <span class="text-gray-300 italic text-[9px]">Belum Lulus</span>
@@ -242,7 +278,7 @@
                             </tbody>
                         </table>
 
-                        {{-- Tabel Sertifikat Eksternal (Placeholder Design Tetap Dipertahankan) --}}
+                        {{-- Tabel Sertifikat Eksternal --}}
                         <table x-show="activeTab === 'external' && !showDetail" x-cloak
                             class="w-full text-left text-xs min-w-[700px]">
                             <thead
@@ -251,24 +287,91 @@
                                     <th class="py-4 px-6 uppercase tracking-wider">Nama Karyawan</th>
                                     <th class="py-4 px-4 uppercase tracking-wider">Unit Kerja</th>
                                     <th class="py-4 px-4 uppercase tracking-wider text-center">Jumlah Sertifikat</th>
+                                    @if(auth()->check() && auth()->user()->role_id == 2)
+                                        <th class="py-4 px-4 uppercase tracking-wider text-center">Belum Disetujui</th>
+                                    @endif
                                     <th class="py-4 px-6 uppercase tracking-wider text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody
                                 class="divide-y divide-gray-100 dark:divide-slate-800 text-gray-700 dark:text-white transition-colors">
-                                <tr class="hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
-                                    <td colspan="4" class="py-12 text-center text-gray-400 italic">Modul Sertifikat
-                                        Eksternal sedang dalam tahap integrasi.</td>
-                                </tr>
+                                <template x-if="isLoadingEksternal">
+                                    <tr>
+                                        <td colspan="{{ auth()->check() && auth()->user()->role_id == 2 ? 5 : 4 }}" class="py-10 text-center">
+                                            <i class="fa-solid fa-spinner fa-spin text-3xl text-blue-500 mb-2"></i>
+                                            <p class="text-xs text-gray-500">Memuat data...</p>
+                                        </td>
+                                    </tr>
+                                </template>
+                                <template x-if="!isLoadingEksternal && eksternalReports.length === 0">
+                                    <tr>
+                                        <td colspan="{{ auth()->check() && auth()->user()->role_id == 2 ? 5 : 4 }}" class="py-12 text-center text-gray-400 italic">Belum ada data sertifikat eksternal.</td>
+                                    </tr>
+                                </template>
+                                <template x-if="!isLoadingEksternal && eksternalReports.length > 0">
+                                    <template x-for="item in eksternalReports" :key="item.user_id">
+                                        <tr class="hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+                                            <td class="py-4 px-6">
+                                                <div class="flex items-center gap-3">
+                                                    <div
+                                                        class="w-8 h-8 bg-gray-100 dark:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-gray-400 dark:text-white text-[10px] border border-gray-200 dark:border-slate-600 uppercase" x-text="item.nama ? item.nama.substring(0, 2) : '??'">
+                                                    </div>
+                                                    <div class="truncate max-w-[150px]">
+                                                        <p class="font-bold text-gray-800 dark:text-white truncate" x-text="item.nama || '-'"></p>
+                                                        <p class="text-[10px] text-gray-400 dark:text-gray-300 italic" x-text="item.nik || '-'"></p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="py-4 px-4 text-gray-500 dark:text-gray-200" x-text="item.unit_kerja ? item.unit_kerja.unit_kerja : '-'"></td>
+                                            <td class="py-4 px-4 text-center">
+                                                <span class="inline-flex items-center gap-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold px-2.5 py-1 rounded-full border border-indigo-100 dark:border-indigo-800">
+                                                    <span x-text="item.jumlah_sertifikat"></span>
+                                                    <i class="fa-solid text-[8px]">Sertifikat</i>
+                                                </span>
+                                            </td>
+                                            @if(auth()->check() && auth()->user()->role_id == 2)
+                                                <td class="py-4 px-4 text-center">
+                                                    <span class="inline-flex items-center gap-1 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[10px] font-bold px-2.5 py-1 rounded-full border border-amber-100 dark:border-amber-800">
+                                                        <span x-text="item.jumlah_belum_disetujui || 0"></span>
+                                                    </span>
+                                                </td>
+                                            @endif
+                                            <td class="py-4 px-6 text-center">
+                                                <a :href="'/sertifikat-eksternal/' + item.user_id" class="text-blue-600 hover:text-blue-800 transition" title="Lihat Detail">
+                                                    <i class="fa-solid fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </template>
                             </tbody>
                         </table>
                     </div>
 
-                    <div class="mt-8 flex justify-center gap-2">
+                    {{-- Pagination Internal --}}
+                    <div x-show="activeTab === 'internal'" class="mt-8 flex justify-center gap-2">
                         <template x-if="pagination.links">
                             <div class="flex flex-wrap items-center justify-center gap-1">
                                 <template x-for="(link, index) in pagination.links" :key="index">
                                     <button @click="if(link.url) fetchData(new URL(link.url).searchParams.get('page'))"
+                                        x-html="link.label"
+                                        :disabled="!link.url || link.active"
+                                        :class="[
+                                            'px-3 py-1.5 text-[10px] sm:text-xs font-medium rounded-md transition-colors',
+                                            link.active ? 'bg-blue-600 text-white shadow-md' : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700',
+                                            !link.url ? 'opacity-50 cursor-not-allowed' : ''
+                                        ]"></button>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+
+                    {{-- Pagination Eksternal --}}
+                    <div x-show="activeTab === 'external' && !showDetail" class="mt-8 flex justify-center gap-2">
+                        <template x-if="eksternalPagination.links">
+                            <div class="flex flex-wrap items-center justify-center gap-1">
+                                <template x-for="(link, index) in eksternalPagination.links" :key="'ext-'+index">
+                                    <button @click="if(link.url) fetchSertifikatEksternal(new URL(link.url).searchParams.get('page'))"
                                         x-html="link.label"
                                         :disabled="!link.url || link.active"
                                         :class="[
@@ -302,7 +405,7 @@
         </div>
 
         {{-- Modal Pop-Up Sertifikat --}}
-        <div x-show="openSertifikat" class="fixed inset-0 z-100 flex items-center justify-center p-4" x-cloak>
+        <div x-show="openSertifikat" class="fixed inset-0 z-[100] flex items-center justify-center p-4" x-cloak>
             <div x-show="openSertifikat" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
                 x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
                 x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
@@ -311,45 +414,30 @@
                 x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
                 x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 scale-100"
                 x-transition:leave-end="opacity-0 scale-95"
-                class="relative bg-white dark:bg-slate-900 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden border dark:border-slate-800">
-                <div class="flex items-center justify-between px-6 py-4 border-b dark:border-slate-800">
-                    <h3 class="text-base font-bold text-slate-800 dark:text-white">Preview Sertifikat</h3>
+                class="relative bg-white dark:bg-slate-900 w-full max-w-4xl max-h-[90vh] flex flex-col rounded-2xl shadow-2xl overflow-hidden border dark:border-slate-800 transition-all duration-300">
+                <div class="flex items-center justify-between px-6 py-4 border-b dark:border-slate-800 shrink-0">
+                    <h3 class="text-base font-bold text-slate-800 dark:text-white">Pratinjau Sertifikat</h3>
                     <button @click="openSertifikat = false"
                         class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition"><i
                             class="fa-solid fa-xmark text-xl"></i></button>
                 </div>
-                <div class="p-4 sm:p-6 lg:p-12 flex justify-center bg-slate-50 dark:bg-slate-950/50 overflow-hidden">
-                    <div class="certificate-scaler-wrapper w-full flex items-center justify-center">
-                        <div
-                            class="certificate-content relative w-[800px] aspect-[1.414/1] bg-white shadow-lg border-[12px] border-blue-100 flex flex-col items-center p-8 lg:p-12 text-center shrink-0">
-                            <div
-                                class="absolute top-0 left-0 w-24 h-24 border-t-4 border-l-4 border-blue-400 rounded-tl-lg">
-                            </div>
-                            <div
-                                class="absolute bottom-0 right-0 w-24 h-24 border-b-4 border-r-4 border-blue-400 rounded-br-lg">
-                            </div>
-                            <div class="mb-6 text-center">
-                                <h4 class="text-red-600 font-bold text-xs leading-none uppercase tracking-tighter">Citra
-                                    Husada</h4>
-                                <p class="text-green-600 font-bold text-[10px]">Learning Management System</p>
-                            </div>
-                            <h2 class="text-2xl lg:text-3xl font-serif font-bold text-slate-800 mb-2">Certificate of
-                                Completion</h2>
-                            <h1 class="text-3xl lg:text-4xl font-bold text-blue-600 border-b-2 border-blue-50 px-4 mt-8"
-                                x-text="selectedUser"></h1>
-                            <p class="text-xs text-slate-500 mt-12">Has successfully completed the training module</p>
-                            <h3 class="text-sm lg:text-base font-bold text-slate-800 max-w-md uppercase mt-2"
-                                x-text="selectedCourse"></h3>
-                            <div class="mt-auto w-full flex justify-between items-end px-4">
-                                <div class="text-left">
-                                    <p class="text-[10px] text-slate-400 uppercase tracking-widest">Date Issued</p>
-                                    <p class="text-xs font-bold text-slate-700" x-text="selectedDate"></p>
-                                </div>
-                                <div
-                                    class="w-20 h-20 bg-blue-50/50 rounded-full flex items-center justify-center border-2 border-blue-100">
-                                    <i class="fa-solid fa-stamp text-blue-200 text-3xl"></i>
-                                </div>
-                            </div>
+                <div class="p-6 overflow-y-auto custom-scrollbar flex-1 bg-slate-50 dark:bg-slate-950/50">
+                    <div x-show="sertifikatLoading" class="flex flex-col items-center justify-center py-20">
+                        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-500 mb-4"></i>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-bold">Membuat sertifikat...</p>
+                    </div>
+                    
+                    <div x-show="!sertifikatLoading" class="flex flex-col gap-8 max-w-3xl mx-auto">
+                        {{-- Bagian Depan --}}
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-600 dark:text-gray-400 mb-3 uppercase">Bagian Depan</h4>
+                            <img :src="sertifikatDepanUrl" class="w-full h-auto rounded-lg shadow-lg border border-gray-200 dark:border-slate-700" alt="Sertifikat Depan">
+                        </div>
+                        
+                        {{-- Bagian Belakang --}}
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-600 dark:text-gray-400 mb-3 uppercase">Bagian Belakang</h4>
+                            <img :src="sertifikatBelakangUrl" class="w-full h-auto rounded-lg shadow-lg border border-gray-200 dark:border-slate-700" alt="Sertifikat Belakang">
                         </div>
                     </div>
                 </div>
@@ -425,6 +513,9 @@
             selectedDate: '',
             selectedCertId: '',
             isLoading: true,
+            sertifikatDepanUrl: null,
+            sertifikatBelakangUrl: null,
+            sertifikatLoading: false,
             stats: {
                 total_peserta: 0,
                 penyelesaian_percent: 0,
@@ -433,22 +524,53 @@
             },
             reports: [],
             pagination: {},
+            eksternalReports: [],
+            eksternalPagination: {},
+            isLoadingEksternal: false,
             filters: {
-                search: new URLSearchParams(window.location.search).get('search') || '',
+                date_range: (function() {
+                    const start = new URLSearchParams(window.location.search).get('start_date');
+                    const end = new URLSearchParams(window.location.search).get('end_date');
+                    return (start && end) ? `${start} to ${end}` : '';
+                })(),
                 unit_kerja: new URLSearchParams(window.location.search).get('unit_kerja') || '',
                 status: new URLSearchParams(window.location.search).get('status') || ''
             },
 
             async initData() {
                 await this.fetchData();
+                await this.fetchSertifikatEksternal();
+            },
+
+            initFlatpickr() {
+                flatpickr("#date_range_picker", {
+                    mode: 'range',
+                    dateFormat: 'Y-m-d',
+                    defaultDate: this.filters.date_range || null,
+                    onChange: (selectedDates, dateStr) => {
+                        this.filters.date_range = dateStr;
+                    }
+                });
             },
 
             async fetchData(page = 1) {
+                if (this.activeTab === 'external') {
+                    return this.fetchSertifikatEksternal(page);
+                }
                 this.isLoading = true;
                 try {
                     const url = new URL('/api/admin/laporan-monitoring/data', window.location.origin);
                     url.searchParams.append('page', page);
-                    if (this.filters.search) url.searchParams.append('search', this.filters.search);
+                    if (this.filters.date_range) {
+                        const dates = this.filters.date_range.split(' to ');
+                        if (dates.length === 2) {
+                            url.searchParams.append('start_date', dates[0]);
+                            url.searchParams.append('end_date', dates[1]);
+                        } else if (dates.length === 1 && dates[0]) {
+                            url.searchParams.append('start_date', dates[0]);
+                            url.searchParams.append('end_date', dates[0]);
+                        }
+                    }
                     if (this.filters.unit_kerja) url.searchParams.append('unit_kerja', this.filters.unit_kerja);
                     if (this.filters.status) url.searchParams.append('status', this.filters.status);
 
@@ -475,6 +597,41 @@
                 }
             },
 
+            async fetchSertifikatEksternal(page = 1) {
+                this.isLoadingEksternal = true;
+                try {
+                    const url = new URL('/api/admin/laporan-monitoring/sertifikat-eksternal', window.location.origin);
+                    url.searchParams.append('page', page);
+                    if (this.filters.date_range) {
+                        const dates = this.filters.date_range.split(' to ');
+                        if (dates.length === 2) {
+                            url.searchParams.append('start_date', dates[0]);
+                            url.searchParams.append('end_date', dates[1]);
+                        } else if (dates.length === 1 && dates[0]) {
+                            url.searchParams.append('start_date', dates[0]);
+                            url.searchParams.append('end_date', dates[0]);
+                        }
+                    }
+                    if (this.filters.unit_kerja) url.searchParams.append('unit_kerja', this.filters.unit_kerja);
+
+                    const response = await fetch(url.toString(), {
+                        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    const result = await response.json();
+                    
+                    this.eksternalReports = result.data.data;
+                    this.eksternalPagination = {
+                        current_page: result.data.current_page,
+                        last_page: result.data.last_page,
+                        links: result.data.links
+                    };
+                } catch (error) {
+                    console.error('Error fetching sertifikat eksternal:', error);
+                } finally {
+                    this.isLoadingEksternal = false;
+                }
+            },
+
             getPercent(report) {
                 if (!report.materi) return 0;
                 const totalSteps = (report.materi.sub_materis_count || 0) + (report.materi.post_tests_count || 0);
@@ -489,11 +646,52 @@
 
             getQueryString() {
                 const params = new URLSearchParams();
-                if (this.filters.search) params.append('search', this.filters.search);
+                if (this.filters.date_range) {
+                    const dates = this.filters.date_range.split(' to ');
+                    if (dates.length === 2) {
+                        params.append('start_date', dates[0]);
+                        params.append('end_date', dates[1]);
+                    } else if (dates.length === 1 && dates[0]) {
+                        params.append('start_date', dates[0]);
+                        params.append('end_date', dates[0]);
+                    }
+                }
                 if (this.filters.unit_kerja) params.append('unit_kerja', this.filters.unit_kerja);
                 if (this.filters.status) params.append('status', this.filters.status);
                 const str = params.toString();
                 return str ? '?' + str : '';
+            },
+
+            async viewUserSertifikat(userId, materiId) {
+                this.openSertifikat = true;
+                this.sertifikatLoading = true;
+                this.sertifikatDepanUrl = null;
+                this.sertifikatBelakangUrl = null;
+
+                try {
+                    const token = localStorage.getItem('access_token') || '';
+                    const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+                    // Fetch Depan
+                    const resDepan = await fetch(`/api/admin/sertifikat/generate/${userId}/${materiId}?type=depan`, { headers });
+                    if(resDepan.ok) {
+                        const blobDepan = await resDepan.blob();
+                        if(this.sertifikatDepanUrl) URL.revokeObjectURL(this.sertifikatDepanUrl);
+                        this.sertifikatDepanUrl = URL.createObjectURL(blobDepan);
+                    }
+
+                    // Fetch Belakang
+                    const resBelakang = await fetch(`/api/admin/sertifikat/generate/${userId}/${materiId}?type=belakang`, { headers });
+                    if(resBelakang.ok) {
+                        const blobBelakang = await resBelakang.blob();
+                        if(this.sertifikatBelakangUrl) URL.revokeObjectURL(this.sertifikatBelakangUrl);
+                        this.sertifikatBelakangUrl = URL.createObjectURL(blobBelakang);
+                    }
+                } catch(e) {
+                    console.error('Error fetching certificate:', e);
+                } finally {
+                    this.sertifikatLoading = false;
+                }
             }
         }));
     });

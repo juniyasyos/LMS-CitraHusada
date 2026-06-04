@@ -2,7 +2,7 @@
 @section('title', 'pembelajaran')
 @section('content')
 
-<div class="flex min-h-screen bg-gray-100">
+<div class="flex min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
     <!-- SIDEBAR -->
     <aside id="sidebar"
         class="fixed lg:sticky z-40 top-0 left-0 w-64 h-screen bg-white border-r
@@ -19,7 +19,7 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <main class="flex-1 p-4 lg:p-8">
+    <main class="flex-1 p-4 lg:p-8 bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
 
         <!-- HEADER -->
         <div class="flex justify-between items-center mb-6">
@@ -28,15 +28,12 @@
             <div class="flex items-center gap-3">
 
                 <!-- HAMBURGER -->
-                <button id="toggleSidebar"
-                    class="lg:hidden text-gray-600 text-xl">
-                    <i class="fas fa-bars"></i>
-                </button>
+                <button id="toggleSidebar" class="lg:hidden text-gray-600 dark:text-gray-300 text-xl">
 
                 <!-- DESKTOP TEXT -->
                 <div class="hidden lg:block">
-                    <h2 id="welcomeText" class="text-2xl font-semibold"></h2>
-                    <p id="unitJenisText" class="text-sm text-gray-500"></p>
+                    <h2 id="welcomeText" class="text-2xl font-semibold text-gray-900 dark:text-white"></h2>
+                    <p id="unitJenisText" class="text-sm text-gray-500 dark:text-gray-400"></p>
                 </div>
                     
                 <!-- MOBILE LOGO -->
@@ -60,8 +57,8 @@
 
                 <!-- USER INFO DESKTOP -->
                 <div class="text-right hidden lg:block">
-                    <p id="profileName" class="font-medium"></p>
-                    <p id="profileUnit" class="text-sm text-gray-500"></p>
+                    <p id="profileName" class="font-medium text-gray-900 dark:text-white"></p>
+                    <p id="profileUnit" class="text-sm text-gray-500 dark:text-gray-400"></p>
                 </div>
 
             </div>
@@ -70,18 +67,18 @@
 
         <!-- MOBILE WELCOME TEXT -->
         <div class="lg:hidden mb-6">
-            <h2 id="welcomeTextMobile" class="text-lg font-semibold"></h2>
-            <p id="unitJenisMobile" class="text-sm text-gray-500"></p>
+            <h2 id="welcomeTextMobile" class="text-lg font-semibold text-gray-900 dark:text-white"></h2>
+            <p id="unitJenisMobile" class="text-sm text-gray-500 dark:text-gray-400"></p>
         </div>
 
         <!-- SEARCH -->
         <div class="relative w-full max-w-md flex items-center mb-6">
-            <i class="fas fa-search absolute left-3 text-gray-400"></i>
+            <i class="fas fa-search absolute left-3 text-gray-400 dark:text-gray-500"></i>
             <input 
                 id="searchMateri"
                 type="text"
                 placeholder="Cari modul..."
-                class="w-full pl-10 pr-4 h-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                class="w-full pl-10 pr-4 h-10 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                 oninput="debounceSearch()"
             >
         </div>
@@ -90,19 +87,19 @@
         <div class="grid grid-cols-3 gap-3 mb-8"> 
 
             <button onclick="setActive(this); filterMateri('belum')"
-            class="filter-btn flex-1 flex items-center justify-between px-6 py-3 bg-white border rounded-xl shadow-sm hover:bg-gray-50">
+            class="filter-btn flex-1 flex items-center justify-between px-6 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-slate-800 transition"
             <span>Belum Mulai</span>
             <i class="fa-solid fa-exclamation-circle text-gray-400"></i>
             </button>
 
             <button onclick="setActive(this); filterMateri('progres')"
-            class="filter-btn flex-1 flex items-center justify-between px-6 py-3 bg-white border rounded-xl shadow-sm hover:bg-gray-50">
+            class="filter-btn flex-1 flex items-center justify-between px-6 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-slate-800 transition"
             <span>Sedang Berjalan</span>
             <i class="fa-solid fa-clock text-gray-400"></i>
             </button>
 
             <button onclick="setActive(this); filterMateri('selesai')"
-            class="filter-btn flex-1 flex items-center justify-between px-6 py-3 bg-white border rounded-xl shadow-sm hover:bg-gray-50">
+            class="filter-btn flex-1 flex items-center justify-between px-6 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-slate-800 transition"
             <span>Selesai</span>
             <i class="fa-solid fa-check-circle text-gray-400"></i>
             </button>
@@ -114,7 +111,7 @@
 
         <!-- LOAD MORE -->
         <div id="loadMoreContainer" class="text-center mt-10 hidden">
-            <button onclick="loadMoreMateri()" class="text-blue-600 hover:underline bg-white px-6 py-2 rounded-full border shadow-sm transition">
+            <button onclick="loadMoreMateri()" class="text-blue-600 dark:text-blue-400 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 px-6 py-2 rounded-full shadow-sm transition hover:bg-gray-50 dark:hover:bg-slate-800">
                 Lihat Lebih Banyak →
             </button>
         </div>
@@ -132,15 +129,15 @@ document.addEventListener('DOMContentLoaded', function() {
 function setActive(clickedButton) {
     const buttons = document.querySelectorAll('.filter-btn');
 
-    buttons.forEach(btn => {
-        // reset ke default
-        btn.classList.remove('bg-blue-100', 'text-black');
-        btn.classList.add('bg-white');
+    buttons.forEach(btn => {btn.classList.remove('bg-blue-100', 'text-black', 'dark:bg-blue-900/30', 'dark:text-blue-400');
+    btn.classList.add('bg-white');
     });
 
     // set yang diklik jadi aktif
     clickedButton.classList.remove('bg-white');
-    clickedButton.classList.add('bg-blue-100', 'text-black');
+
+    clickedButton.classList.add('bg-blue-100', 'text-black', 'dark:bg-blue-900/30', 'dark:text-blue-400'
+    );
 }
 
 //load data profile
@@ -233,6 +230,12 @@ function renderMateri(materis){
     materis.forEach(materi => {
 
         const progressPercent = materi.progress_percent ?? 0;
+        const dueDate = new Date(materi.tanggal_selesai);
+        const formattedDueDate = dueDate.toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
 
         let statusColor = "bg-gray-800";
         let btnText = "Lanjutkan";
@@ -255,7 +258,7 @@ function renderMateri(materis){
         }
         
         container.innerHTML += `
-        <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+        <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl shadow-md overflow-hidden">
 
             <div class="h-40 bg-gray-300 relative">
                 <img src="${storageUrl}/${materi.image}" 
@@ -268,26 +271,26 @@ function renderMateri(materis){
 
             <div class="p-5">
 
-                <h3 class="font-semibold text-lg">${materi.judul}</h3>
-                <p class="text-sm text-gray-500 mb-4">${materi.subjudul}</p>
+                <h3 class="font-semibold text-lg text-gray-900 dark:text-white">${materi.judul}</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">${materi.subjudul}</p>
 
                 <div class="flex justify-between items-center text-sm mb-2">
                     <div class="flex items-center gap-1">
                         <i class="fa-solid fa-clock text-gray-400"></i>
-                        <p>${materi.jam_pelajaran} JPL</p>
+                        <p class="text-gray-500 dark:text-gray-400">${materi.jam_pelajaran} JPL</p>
                     </div>
 
                     <span class="text-red-500 text-xs">
-                        Due: ${materi.tanggal_selesai}
+                        Due: ${formattedDueDate}
                     </span>
                 </div>
 
-                <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
+                <div class="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 mb-3">
                     <div class="bg-blue-600 h-2 rounded-full"
                          style="width:${progressPercent}%"></div>
                 </div>
 
-                <span class="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
+                <span class="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full">
                     ${progressPercent}%
                 </span>
 
@@ -300,7 +303,7 @@ function renderMateri(materis){
                     </a>
 
                     <a href="/detail-materi/${materi.materi_id}"
-                        class="flex-1 border py-2 rounded-lg hover:bg-gray-100 flex items-center justify-center gap-2">
+                        class="flex-1 border border-gray-300 dark:border-slate-700 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 flex items-center justify-center gap-2">
                         <i class="fas fa-eye"></i>
                         Detail
                     </a>

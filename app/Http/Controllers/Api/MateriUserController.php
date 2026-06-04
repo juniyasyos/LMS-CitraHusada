@@ -8,6 +8,7 @@ use App\Models\UserProgress;
 use App\Models\SkorUser;
 use App\Models\Notification;
 use App\Models\User;
+use App\Models\Sertifikat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -25,7 +26,7 @@ class MateriUserController extends Controller
         $statusFilter = $request->query('status');
         $search = $request->query('search');
 
-        $materis = Materi::query()
+        $materis = Materi::available()
 
             // SEARCH
             ->when($search, function ($query) use ($search) {
@@ -181,7 +182,7 @@ class MateriUserController extends Controller
     {
         $user = Auth::user();
 
-        $materi = Materi::with([
+        $materi = Materi::available()->with([
             'subMateris',
             'postTests',
             'progresses' => function ($q) use ($user) {
@@ -265,7 +266,7 @@ class MateriUserController extends Controller
     {
         $user = Auth::user();
 
-        $materi = Materi::with([
+        $materi = Materi::available()->with([
             'subMateris',
             'postTests',
             'progresses' => function ($q) use ($user) {
@@ -341,7 +342,7 @@ class MateriUserController extends Controller
         $materiId = $request->materi_id;
         $urutan = $request->urutan;
 
-        $materi = Materi::with(['subMateris', 'postTests'])->findOrFail($materiId);
+        $materi = Materi::available()->with(['subMateris', 'postTests'])->findOrFail($materiId);
 
         $totalStep =
             $materi->subMateris->count() +
@@ -369,28 +370,34 @@ class MateriUserController extends Controller
             $progress->urutan_selesai = $urutan;
 
             if ($urutan >= $totalStep) {
-                // Cek skor_total jika materi ini memiliki post test
-                $totalPostTest = $materi->postTests->count();
+                // Cek skor_total jika materi ini memiliki post test (selain pretest)
+                $totalPostTest = $materi->postTests->where('pretest', false)->count();
                 if ($totalPostTest > 0) {
                     $kkm = 75;
                     if ($progress->skor_total >= $kkm) {
                         if ($progress->status !== 'Selesai') {
-                            $userModel = User::find($user->user_id);
-                            $userModel->total_jpl += $materi->jam_pelajaran;
-                            $userModel->save();
-                            
                             $progress->status = 'Selesai';
+
+                            Sertifikat::firstOrCreate([
+                                'user_id' => $user->user_id,
+                                'materi_id' => $materiId
+                            ], [
+                                'status' => 'Belum Disetujui'
+                            ]);
                         }
                     } else {
                         $progress->status = 'Progres';
                     }
                 } else {
                     if ($progress->status !== 'Selesai') {
-                        $userModel = User::find($user->user_id);
-                        $userModel->total_jpl += $materi->jam_pelajaran;
-                        $userModel->save();
-                        
                         $progress->status = 'Selesai';
+
+                        Sertifikat::firstOrCreate([
+                            'user_id' => $user->user_id,
+                            'materi_id' => $materiId
+                        ], [
+                            'status' => 'Belum Disetujui'
+                        ]);
                     }
                 }
             } else {
@@ -418,7 +425,7 @@ class MateriUserController extends Controller
     public function getSoalPostTest(Request $request, $materiId)
     {
         $postTestId = $request->query('post_test_id');
-        $materi = Materi::with([
+        $materi = Materi::available()->with([
             'postTests.soals'
         ])->findOrFail($materiId);
 
@@ -480,7 +487,7 @@ class MateriUserController extends Controller
         $jawabanUser = $request->jawaban;
         $waktuPengerjaan = $request->waktu_pengerjaan ?? 0;
 
-        $materi = Materi::with(['postTests.soals', 'subMateris'])->findOrFail($materiId);
+        $materi = Materi::available()->with(['postTests.soals', 'subMateris'])->findOrFail($materiId);
         $postTest = $materi->postTests->where('post_test_id', $postTestId)->first();
         if (!$postTest) {
             $postTest = $materi->postTests()->first(); // Fallback
@@ -526,19 +533,23 @@ class MateriUserController extends Controller
             }
         }
 
-        // 3. Hitung Rata-rata Skor dari SEMUA kuis yang ada di materi ini
-        $allPostTests = $materi->postTests;
-        $totalPostTestCount = $allPostTests->count();
+        // 3. Hitung Rata-rata Skor dari SEMUA kuis (selain pretest) yang ada di materi ini
+        $nonPretests = $materi->postTests->where('pretest', false);
+        $totalPostTestCount = $nonPretests->count();
 
         // Ambil semua skor yang sudah dikerjakan untuk materi ini
         $skorDikerjakan = SkorUser::where('progress_id', $progress->progress_id)->get();
-        $totalSkorSaatIni = $skorDikerjakan->sum('skor');
-
-        // Rata-rata dihitung berdasarkan total kuis yang ada (bukan hanya yang sudah dikerjakan)
-        $rataRataSkor = $totalSkorSaatIni / $totalPostTestCount;
+        
+        if ($totalPostTestCount > 0) {
+            $nonPretestIds = $nonPretests->pluck('post_test_id');
+            $totalSkorSaatIni = $skorDikerjakan->whereIn('post_test_id', $nonPretestIds)->sum('skor');
+            $rataRataSkor = $totalSkorSaatIni / $totalPostTestCount;
+        } else {
+            $rataRataSkor = 0;
+        }
 
         // 4. Update Progress & Status
-        $totalSteps = $materi->subMateris->count() + $totalPostTestCount;
+        $totalSteps = $materi->subMateris->count() + $materi->postTests->count();
 
         // User tetap boleh lanjut ke step berikutnya meskipun skor kuis ini kecil
         if ($progress->urutan_selesai < $postTest->urutan_post_test) {
@@ -546,14 +557,17 @@ class MateriUserController extends Controller
         }
 
         $kkm = 75;
-        // Cek: Apakah sudah sampai di step terakhir DAN rata-rata lulus KKM?
-        if ($progress->urutan_selesai >= $totalSteps && $rataRataSkor >= $kkm) {
+        // Cek: Apakah sudah sampai di step terakhir DAN rata-rata lulus KKM (jika ada kuis non-pretest)?
+        if ($progress->urutan_selesai >= $totalSteps && ($totalPostTestCount == 0 || $rataRataSkor >= $kkm)) {
             if ($progress->status !== 'Selesai') {
-                $userModel = User::find($user->user_id);
-                $userModel->total_jpl += $materi->jam_pelajaran;
-                $userModel->save();
-                
                 $progress->status = 'Selesai';
+
+                Sertifikat::firstOrCreate([
+                    'user_id' => $user->user_id,
+                    'materi_id' => $materiId
+                ], [
+                    'status' => 'Belum Disetujui'
+                ]);
             }
         } else {
             $progress->status = 'Progres';
@@ -584,7 +598,7 @@ class MateriUserController extends Controller
      */
     private function checkAndResetProgress($userId, $materiId)
     {
-        $materi = Materi::with(['postTests'])->find($materiId);
+        $materi = Materi::available()->with(['postTests'])->find($materiId);
         if (!$materi)
             return null;
 
@@ -595,8 +609,8 @@ class MateriUserController extends Controller
         if (!$progress)
             return null;
 
-        $allPostTests = $materi->postTests;
-        $totalPostTestCount = $allPostTests->count();
+        $nonPretests = $materi->postTests->where('pretest', false);
+        $totalPostTestCount = $nonPretests->count();
 
         if ($totalPostTestCount == 0)
             return null;
@@ -606,7 +620,7 @@ class MateriUserController extends Controller
         $semuaKesempatanHabis = true;
         $totalSkor = 0;
 
-        foreach ($allPostTests as $test) {
+        foreach ($nonPretests as $test) {
             $skorUser = $skorUsers->where('post_test_id', $test->post_test_id)->first();
 
             if (!$skorUser) {
@@ -660,7 +674,7 @@ class MateriUserController extends Controller
         $materiId = $request->materi_id;
         $postTestId = $request->post_test_id;
 
-        $materi = Materi::with('postTests')->findOrFail($materiId);
+        $materi = Materi::available()->with('postTests')->findOrFail($materiId);
         $postTest = $materi->postTests->where('post_test_id', $postTestId)->first();
         if (!$postTest) {
             $postTest = $materi->postTests()->first(); // Fallback

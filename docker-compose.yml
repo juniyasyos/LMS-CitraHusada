@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # 1. Service App: Laravel Development Server & Vite
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lms_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "4000:8000"  # Format: "PORT_LAPTOP:PORT_CONTAINER" -> Akses web via http://localhost:4000
+      - "5173:5173"  # Vite HMR (Hot-Reload) port
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+    depends_on:
+      - database
+    networks:
+      - lms-network
+
+  # 2. Service Database: MySQL
+  database:
+    image: mysql:8.0
+    container_name: lms_db
+    restart: unless-stopped
+    ports:
+      # Format: "PORT_LAPTOP:PORT_CONTAINER" -> Akses MySQL via port 4002 dari Windows
+      - "4002:3306"
+    environment:
+      MYSQL_DATABASE: lms_citra_husada
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes" # Set to 'yes' to match your current config (root user with empty password)
+    volumes:
+      - lms_mysql_data:/var/lib/mysql
+    networks:
+      - lms-network
+
+  # 3. Service phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: lms_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8080:80"  # Access phpMyAdmin via http://localhost:8080
+    environment:
+      PMA_HOST: database
+      PMA_USER: root
+      PMA_PASSWORD: ""
+    depends_on:
+      - database
+    networks:
+      - lms-network
+
+# Networks to link services
+networks:
+  lms-network:
+    driver: bridge
+
+# Persistent volume for MySQL database
+volumes:
+  lms_mysql_data:
+    driver: local

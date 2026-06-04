@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\PembelajaranController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\MateriUserController;
 use App\Http\Controllers\Api\DashboardSuperadminController;
+use App\Http\Controllers\Api\DashboardAdminController;
 use App\Http\Controllers\Api\BackupController;
 use App\Http\Controllers\Api\KategoriController;
 use App\Http\Controllers\Api\LaporanMonitoringController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\Api\ManajemenPenggunaController;
 use App\Http\Controllers\Api\UnitKerjaController;
 use App\Http\Controllers\Api\LogAktivitasController;
 use App\Http\Controllers\Api\ManajemenPelatihanController;
+use App\Http\Controllers\Api\SertifikatController;
 
 /*
 |--------------------------------------------------------------------------
@@ -94,6 +96,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Route::get('/dashboard/charts', [\App\Http\Controllers\DashboardSuperadminController::class, 'getChartData'])->name('api.dashboard.charts');
         Route::get('/superadmin/dashboard', [DashboardSuperadminController::class, 'index']);
         Route::get('/superadmin/dashboard/charts', [DashboardSuperadminController::class, 'getChartData']);
+        // Route::get('/karyawan-progress', [DashboardSuperadminController::class, 'getKaryawanProgress']);
 
         // Manajemen Pengguna
         Route::prefix('manajemen-pengguna')->group(function () {
@@ -114,6 +117,60 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/destroy/{id}', [UnitKerjaController::class, 'destroy']); // Hapus data
         });
 
+        // Kategori
+        Route::prefix('kategori')->group(function () {
+            Route::get('/data', [KategoriController::class, 'getKategoriData']);
+            Route::post('/store', [KategoriController::class, 'store']);
+            Route::put('/update/{id}', [KategoriController::class, 'update']);
+            Route::delete('/destroy/{id}', [KategoriController::class, 'destroy']);
+        });
+
+        //Backup/Cadangan
+        Route::prefix('backup')->group(function () {
+            Route::get('/data', [BackupController::class, 'getBackupData'])->name('api.backup.data');
+            Route::post('/run', [BackupController::class, 'runBackup'])->name('api.backup.run');
+            Route::post('/settings', [BackupController::class, 'updateSettings'])->name('api.backup.settings');
+            Route::post('/delete-selected', [BackupController::class, 'deleteSelected'])->name('api.backup.delete-selected');
+            Route::post('/reset', [BackupController::class, 'reset'])->name('api.backup.reset');
+        });
+
+        //Log Aktivitas
+        Route::get('/log-aktivitas', [LogAktivitasController::class, 'index']);
+
+        //Detail Leaderboard
+        Route::get('/leaderboard/data', [LeaderboardController::class, 'getLeaderboardDataApi']);
+
+    });
+
+    Route::middleware(['role:1,2', 'no.impersonate'])->prefix('admin')->group(function () {
+        Route::get('/laporan-monitoring/data', [LaporanMonitoringController::class, 'getMonitoringData']);
+        Route::get('/laporan-monitoring/sertifikat-eksternal', [LaporanMonitoringController::class, 'getSertifikatEksternalData']);
+        Route::get('/laporan-monitoring/sertifikat-eksternal/list', [LaporanMonitoringController::class, 'getSertifikatEksternalList']);
+        Route::get('/laporan-monitoring/sertifikat-eksternal/{userId}', [LaporanMonitoringController::class, 'getUserSertifikatEksternal']);
+        // Route::get('/generate/{userId}/{materiId}', [SertifikatController::class, 'generateUserSertifikat'])->name('api.sertifikat.generate');
+        Route::prefix('sertifikat')->group(function () {
+            Route::get('/generate/{userId}/{materiId}', [SertifikatController::class, 'generateUserSertifikat']);
+        });
+    });
+
+    Route::middleware(['role:2', 'no.impersonate'])->prefix('admin')->group(function () {
+        // Kelola Tanda Tangan / Sertifikat
+        Route::prefix('sertifikat')->group(function () {
+            Route::get('/direktur', [SertifikatController::class, 'getDirektur']);
+            Route::post('/direktur', [SertifikatController::class, 'updateDirektur']);
+            Route::get('/preview', [SertifikatController::class, 'previewSertifikat']);
+            Route::post('/validasi/{userId}/{materiId}', [SertifikatController::class, 'processValidasi']);
+        });
+        Route::post('/sertifikat-eksternal/verifikasi/{sertifikatEksternalId}', [LaporanMonitoringController::class, 'verifikasiSertifikatEksternal']);
+    });
+        
+    Route::middleware(['role:2,3', 'no.impersonate'])->prefix('admin')->group(function () {
+        Route::get('/dashboard', [DashboardAdminController::class, 'index']);
+        Route::get('/dashboard/charts', [DashboardAdminController::class, 'getChartData']);
+        Route::get('/karyawan-progress', [DashboardAdminController::class, 'getKaryawanProgress']);
+    });
+
+    Route::middleware(['role:1,3', 'no.impersonate'])->prefix('admin')->group(function () {
         // Manajemen Pelatihan
         Route::prefix('manajemen-pelatihan')->group(function () {
             Route::get('/data', [ManajemenPelatihanController::class, 'getData']);
@@ -138,34 +195,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/post-test/{id}', [ManajemenPelatihanController::class, 'updatePostTest']);
             Route::delete('/post-test/{id}', [ManajemenPelatihanController::class, 'destroyPostTest']);
         });
-
-        // Kategori
-        Route::prefix('kategori')->group(function () {
-            Route::get('/data', [KategoriController::class, 'getKategoriData']);
-            Route::post('/store', [KategoriController::class, 'store']);
-            Route::put('/update/{id}', [KategoriController::class, 'update']);
-            Route::delete('/destroy/{id}', [KategoriController::class, 'destroy']);
-        });
-
-        //Laporan Monitoring
-        Route::get('/laporan-monitoring/data', [LaporanMonitoringController::class, 'getMonitoringData']);
-
-        //Backup/Cadangan
-        Route::prefix('backup')->group(function () {
-            Route::get('/data', [BackupController::class, 'getBackupData'])->name('api.backup.data');
-            Route::post('/run', [BackupController::class, 'runBackup'])->name('api.backup.run');
-            Route::post('/settings', [BackupController::class, 'updateSettings'])->name('api.backup.settings');
-            Route::post('/delete-selected', [BackupController::class, 'deleteSelected'])->name('api.backup.delete-selected');
-            Route::post('/reset', [BackupController::class, 'reset'])->name('api.backup.reset');
-        });
-
-
-        //Log Aktivitas
-        Route::get('/log-aktivitas', [LogAktivitasController::class, 'index']);
-
-        //Detail Leaderboard
-        Route::get('/leaderboard/data', [LeaderboardController::class, 'getLeaderboardDataApi']);
-
-
     });
+
 });

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
 
 class Materi extends Model
 {
@@ -14,6 +15,7 @@ class Materi extends Model
 
     protected $fillable = [
         'judul',
+        'nama_pemateri',
         'subjudul',
         'deskripsi',
         'image_path',
@@ -21,12 +23,36 @@ class Materi extends Model
         'tanggal_selesai',
         'jam_pelajaran',
         'kategori_id',
+        'nomor_surat',
+        'arsip',
+        'is_cleaned',
     ];
 
     protected $casts = [
         'tanggal_upload' => 'datetime',
         'tanggal_selesai' => 'datetime',
     ];
+
+    /**
+     * Scope: Hanya mengambil materi yang filenya BELUM dibersihkan (bukan hapus permanen).
+     * Digunakan untuk menyembunyikan materi yang sudah dihapus permanen di halaman karyawan dan kelola materi aktif.
+     */
+    public function scopeAktif($query)
+    {
+        return $query->where('is_cleaned', false);
+    }
+
+    public function scopeAvailable($query)
+    {
+        $today = Carbon::today();
+
+        return $query->where('is_cleaned', false)
+            ->whereDate('tanggal_upload', '<=', $today)
+            ->where(function ($query) use ($today) {
+                $query->whereNull('tanggal_selesai')
+                    ->orWhereDate('tanggal_selesai', '>=', $today);
+            });
+    }
 
     public function subMateris()
     {

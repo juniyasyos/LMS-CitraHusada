@@ -31,7 +31,7 @@
                         {{ auth()->user()->nama }}
                     </p>
                     <p class="text-[10px] text-gray-500 dark:text-gray-300 font-medium italic">
-                        {{ auth()->user()->role->role ?? 'Superadmin' }}
+                        {{ auth()->user()->role->role ?? 'unknown' }}
                     </p>
                 </div>
                 <div class="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden border border-gray-100 dark:border-slate-800 flex items-center justify-center shrink-0">

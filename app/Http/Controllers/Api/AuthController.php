@@ -16,6 +16,12 @@ class AuthController extends Controller
      */
     public function showLogin()
     {
+        if (Auth::check()) {
+            $user = Auth::user();
+            // $redirectUrl = ($user->role_id == 1) ? '/beranda-superadmin' : (($user->role_id == 2) ? '/beranda-admin' : '/pembelajaran');
+            $redirectUrl = '/pembelajaran';
+            return redirect($redirectUrl);
+        }
         return view('login');
     }
 

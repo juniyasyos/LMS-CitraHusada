@@ -87,9 +87,21 @@ class LeaderboardController extends Controller
         $search = $request->query('search');
         
         $query = User::with('unitKerja')
-            ->withCount(['progresses as pelatihan_selesai' => function ($query) {
-                $query->where('status', 'Selesai');
-            }]);
+            ->withCount([
+                'progresses as pelatihan_selesai' => function ($query) {
+                    $query->where('status', 'Selesai');
+                }
+            ])
+            ->select('users.*')
+            ->selectRaw('
+                COALESCE(users.total_jpl, 0) +
+                COALESCE((
+                    SELECT SUM(jpl)
+                    FROM sertifikat_eksternals
+                    WHERE sertifikat_eksternals.user_id = users.user_id
+                    AND sertifikat_eksternals.status = "Disetujui"
+                ), 0) as total_jpl
+            ');
 
         // Filter Search
         if ($search) {
@@ -99,9 +111,9 @@ class LeaderboardController extends Controller
 
         // Filter Status JPL
         if ($statusFilter == 'terpenuhi') {
-            $query->where('total_jpl', '>=', 20);
+            $query->having('total_jpl', '>=', 20);
         } elseif ($statusFilter == 'belum_terpenuhi') {
-            $query->where('total_jpl', '<', 20);
+            $query->having('total_jpl', '<', 20);
         }
 
         return $query->orderBy('total_jpl', 'desc');

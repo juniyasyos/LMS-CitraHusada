@@ -9,11 +9,13 @@ use App\Models\UserProgress;
 use App\Models\Sertifikat;
 use App\Models\SkorUser;
 use App\Models\UnitKerja;
+use App\Models\SertifikatEksternal;
 use App\Models\LogAktivitas;
 use App\Exports\MonitoringExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class LaporanMonitoringController extends Controller
 {
@@ -23,7 +25,225 @@ class LaporanMonitoringController extends Controller
     public function index()
     {
         $unitKerjas = UnitKerja::all();
+        if (auth()->user()->role_id == 2) {
+            return view('Admin_Views.laporan-monitoring-admin', compact('unitKerjas'));
+        }
         return view('SuperAdmin_Views.laporan-monitoring', compact('unitKerjas'));
+    }
+
+    /**
+     * API: Mengambil data Sertifikat Eksternal (dikelompokkan per user)
+     */
+    public function getSertifikatEksternalData(Request $request)
+    {
+        $query = User::select('users.user_id', 'users.nama', 'users.nik', 'users.unit_kerja_id')
+            ->join('sertifikat_eksternals', 'users.user_id', '=', 'sertifikat_eksternals.user_id')
+            ->with('unitKerja')
+            ->groupBy('users.user_id', 'users.nama', 'users.nik', 'users.unit_kerja_id')
+            ->selectRaw('COUNT(sertifikat_eksternals.sertifikat_eksternal_id) as jumlah_sertifikat')
+            ->selectRaw("SUM(CASE WHEN sertifikat_eksternals.status = 'Belum Disetujui' THEN 1 ELSE 0 END) as jumlah_belum_disetujui");
+
+        // Filter berdasarkan unit kerja
+        if ($unitFilter = $request->input('unit_kerja')) {
+            $query->where('users.unit_kerja_id', $unitFilter);
+        }
+
+        // Filter berdasarkan rentang waktu
+        if ($startDate = $request->input('start_date')) {
+            $endDate = $request->input('end_date') ?: $startDate;
+            $query->whereBetween('sertifikat_eksternals.created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+        }
+
+        $data = $query->orderBy('users.nama')->paginate(10);
+
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
+    /**
+     * API: Mengambil list data Sertifikat Eksternal secara detail (tanpa grouping)
+     */
+    public function getSertifikatEksternalList(Request $request)
+    {
+        $query = SertifikatEksternal::with(['user.unitKerja']);
+
+        // Filter berdasarkan unit kerja
+        if ($unitFilter = $request->input('unit_kerja')) {
+            $query->whereHas('user', function($q) use ($unitFilter) {
+                $q->where('unit_kerja_id', $unitFilter);
+            });
+        }
+
+        // Filter berdasarkan rentang waktu
+        if ($startDate = $request->input('start_date')) {
+            $endDate = $request->input('end_date') ?: $startDate;
+            $query->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+        }
+
+        // Filter berdasarkan pencarian nama atau judul
+        if ($search = $request->input('search')) {
+            $query->where(function($q) use ($search) {
+                $q->where('judul', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($qu) use ($search) {
+                      $qu->where('nama', 'like', "%{$search}%")
+                         ->orWhere('nik', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $data = $query->orderByDesc('created_at')->paginate(10);
+
+        // Map data sesuai format yang diminta
+        $mappedData = $data->getCollection()->map(function($item) {
+            return [
+                'sertifikat_eksternal_id' => $item->sertifikat_eksternal_id,
+                'user_id' => $item->user_id,
+                'nama' => $item->user->nama ?? '-',
+                'nik' => $item->user->nik ?? '-',
+                'unit_kerja' => $item->user->unitKerja->unit_kerja ?? '-',
+                'judul' => $item->judul,
+                'status' => $item->status,
+                'image_path' => $item->image_path
+            ];
+        });
+
+        // Set collection kembali
+        $data->setCollection($mappedData);
+
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
+    /**
+     * Menampilkan halaman review Pelatihan Eksternal
+     */
+    public function showReviewPelatihan($sertifikatEksternalId)
+    {
+        $sertifikat = SertifikatEksternal::with('user')->findOrFail($sertifikatEksternalId);
+        $user = $sertifikat->user;
+
+        // Internal JPL: total_jpl pada tabel users
+        $internalJpl = $user->total_jpl ?? 0;
+
+        // Eksternal JPL: jumlah semua jpl sertifikat_eksternal yang disetujui
+        $eksternalJpl = SertifikatEksternal::where('user_id', $user->user_id)
+            ->where('status', 'Disetujui')
+            ->sum('jpl');
+
+        // Total Keseluruhan
+        $totalJpl = $internalJpl + $eksternalJpl;
+
+        return view('Admin_Views.review-pelatihan', compact('sertifikat', 'user', 'internalJpl', 'eksternalJpl', 'totalJpl'));
+    }
+
+    /**
+     * API / Web POST Action: Melakukan verifikasi kelayakan sertifikat eksternal
+     */
+    public function verifikasiSertifikatEksternal(Request $request, $sertifikatEksternalId)
+    {
+        $sertifikat = SertifikatEksternal::findOrFail($sertifikatEksternalId);
+        $decision = $request->input('decision'); // 'Setuju' atau 'Tolak'
+
+        if ($decision === 'Setuju') {
+            $request->validate([
+                'jpl' => 'required|numeric|min:1'
+            ], [
+                'jpl.required' => 'Konfirmasi Jam Pembelajaran (JPL) wajib diisi untuk menyetujui sertifikat.',
+                'jpl.numeric' => 'JPL harus berupa angka.'
+            ]);
+
+            $sertifikat->jpl = $request->input('jpl');
+            $sertifikat->deskripsi = $request->input('deskripsi'); // opsional
+            $sertifikat->status = 'Disetujui';
+        } else {
+            $request->validate([
+                'deskripsi' => 'required|string|min:5'
+            ], [
+                'deskripsi.required' => 'Komentar/Catatan Peninjauan wajib diisi sebagai alasan penolakan sertifikat.'
+            ]);
+
+            $sertifikat->jpl = 0;
+            $sertifikat->deskripsi = $request->input('deskripsi');
+            $sertifikat->status = 'Ditolak';
+        }
+
+        $sertifikat->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status sertifikat eksternal berhasil diperbarui.'
+        ]);
+    }
+
+    /**
+     * Menampilkan halaman detail Sertifikat Eksternal per User
+     */
+    public function showSertifikatEksternal($userId)
+    {
+        $user = User::findOrFail($userId);
+        return view('SuperAdmin_Views.sertifikat-eksternal', compact('user'));
+    }
+
+    /**
+     * API: Mengambil data sertifikat eksternal milik user tertentu
+     */
+    public function getUserSertifikatEksternal(Request $request, $userId)
+    {
+        $query = SertifikatEksternal::where('user_id', $userId);
+
+        // Filter berdasarkan rentang waktu
+        if ($startDate = $request->input('start_date')) {
+            $endDate = $request->input('end_date') ?: $startDate;
+            $query->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+        }
+
+        // Filter berdasarkan status
+        if ($status = $request->input('status')) {
+            $query->where('status', $status);
+        }
+
+        $data = $query->orderByDesc('created_at')->paginate(10);
+
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
+    /**
+     * Ekspor Excel Sertifikat Eksternal per User
+     */
+    public function exportSertifikatEksternalExcel(Request $request, $userId)
+    {
+        $user = User::findOrFail($userId);
+        $this->logActivity($request, 'Download', 'sertifikat_eksternals', auth()->id(), "Mengekspor sertifikat eksternal {$user->nama} (Excel)");
+        return Excel::download(new \App\Exports\SertifikatEksternalExport($request, $userId), 'sertifikat-eksternal-' . $user->nama . '-' . now()->format('Y-m-d') . '.xlsx');
+    }
+
+    /**
+     * Ekspor PDF Sertifikat Eksternal per User
+     */
+    public function exportSertifikatEksternalPdf(Request $request, $userId)
+    {
+        $user = User::findOrFail($userId);
+        
+        $query = SertifikatEksternal::where('user_id', $userId);
+
+        if ($startDate = $request->input('start_date')) {
+            $endDate = $request->input('end_date') ?: $startDate;
+            $query->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+        }
+
+        if ($status = $request->input('status')) {
+            $query->where('status', $status);
+        }
+
+        $sertifikats = $query->orderByDesc('created_at')->get();
+        $pdf = Pdf::loadView('exports.sertifikat_eksternal_pdf', compact('sertifikats', 'user'))->setPaper('a4', 'landscape');
+
+        $this->logActivity($request, 'Download', 'sertifikat_eksternals', auth()->id(), "Mengekspor sertifikat eksternal {$user->nama} (PDF)");
+        return $pdf->download('sertifikat-eksternal-' . $user->nama . '-' . now()->format('Y-m-d') . '.pdf');
     }
 
     /**
@@ -43,7 +263,8 @@ class LaporanMonitoringController extends Controller
         ];
 
         // 2. Query Tabel dengan Filter
-        $search = $request->input('search');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
         $unitFilter = $request->input('unit_kerja');
         $statusFilter = $request->input('status');
 
@@ -51,15 +272,17 @@ class LaporanMonitoringController extends Controller
             $q->withCount(['subMateris', 'postTests']);
         }]);
 
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->whereHas('user', function ($uq) use ($search) {
-                    $uq->where('nama', 'LIKE', "%{$search}%")
-                        ->orWhere('nik', 'LIKE', "%{$search}%");
-                })->orWhereHas('materi', function ($mq) use ($search) {
-                    $mq->where('judul', 'LIKE', "%{$search}%");
-                });
-            });
+        $query->select('user_progress.*');
+        $query->addSelect([
+            'sertifikat_status' => \App\Models\Sertifikat::select('status')
+                ->whereColumn('sertifikats.user_id', 'user_progress.user_id')
+                ->whereColumn('sertifikats.materi_id', 'user_progress.materi_id')
+                ->limit(1)
+        ]);
+
+        if ($startDate) {
+            $endDate = $endDate ?: $startDate;
+            $query->whereBetween('updated_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
         }
 
         if ($unitFilter) {
@@ -113,14 +336,9 @@ class LaporanMonitoringController extends Controller
      */
     private function applyFilters($query, Request $request)
     {
-        if ($search = $request->input('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->whereHas('user', function ($uq) use ($search) {
-                    $uq->where('nama', 'LIKE', "%{$search}%")->orWhere('nik', 'LIKE', "%{$search}%");
-                })->orWhereHas('materi', function ($mq) use ($search) {
-                    $mq->where('judul', 'LIKE', "%{$search}%");
-                });
-            });
+        if ($startDate = $request->input('start_date')) {
+            $endDate = $request->input('end_date') ?: $startDate;
+            $query->whereBetween('updated_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
         }
         if ($unit = $request->input('unit_kerja')) {
             $query->whereHas('user', function ($q) use ($unit) { $q->where('unit_kerja_id', $unit); });
