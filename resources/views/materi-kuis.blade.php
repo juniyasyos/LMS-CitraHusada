@@ -12,30 +12,30 @@
 
     <!-- POPUP Awal Kuis -->
     <div id="popupWelcome" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-2xl shadow-lg w-[90%] max-w-md p-6 relative text-center">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-lg w-[90%] max-w-md p-6 relative text-center border dark:border-slate-800">
             <div class="flex justify-center mb-4">
                 <lottie-player src="https://lottie.host/363a0f93-0231-4ecf-9d9c-77a30aa4cc4d/hY7zUek7Du.json"
                     background="transparent" style="width:120px;height:120px;" autoplay></lottie-player>
             </div>
             <div>
-                <h3 id="welcomeTitle" class="font-semibold text-lg mb-2"></h3>
-                <p id="welcomeDesc" class="text-gray-500 text-sm mb-6"></p>
+                <h3 id="welcomeTitle" class="font-semibold text-lg mb-2 text-gray-900 dark:text-white"></h3>
+                <p id="welcomeDesc" class="text-gray-500 dark:text-gray-400 text-sm mb-6"></p>
                 <button onclick="mulaiDariPopup()"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg w-full">Mulai Kuis</button>
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg w-full transition-colors">Mulai Kuis</button>
             </div>
         </div>
     </div>
 
     <!-- POPUP Motivasi (Tengah) -->
     <div id="popupMotivasi" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-2xl shadow-lg w-[90%] max-w-md p-6 relative text-center">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-lg w-[90%] max-w-md p-6 relative text-center border dark:border-slate-800">
             <div class="flex justify-center mb-4">
                 <lottie-player src="https://lottie.host/7559d986-bb08-4257-afdc-7a9253af9a54/c2F2tTQjjS.json"
                     background="transparent" style="width:120px;height:120px;" loop autoplay></lottie-player>
             </div>
             <div>
-                <h3 id="motivasiTitle" class="font-semibold text-lg mb-2"></h3>
-                <p id="motivasiDesc" class="text-gray-500 text-sm"></p>
+                <h3 id="motivasiTitle" class="font-semibold text-lg mb-2 text-gray-900 dark:text-white"></h3>
+                <p id="motivasiDesc" class="text-gray-500 dark:text-gray-400 text-sm"></p>
             </div>
         </div>
     </div>
@@ -45,25 +45,25 @@
         @include('components.header')
     </div>
 
-    <div class="flex flex-col lg:flex-row min-h-screen">
+    <div class="flex flex-col lg:flex-row min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
 
         <!-- SIDEBAR -->
-        <aside class="order-2 lg:order-1 w-full lg:w-72 bg-white border-t lg:border-t-0 lg:border-r p-4 lg:p-6">
+        <aside class="order-2 lg:order-1 w-full lg:w-72 bg-white dark:bg-slate-900 border-t dark:border-slate-800 lg:border-t-0 lg:border-r lg:dark:border-slate-800 p-4 lg:p-6 transition-colors duration-300">
 
-            <h2 class="font-bold text-base lg:text-lg mb-4">Progress Belajar</h2>
+            <h2 class="font-bold text-base lg:text-lg mb-4 text-gray-900 dark:text-white">Progress Belajar</h2>
 
             <div class="mb-6">
-                <div class="flex justify-between text-sm mb-1">
+                <div class="flex justify-between text-sm mb-1 text-gray-900 dark:text-white">
                     <span>Progress</span>
-                    <span id="progressText" class="font-medium text-blue-600">0%</span>
+                    <span id="progressText" class="font-medium text-blue-600 dark:text-blue-400">0%</span>
                 </div>
 
-                <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2">
                     <div id="progressBar" class="bg-blue-600 h-2 rounded-full" style="width:0%"></div>
                 </div>
             </div>
 
-            <h2 class="font-semibold text-sm lg:text-md mb-3">Daftar Materi</h2>
+            <h2 class="font-semibold text-sm lg:text-md mb-3 text-gray-900 dark:text-white">Daftar Materi</h2>
 
             <div id="daftarMateri" class="space-y-2 text-sm"></div>
 
@@ -74,12 +74,12 @@
 
             <!-- MOBILE TITLE -->
             <div class="lg:hidden mb-4">
-                <h1 class="text-xl font-bold text-gray-800">Kuis</h1>
+                <h1 class="text-xl font-bold text-gray-800 dark:text-white">Kuis</h1>
             </div>
 
             <!-- BUTTON BACK -->
             <a href="/lanjutkan-materi/{{ $materiId }}"
-                class="inline-flex items-center gap-2 text-gray-600 hover:text-red-500 mb-6 transition">
+                class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 mb-6 transition">
                 <i class="fas fa-times text-lg"></i>
                 <span>Kembali</span>
             </a>
@@ -87,29 +87,29 @@
             <!-- HEADER QUIZ -->
             <div id="quizHeader">
 
-                <div class="flex justify-between items-center mb-3 text-xl text-black font-bold">
+                <div class="flex justify-between items-center mb-3 text-xl text-black dark:text-white font-bold">
 
                     <div>
                         Soal
-                        <span id="nomorSoal" class="text-gray-900 font-bold">0</span>
+                        <span id="nomorSoal" class="text-gray-900 dark:text-gray-100 font-bold">0</span>
                         dari
-                        <span id="totalSoal" class="text-gray-900 font-bold">0</span>
+                        <span id="totalSoal" class="text-gray-900 dark:text-gray-100 font-bold">0</span>
                     </div>
 
-                    <div class="flex items-center gap-2 text-sm bg-gray-100 rounded-full px-2 py-1">
-                        <i class="fa-solid fa-clock text-gray-500"></i>
-                        <span id="timer">00:00</span>
+                    <div class="flex items-center gap-2 text-sm bg-gray-100 dark:bg-slate-800 rounded-full px-2 py-1">
+                        <i class="fa-solid fa-clock text-gray-500 dark:text-gray-400"></i>
+                        <span id="timer" class="dark:text-gray-200">00:00</span>
                     </div>
 
                 </div>
 
                 <!-- PROGRESS -->
-                <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                <div class="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 mb-2">
                     <div id="progressSoal" class="bg-blue-500 h-2 rounded-full" style="width:0%"></div>
                 </div>
 
                 <div class="mb-8 text-right">
-                    <span id="poinSoal" class="text-sm text-blue-600 font-medium bg-blue-100 rounded-full px-2 py-1">
+                    <span id="poinSoal" class="text-sm text-blue-600 dark:text-blue-400 font-medium bg-blue-100 dark:bg-blue-900/30 rounded-full px-2 py-1">
                         Poin : 0
                     </span>
                 </div>
@@ -117,7 +117,7 @@
             </div>
 
             <!-- CARD SOAL -->
-            <div id="cardSoal" class="bg-white border rounded-xl p-4 sm:p-6"></div>
+            <div id="cardSoal" class="bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-4 sm:p-6 transition-colors duration-300"></div>
 
             <!-- HASIL -->
             <div id="hasilContainer" class="hidden text-center mt-10"></div>
@@ -128,17 +128,17 @@
 
     <!-- MODAL -->
     <div id="modalKonfirmasi" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
-        <div id="modalBox" class="bg-white rounded-xl p-6 w-[90%] max-w-md text-center border-2 border-blue-500">
+        <div id="modalBox" class="bg-white dark:bg-slate-900 rounded-xl p-6 w-[90%] max-w-md text-center border-2 border-blue-500">
             <div class="flex justify-center mb-4">
                 <lottie-player src="https://assets10.lottiefiles.com/packages/lf20_touohxv0.json" background="transparent"
                     style="width:130px;height:130px;" autoplay></lottie-player>
             </div>
-            <h2 class="text-lg font-semibold mb-2">
+            <h2 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
                 Apakah anda sudah yakin ?
             </h2>
             <div class="mb-6">
-                <p id="konfirmasiTitle" class="font-semibold text-gray-700 text-sm"></p>
-                <p id="konfirmasiDesc" class="text-sm text-gray-500"></p>
+                <p id="konfirmasiTitle" class="font-semibold text-gray-700 dark:text-gray-300 text-sm"></p>
+                <p id="konfirmasiDesc" class="text-sm text-gray-500 dark:text-gray-400"></p>
             </div>
 
             <div class="flex justify-center gap-4">
@@ -155,19 +155,19 @@
 
     <!-- TOAST PERCOBAAN HABIS -->
     <div id="quizLimitAlert"
-        class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-white border-l-4 border-red-500 text-gray-800 px-6 py-4 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center gap-4 transition-all duration-300 opacity-0 -translate-y-10 pointer-events-none min-w-[320px]">
+        class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-slate-900 border-l-4 border-red-500 text-gray-800 dark:text-white px-6 py-4 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center gap-4 transition-all duration-300 opacity-0 -translate-y-10 pointer-events-none min-w-[320px]">
 
         <!-- ICON -->
-        <div class="bg-red-50 text-red-500 rounded-full w-10 h-10 flex items-center justify-center shrink-0">
+        <div class="bg-red-50 dark:bg-red-500/20 text-red-500 rounded-full w-10 h-10 flex items-center justify-center shrink-0">
             <i class="fa-solid fa-circle-xmark text-lg"></i>
         </div>
 
         <!-- TEXT -->
         <div>
-            <h4 class="font-bold text-sm sm:text-base text-gray-900">
+            <h4 class="font-bold text-sm sm:text-base text-gray-900 dark:text-white">
                 Percobaan Habis
             </h4>
-            <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
+            <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                 Kamu sudah mencapai batas maksimal percobaan kuis.
             </p>
         </div>
@@ -247,22 +247,22 @@
                 let isOpened = step.urutan === activeUrutan;
                 let isUnlocked = step.urutan <= urutanSelesai + 1;
 
-                let icon = "fa-lock text-gray-400";
-                let classItem = "text-gray-400 cursor-not-allowed";
+                let icon = "fa-lock text-gray-400 dark:text-gray-500";
+                let classItem = "text-gray-400 dark:text-gray-500 cursor-not-allowed";
                 let status = "lock";
 
                 if (isOpened) {
-                    icon = "fa-play text-blue-500";
-                    classItem = "bg-blue-100 text-blue-600 font-medium";
+                    icon = "fa-play text-blue-500 dark:text-blue-400";
+                    classItem = "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium";
                     status = "aktif";
                 } else if (isUnlocked) {
                     if (step.urutan <= urutanSelesai) {
-                        icon = "fa-circle-check text-green-500";
-                        classItem = "text-gray-800 font-medium hover:bg-gray-100";
+                        icon = "fa-circle-check text-green-500 dark:text-green-400";
+                        classItem = "text-gray-800 dark:text-gray-200 font-medium hover:bg-gray-100 dark:hover:bg-slate-800";
                         status = "selesai";
                     } else {
-                        icon = "fa-unlock text-gray-600";
-                        classItem = "text-gray-800 font-medium hover:bg-gray-100";
+                        icon = "fa-unlock text-gray-600 dark:text-gray-400";
+                        classItem = "text-gray-800 dark:text-gray-200 font-medium hover:bg-gray-100 dark:hover:bg-slate-800";
                         status = "unlocked";
                     }
                 }
@@ -321,7 +321,7 @@
 
             if (soalList.length === 0) {
                 document.getElementById("cardSoal").innerHTML =
-                    "<p class='text-gray-500'>Soal tidak tersedia</p>";
+                    "<p class='text-gray-500 dark:text-gray-400'>Soal tidak tersedia</p>";
                 return;
             }
 
@@ -360,12 +360,12 @@
             pilihan.forEach((p, index) => {
                 if (p) {
                     pilihanHTML += `
-                    <label class="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                    <label class="flex items-start gap-3 p-3 border dark:border-slate-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-gray-200">
                         <input type="${soal.status_pilihan ? 'checkbox' : 'radio'}"
                         name="soal"
                         value="${index + 1}"
                         onchange="cekPilihan()"
-                        class="mt-1 w-4 h-4">
+                        class="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 dark:bg-slate-700 dark:border-slate-600">
                         <span>${p}</span>
                     </label>`;
                 }
@@ -373,7 +373,7 @@
 
             document.getElementById("cardSoal").innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-6">
-                    <h2 class="text-lg sm:text-xl font-semibold leading-relaxed sm:max-w-xl">
+                    <h2 class="text-lg sm:text-xl font-semibold leading-relaxed sm:max-w-xl text-gray-900 dark:text-white">
                         ${soal.soal}
                     </h2>
 
@@ -504,10 +504,10 @@
 
             document.getElementById("cardSoal").innerHTML = `
                 <div class="text-center py-10">
-                    <h2 class="text-2xl font-semibold mb-3">
+                    <h2 class="text-2xl font-semibold mb-3 text-gray-900 dark:text-white">
                         Kuis Selesai
                     </h2>
-                    <p class="text-gray-500">
+                    <p class="text-gray-500 dark:text-gray-400">
                         Terima kasih sudah mengerjakan kuis.
                     </p>
                 </div>
@@ -629,14 +629,14 @@
 
                 if (data.is_locked_back) {
                     document.getElementById("hasilContainer").innerHTML = `
-                        <div class="bg-white border rounded-xl p-6 sm:p-8 max-w-xl mx-auto text-center shadow-sm border-red-200">
-                            <div class="text-4xl sm:text-5xl mb-4 text-red-500">
+                        <div class="bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-6 sm:p-8 max-w-xl mx-auto text-center shadow-sm border-red-200 dark:border-red-900/50">
+                            <div class="text-4xl sm:text-5xl mb-4 text-red-500 dark:text-red-400">
                                 <i class="fa-solid fa-rotate-left"></i>
                             </div>
-                            <h2 class="text-xl sm:text-2xl font-bold mb-2 text-red-600">
+                            <h2 class="text-xl sm:text-2xl font-bold mb-2 text-red-600 dark:text-red-500">
                                 Kesempatan Habis!
                             </h2>
-                            <p class="text-gray-600 mb-6 text-sm sm:text-base">
+                            <p class="text-gray-600 dark:text-gray-400 mb-6 text-sm sm:text-base">
                                 ${data.lockback_message}
                             </p>
                             <div class="mt-6 flex justify-center">
@@ -683,34 +683,34 @@
 
                 document.getElementById("hasilContainer").innerHTML = `
                     ${data.skor_kuis_ini >= 75
-                        ? `<div class="bg-white border rounded-xl p-6 sm:p-8 max-w-xl mx-auto text-center shadow-sm">
+                        ? `<div class="bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-6 sm:p-8 max-w-xl mx-auto text-center shadow-sm">
                             <!-- ICON -->
-                            <div class="text-green-500 text-4xl sm:text-5xl mb-4">
+                            <div class="text-green-500 dark:text-green-400 text-4xl sm:text-5xl mb-4">
                                 <i class="fa-solid fa-circle-check"></i>
                             </div>
 
                             <!-- JUDUL -->
-                            <h2 class="text-xl sm:text-2xl font-bold mb-2">
+                            <h2 class="text-xl sm:text-2xl font-bold mb-2 text-gray-900 dark:text-white">
                                 Selamat!
                             </h2>
 
                             <!-- DESKRIPSI -->
-                            <p class="text-gray-600 mb-4 text-sm sm:text-base">
+                            <p class="text-gray-600 dark:text-gray-400 mb-4 text-sm sm:text-base">
                                 Kamu telah menyelesaikan kuis dengan nilai
                             </p>
 
                             <!-- NILAI -->
-                            <div class="text-3xl sm:text-4xl font-bold text-blue-600 mb-2">
+                            <div class="text-3xl sm:text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">
                                 ${data.skor_kuis_ini} / 100
                             </div>
 
                             <!-- DURASI -->
-                            <p class="text-[11px] text-gray-400 font-medium mb-6">
+                            <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium mb-6">
                                 <i class="fa-regular fa-clock mr-1"></i> Waktu pengerjaan: ${formatDurasi(data.waktu_pengerjaan)}
                             </p>
 
                             <!-- PESAN -->
-                            <p class="text-gray-500 mb-8 text-sm sm:text-base">
+                            <p class="text-gray-500 dark:text-gray-400 mb-8 text-sm sm:text-base">
                                 Hasil yang sangat baik! Kamu sudah memahami materi keselamatan pasien
                                 dengan baik. Terus pertahankan semangat belajarmu.
                             </p>
@@ -722,35 +722,35 @@
                             </div>
 
                         </div>`
-                        : `<div class="bg-white border rounded-xl p-6 sm:p-8 max-w-xl mx-auto text-center shadow-sm">
+                        : `<div class="bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-6 sm:p-8 max-w-xl mx-auto text-center shadow-sm">
 
                             <!-- ICON -->
-                            <div class="text-4xl sm:text-5xl mb-4 text-red-500">
+                            <div class="text-4xl sm:text-5xl mb-4 text-red-500 dark:text-red-400">
                                 <i class="fa-solid fa-circle-xmark"></i>
                             </div>
 
                             <!-- JUDUL -->
-                            <h2 class="text-xl sm:text-2xl font-bold mb-2">
+                            <h2 class="text-xl sm:text-2xl font-bold mb-2 text-gray-900 dark:text-white">
                                 Tetap Semangat!
                             </h2>
 
                             <!-- DESKRIPSI -->
-                            <p class="text-gray-600 mb-4 text-sm sm:text-base">
+                            <p class="text-gray-600 dark:text-gray-400 mb-4 text-sm sm:text-base">
                                 Nilai kamu masih di bawah KKM. Jangan menyerah, coba lagi ya!
                             </p>
 
                             <!-- NILAI -->
-                            <div class="text-3xl sm:text-4xl font-bold mb-2 text-red-600">
+                            <div class="text-3xl sm:text-4xl font-bold mb-2 text-red-600 dark:text-red-500">
                                 ${data.skor_kuis_ini} / 100
                             </div>
 
                             <!-- DURASI -->
-                            <p class="text-[11px] text-gray-400 font-medium mb-6">
+                            <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium mb-6">
                                 <i class="fa-regular fa-clock mr-1"></i> Waktu pengerjaan: ${formatDurasi(data.waktu_pengerjaan)}
                             </p>
 
                             <!-- PESAN MOTIVASI -->
-                            <p class="text-gray-500 mb-6 text-sm sm:text-base">
+                            <p class="text-gray-500 dark:text-gray-400 mb-6 text-sm sm:text-base">
                                 Kamu bisa lebih baik lagi! Perbanyak latihan dan jangan takut mencoba.
                             </p>
 

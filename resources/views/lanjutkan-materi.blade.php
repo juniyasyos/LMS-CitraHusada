@@ -7,29 +7,29 @@
         @include('components.header')
     </div>
 
-    <div class="flex flex-col lg:flex-row min-h-screen">
+    <div class="flex flex-col lg:flex-row min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
 
         <!-- SIDEBAR MATERI -->
         <aside
-            class="order-3 lg:order-1 w-full lg:w-72 bg-white border-t lg:border-t-0 lg:border-r p-4 lg:p-6 max-h-[300px] overflow-y-auto lg:max-h-none">
+            class="order-3 lg:order-1 w-full lg:w-72 bg-white dark:bg-slate-900 border-t dark:border-slate-800 lg:border-t-0 lg:border-r lg:dark:border-slate-800 p-4 lg:p-6 max-h-[300px] overflow-y-auto lg:max-h-none transition-colors duration-300">
 
-            <h2 class="font-bold text-base lg:text-lg mb-4">
+            <h2 class="font-bold text-base lg:text-lg mb-4 text-gray-900 dark:text-white">
                 Progress Belajar
             </h2>
 
             <!-- PROGRESS BAR -->
             <div class="mb-6">
-                <div class="flex justify-between text-sm mb-1">
+                <div class="flex justify-between text-sm mb-1 text-gray-900 dark:text-white">
                     <span>Progress</span>
-                    <span id="progressText" class="font-medium text-blue-600">0%</span>
+                    <span id="progressText" class="font-medium text-blue-600 dark:text-blue-400">0%</span>
                 </div>
 
-                <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2">
                     <div id="progressBar" class="bg-blue-600 h-2 rounded-full" style="width: 0%"></div>
                 </div>
             </div>
 
-            <h2 class="font-semibold text-sm lg:text-md mb-3">
+            <h2 class="font-semibold text-sm lg:text-md mb-3 text-gray-900 dark:text-white">
                 Daftar Materi
             </h2>
 
@@ -43,13 +43,13 @@
 
             <!-- BUTTON KELUAR -->
             <a href="/detail-materi/{{ $materiId }}"
-                class="inline-flex items-center gap-2 text-gray-600 hover:text-red-500 mb-6 transition">
+                class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 mb-6 transition">
                 <i class="fas fa-times text-lg"></i>
                 <span>Kembali</span>
             </a>
 
             <!-- JUDUL VIDEO -->
-            <h1 id="judulMateriAktif" class="text-lg sm:text-xl lg:text-2xl font-bold mb-6"></h1>
+            <h1 id="judulMateriAktif" class="text-lg sm:text-xl lg:text-2xl font-bold mb-6 text-gray-900 dark:text-white"></h1>
             {{-- <h1 class="text-lg sm:text-xl lg:text-2xl font-bold mb-6">
                 Introduction Keselamatan Pasien
             </h1> --}}
@@ -60,31 +60,31 @@
             </div>
 
             <!-- PENJELASAN MATERI -->
-            <div id="tentangMateriBox" class="bg-white border rounded-xl p-4 sm:p-6">
-                <h2 class="text-base lg:text-lg font-semibold mb-3">
+            <div id="tentangMateriBox" class="bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-4 sm:p-6 transition-colors duration-300">
+                <h2 class="text-base lg:text-lg font-semibold mb-3 text-gray-900 dark:text-white">
                     Tentang Materi
                 </h2>
 
-                <p id="deskripsiMateri" class="text-gray-600 leading-relaxed text-sm sm:text-base"></p>
+                <p id="deskripsiMateri" class="text-gray-600 dark:text-gray-300 leading-relaxed text-sm sm:text-base"></p>
             </div>
         </main>
     </div>
 
     <!-- TOAST PERCOBAAN HABIS -->
     <div id="quizLimitAlert"
-        class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-white border-l-4 border-red-500 text-gray-800 px-6 py-4 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center gap-4 transition-all duration-300 opacity-0 -translate-y-10 pointer-events-none min-w-[320px]">
+        class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-slate-900 border-l-4 border-red-500 text-gray-800 dark:text-white px-6 py-4 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center gap-4 transition-all duration-300 opacity-0 -translate-y-10 pointer-events-none min-w-[320px]">
 
         <!-- ICON -->
-        <div class="bg-red-50 text-red-500 rounded-full w-10 h-10 flex items-center justify-center shrink-0">
+        <div class="bg-red-50 dark:bg-red-500/20 text-red-500 rounded-full w-10 h-10 flex items-center justify-center shrink-0">
             <i class="fa-solid fa-circle-xmark text-lg"></i>
         </div>
 
         <!-- TEXT -->
         <div>
-            <h4 class="font-bold text-sm sm:text-base text-gray-900">
+            <h4 class="font-bold text-sm sm:text-base text-gray-900 dark:text-white">
                 Percobaan Habis
             </h4>
-            <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
+            <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                 Kamu sudah mencapai batas maksimal percobaan kuis.
             </p>
         </div>
@@ -180,22 +180,22 @@
                 let isOpened = step.urutan === activeUrutan;
                 let isUnlocked = step.urutan <= urutanSelesai + 1;
 
-                let icon = "fa-lock text-gray-400";
-                let classItem = "text-gray-400 cursor-not-allowed";
+                let icon = "fa-lock text-gray-400 dark:text-gray-500";
+                let classItem = "text-gray-400 dark:text-gray-500 cursor-not-allowed";
                 let status = "lock";
 
                 if (isOpened) {
-                    icon = "fa-play text-blue-500";
-                    classItem = "bg-blue-100 text-blue-600 font-medium";
+                    icon = "fa-play text-blue-500 dark:text-blue-400";
+                    classItem = "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium";
                     status = "aktif";
                 } else if (isUnlocked) {
                     if (step.urutan <= urutanSelesai) {
-                        icon = "fa-circle-check text-green-500";
-                        classItem = "text-gray-800 font-medium hover:bg-gray-100";
+                        icon = "fa-circle-check text-green-500 dark:text-green-400";
+                        classItem = "text-gray-800 dark:text-gray-200 font-medium hover:bg-gray-100 dark:hover:bg-slate-800";
                         status = "selesai";
                     } else {
-                        icon = "fa-unlock text-gray-600";
-                        classItem = "text-gray-800 font-medium hover:bg-gray-100";
+                        icon = "fa-unlock text-gray-600 dark:text-gray-400";
+                        classItem = "text-gray-800 dark:text-gray-200 font-medium hover:bg-gray-100 dark:hover:bg-slate-800";
                         status = "unlocked";
                     }
                 }
@@ -266,20 +266,20 @@
                     }
 
                     viewer.innerHTML = `
-                    <div class="bg-white border rounded-xl p-6 text-center">
-                        <h2 class="text-3xl font-bold text-black">
+                    <div class="bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-6 text-center">
+                        <h2 class="text-3xl font-bold text-black dark:text-white">
                             ${skor} %
                         </h2>
-                        <p class="text-gray-500 mb-3">
+                        <p class="text-gray-500 dark:text-gray-400 mb-3">
                             FINAL SCORE
                         </p>
 
                         ${skor >= 75
-                            ? `<p class="text-green-600 font-semibold">Memenuhi KKM</p>`
-                            : `<p class="text-orange-500 font-semibold">Di Bawah KKM (Boleh lanjut / Remidi)</p>`
+                            ? `<p class="text-green-600 dark:text-green-400 font-semibold">Memenuhi KKM</p>`
+                            : `<p class="text-orange-500 dark:text-orange-400 font-semibold">Di Bawah KKM (Boleh lanjut / Remidi)</p>`
                         }
 
-                        <p class="text-gray-500 mt-3">
+                        <p class="text-gray-500 dark:text-gray-400 mt-3">
                             Kuis sudah pernah dikerjakan.
                         </p>
 
@@ -291,28 +291,28 @@
 
                     // tampilan default (belum pernah kuis)
                     viewer.innerHTML = `
-                    <div class="bg-white border rounded-xl p-6 text-center">
-                        <h2 class="text-lg font-semibold mb-3">Kuis</h2>
-                        <p class="text-gray-600 mb-4">
+                    <div class="bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-6 text-center">
+                        <h2 class="text-lg font-semibold mb-3 text-gray-900 dark:text-white">Kuis</h2>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">
                             Anda akan memulai Kuis untuk materi ini.
                         </p>
 
-                        <div class="flex justify-center gap-6 text-sm mb-6">
-                            <span class="bg-blue-100 px-4 py-2 rounded-lg">
+                        <div class="flex justify-center gap-6 text-sm mb-6 text-gray-900 dark:text-gray-200">
+                            <span class="bg-blue-100 dark:bg-blue-900/30 px-4 py-2 rounded-lg">
                                 ${step.jumlah_soal} Soal
                             </span>
 
-                            <span class="bg-blue-100 px-4 py-2 rounded-lg">
+                            <span class="bg-blue-100 dark:bg-blue-900/30 px-4 py-2 rounded-lg">
                                 ${step.waktu_pengerjaan} Detik
                             </span>
 
-                            <span class="bg-blue-100 px-4 py-2 rounded-lg">
+                            <span class="bg-blue-100 dark:bg-blue-900/30 px-4 py-2 rounded-lg">
                                 ${step.max_attempt} Percobaan
                             </span>
                         </div>
 
                         <button onclick="mulaiKuis()"
-                        class="bg-blue-600 text-white px-6 py-3 rounded-lg">
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition">
                             Mulai Test
                         </button>
                     </div>
@@ -373,36 +373,39 @@
             //     loadPDF(url);
             // }
 
-            else if (["pdf", "ppt", "pptx", "doc", "docx", "xls", "xlsx"].includes(ext)) {
+            else if (["pdf", "ppt", "pptx", "doc", "docx"].includes(ext)) {
                 const fullUrl = window.location.origin + url;
                 let iframeSrc = url;
 
                 if (ext !== 'pdf') {
-                    iframeSrc = "https://docs.google.com/gview?url=" + encodeURIComponent(fullUrl) + "&embedded=true";
+                    iframeSrc = "https://view.officeapps.live.com/op/embed.aspx?src=" + encodeURIComponent(fullUrl);
                 }
 
                 viewer.innerHTML = `
-                <div class="bg-white border rounded-xl overflow-hidden">
+                <div class="bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-xl overflow-hidden flex flex-col">
+                    ${ext !== 'pdf' ? `
+                    <div class="p-3 bg-yellow-50 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 text-sm border-b dark:border-yellow-700/50">
+                        <i class="fa-solid fa-circle-info mr-2"></i>
+                        Jika dokumen tidak tampil (karena web diakses dari localhost), silakan 
+                        <a href="${url}" target="_blank" download class="font-bold underline text-blue-600 dark:text-blue-400">Download/Buka File</a>.
+                    </div>
+                    ` : ''}
                     <iframe 
                         src="${iframeSrc}" 
-                        class="w-full h-[600px]">
+                        class="w-full h-[600px] bg-gray-50 dark:bg-slate-800">
                     </iframe>
 
-                    <div class="p-4 text-right">
+                    <div class="p-4 text-right bg-white dark:bg-slate-900 border-t dark:border-slate-800 mt-auto">
                         <button onclick="updateProgress(${step.urutan})"
-                        class="bg-blue-600 text-white px-5 py-2 rounded-lg">
+                        class="bg-blue-600 hover:bg-blue-700 transition text-white px-5 py-2 rounded-lg">
                             Tandai Sudah Dibaca
                         </button>
                     </div>
                 </div>
                 `;
             }
-            else if (["jpg", "jpeg", "png", "webp"].includes(ext)) {
-                viewer.innerHTML = `
-                <div class="bg-white border rounded-xl p-4 text-center">
-                    <img src="${url}" class="mx-auto max-h-[600px]">
-                </div>
-                `;
+            else {
+                 viewer.innerHTML = `<div class="bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-xl p-6 text-center text-gray-500 dark:text-gray-400">Format file tidak didukung.</div>`;
             }
         }
 

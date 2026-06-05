@@ -14,6 +14,7 @@ class Notification extends Model
         'title',
         'message',
         'is_read',
+        'notif_admin',
         'data'
     ];
 

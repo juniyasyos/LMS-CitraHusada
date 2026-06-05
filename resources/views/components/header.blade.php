@@ -1,4 +1,4 @@
-<div class="flex justify-between items-center p-4 border-b border-gray-200">
+<div class="flex justify-between items-center p-4 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 transition-colors duration-300">
 
     <!-- LOGO -->
     <div class="flex items-center gap-2">
@@ -6,7 +6,7 @@
 
         <div>
             <h1 class="text-red-600 font-bold text-lg">Citra Husada</h1>
-            <p class="text-green-600 text-sm">Learning Management System</p>
+            <p class="text-green-600 dark:text-green-400 text-sm">Learning Management System</p>
         </div>
     </div>
 
@@ -16,8 +16,8 @@
         @include('components.notif')
 
         <div class="text-right">
-            <p id="headerNama" class="font-medium">-</p>
-            <p id="headerUnit" class="text-sm text-gray-500">-</p>
+            <p id="headerNama" class="font-medium text-gray-800 dark:text-white">-</p>
+            <p id="headerUnit" class="text-sm text-gray-500 dark:text-gray-300">-</p>
         </div>
     </div>
 </div>

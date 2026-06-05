@@ -15,10 +15,8 @@ class NotificationController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $isAdmin = ($user->role_id == 1);
 
         $notifications = Notification::where('user_id', $user->user_id)
-            ->where('notif_admin', $isAdmin)
             ->orderBy('is_read', 'asc')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -36,16 +34,13 @@ class NotificationController extends Controller
     public function unread()
     {
         $user = Auth::user();
-        $isAdmin = ($user->role_id == 1);
 
         $notifications = Notification::where('user_id', $user->user_id)
-            ->where('notif_admin', $isAdmin)
             ->where('is_read', false)
             ->orderBy('created_at', 'desc')
             ->get();
 
         $totalAll = Notification::where('user_id', $user->user_id)
-            ->where('notif_admin', $isAdmin)
             ->count();
 
         return response()->json([
@@ -61,10 +56,8 @@ class NotificationController extends Controller
     public function countUnread()
     {
         $user = Auth::user();
-        $isAdmin = ($user->role_id == 1);
 
         $count = Notification::where('user_id', $user->user_id)
-            ->where('notif_admin', $isAdmin)
             ->where('is_read', false)
             ->count();
 
@@ -80,11 +73,9 @@ class NotificationController extends Controller
     public function markAsRead($id)
     {
         $user = Auth::user();
-        $isAdmin = ($user->role_id == 1);
 
         $notification = Notification::where('id', $id)
             ->where('user_id', $user->user_id)
-            ->where('notif_admin', $isAdmin)
             ->first();
 
         if (!$notification) {
@@ -109,10 +100,8 @@ class NotificationController extends Controller
     public function markAllAsRead()
     {
         $user = Auth::user();
-        $isAdmin = ($user->role_id == 1);
 
         Notification::where('user_id', $user->user_id)
-            ->where('notif_admin', $isAdmin)
             ->where('is_read', false)
             ->update(['is_read' => true]);
 
@@ -128,11 +117,9 @@ class NotificationController extends Controller
     public function destroy($id)
     {
         $user = Auth::user();
-        $isAdmin = ($user->role_id == 1);
 
         $notification = Notification::where('id', $id)
             ->where('user_id', $user->user_id)
-            ->where('notif_admin', $isAdmin)
             ->first();
 
         if (!$notification) {
