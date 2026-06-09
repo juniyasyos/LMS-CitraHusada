@@ -242,10 +242,12 @@
                                                     <template x-if="report.sertifikat_status">
                                                         <span
                                                             class="text-[9px] px-2 py-1 rounded-full border font-bold"
-                                                            :class="report.sertifikat_status === 'Disetujui'
-                                                                ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                                                                : 'bg-amber-50 text-amber-600 border-amber-100'"
-                                                            x-text="report.sertifikat_status">
+                                                            :class="{
+                                                                'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800': report.sertifikat_status === 'Disetujui',
+                                                                'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800': report.sertifikat_status === 'Belum Disetujui' || report.sertifikat_status === 'Menunggu',
+                                                                'bg-red-50 text-red-600 border-red-100 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800': report.sertifikat_status === 'Tidak Disetujui' || report.sertifikat_status === 'Ditolak'
+                                                            }"
+                                                            x-text="report.sertifikat_status === 'Ditolak' ? 'Tidak Disetujui' : report.sertifikat_status">
                                                         </span>
                                                     </template>
 
@@ -260,9 +262,11 @@
                                             <td class="py-4 px-6 text-center">
                                                 <template x-if="report.status === 'Selesai'">
                                                     <div>
-                                                        <button @click="viewUserSertifikat(report.user_id, report.materi_id)" class="text-blue-600 hover:text-blue-800 transition">
-                                                            <i class="fa-solid fa-eye"></i>
-                                                        </button>
+                                                        <template x-if="report.sertifikat_status !== 'Tidak Disetujui' && report.sertifikat_status !== 'Ditolak'">
+                                                            <button @click="viewUserSertifikat(report)" class="text-blue-600 hover:text-blue-800 transition">
+                                                                <i class="fa-solid fa-eye"></i>
+                                                            </button>
+                                                        </template>
                                                         @if(auth()->check() && auth()->user()->role_id == 2)
                                                             <a :href="`validasi-pelatihan/${report.user_id}/${report.materi_id}`" class="hover:text-emerald-600 transition"><i class="fa-solid fa-file-circle-check"></i></a>
                                                         @endif
@@ -405,7 +409,7 @@
         </div>
 
         {{-- Modal Pop-Up Sertifikat --}}
-        <div x-show="openSertifikat" class="fixed inset-0 z-[100] flex items-center justify-center p-4" x-cloak>
+        <div x-show="openSertifikat" class="fixed inset-0 z-[100] flex items-center justify-center p-4" x-data="{ currentSlide: 'depan' }" x-effect="if(!openSertifikat) { currentSlide = 'depan'; sertifikatPdfUrl = null; }" x-cloak>
             <div x-show="openSertifikat" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
                 x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
                 x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
@@ -427,18 +431,61 @@
                         <p class="text-sm text-gray-500 dark:text-gray-400 font-bold">Membuat sertifikat...</p>
                     </div>
                     
-                    <div x-show="!sertifikatLoading" class="flex flex-col gap-8 max-w-3xl mx-auto">
-                        {{-- Bagian Depan --}}
-                        <div>
-                            <h4 class="text-xs font-bold text-gray-600 dark:text-gray-400 mb-3 uppercase">Bagian Depan</h4>
-                            <img :src="sertifikatDepanUrl" class="w-full h-auto rounded-lg shadow-lg border border-gray-200 dark:border-slate-700" alt="Sertifikat Depan">
-                        </div>
-                        
-                        {{-- Bagian Belakang --}}
-                        <div>
-                            <h4 class="text-xs font-bold text-gray-600 dark:text-gray-400 mb-3 uppercase">Bagian Belakang</h4>
-                            <img :src="sertifikatBelakangUrl" class="w-full h-auto rounded-lg shadow-lg border border-gray-200 dark:border-slate-700" alt="Sertifikat Belakang">
-                        </div>
+                    <div x-show="!sertifikatLoading" class="w-full">
+                        <!-- PDF Viewer if sertifikatPdfUrl is set -->
+                        <template x-if="sertifikatPdfUrl">
+                            <div class="w-full h-[65vh] rounded-xl overflow-hidden border dark:border-slate-800 bg-white dark:bg-slate-900">
+                                <iframe :src="sertifikatPdfUrl" class="w-full h-full" frameborder="0"></iframe>
+                            </div>
+                        </template>
+
+                        <!-- Slider view if it's dynamic generation -->
+                        <template x-if="!sertifikatPdfUrl">
+                            <div class="relative max-w-3xl mx-auto group">
+                                <!-- Slide Container -->
+                                <div class="relative overflow-hidden w-full">
+                                    <!-- Slide Bagian Depan -->
+                                    <div x-show="currentSlide === 'depan'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-x-8" x-transition:enter-end="opacity-100 transform translate-x-0" class="w-full">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <h4 class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase">Bagian Depan</h4>
+                                            <span class="text-xs font-bold text-gray-400">Halaman 1 dari 2</span>
+                                        </div>
+                                        <img :src="sertifikatDepanUrl" class="w-full h-auto rounded-lg shadow-lg border border-gray-200 dark:border-slate-700" alt="Sertifikat Depan">
+                                    </div>
+                                    
+                                    <!-- Slide Bagian Belakang -->
+                                    <div x-show="currentSlide === 'belakang'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-x-8" x-transition:enter-end="opacity-100 transform translate-x-0" class="w-full" x-cloak>
+                                        <div class="flex items-center justify-between mb-3">
+                                            <h4 class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase">Bagian Belakang</h4>
+                                            <span class="text-xs font-bold text-gray-400">Halaman 2 dari 2</span>
+                                        </div>
+                                        <img :src="sertifikatBelakangUrl" class="w-full h-auto rounded-lg shadow-lg border border-gray-200 dark:border-slate-700" alt="Sertifikat Belakang">
+                                    </div>
+                                </div>
+
+                                <!-- Tombol Navigasi Kiri -->
+                                <button type="button" 
+                                    x-show="currentSlide === 'belakang'"
+                                    @click="currentSlide = 'depan'"
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white dark:bg-slate-900/80 dark:hover:bg-slate-900 text-gray-800 dark:text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition active:scale-95 border dark:border-slate-700">
+                                    <i class="fa-solid fa-chevron-left text-sm"></i>
+                                </button>
+
+                                <!-- Tombol Navigasi Kanan -->
+                                <button type="button" 
+                                    x-show="currentSlide === 'depan'"
+                                    @click="currentSlide = 'belakang'"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white dark:bg-slate-900/80 dark:hover:bg-slate-900 text-gray-800 dark:text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition active:scale-95 border dark:border-slate-700">
+                                    <i class="fa-solid fa-chevron-right text-sm"></i>
+                                </button>
+                                
+                                <!-- Indicator dots under the slide -->
+                                <div class="flex justify-center gap-2 mt-4">
+                                    <button type="button" @click="currentSlide = 'depan'" :class="currentSlide === 'depan' ? 'bg-blue-600 w-6' : 'bg-gray-300 dark:bg-slate-700 w-2'" class="h-2 rounded-full transition-all duration-300"></button>
+                                    <button type="button" @click="currentSlide = 'belakang'" :class="currentSlide === 'belakang' ? 'bg-blue-600 w-6' : 'bg-gray-300 dark:bg-slate-700 w-2'" class="h-2 rounded-full transition-all duration-300"></button>
+                                </div>
+                            </div>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -515,6 +562,7 @@
             isLoading: true,
             sertifikatDepanUrl: null,
             sertifikatBelakangUrl: null,
+            sertifikatPdfUrl: null,
             sertifikatLoading: false,
             stats: {
                 total_peserta: 0,
@@ -662,11 +710,21 @@
                 return str ? '?' + str : '';
             },
 
-            async viewUserSertifikat(userId, materiId) {
+            async viewUserSertifikat(report) {
                 this.openSertifikat = true;
+                this.sertifikatPdfUrl = null;
+
+                if (report.sertifikat_status === 'Disetujui' && report.sertifikat_image_path) {
+                    this.sertifikatLoading = false;
+                    this.sertifikatPdfUrl = '/storage/' + report.sertifikat_image_path;
+                    return;
+                }
+
                 this.sertifikatLoading = true;
                 this.sertifikatDepanUrl = null;
                 this.sertifikatBelakangUrl = null;
+                const userId = report.user_id;
+                const materiId = report.materi_id;
 
                 try {
                     const token = localStorage.getItem('access_token') || '';

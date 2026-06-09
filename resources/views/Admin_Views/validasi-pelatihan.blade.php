@@ -30,7 +30,7 @@
                     </li>
                     <li class="flex items-center gap-2">
                         <span class="text-gray-300 dark:text-gray-600"> > </span>
-                        <span class="text-gray-800 dark:text-white font-semibold">Validasi Pelatihan</span>
+                        <span class="text-gray-800 dark:text-white font-semibold">Verifikasi Pelatihan</span>
                     </li>
                 </ol>
             </nav>
@@ -344,7 +344,7 @@
                         Toast.fire({
                             icon: 'success',
                             title: 'Berhasil!',
-                            text: 'Validasi berhasil.',
+                            text: 'Verifikasi berhasil.',
                         });
 
                         setTimeout(() => {

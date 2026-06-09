@@ -4,6 +4,27 @@ function getToken() {
     return localStorage.getItem('token') || sessionStorage.getItem('token');
 }
 
+function performWebLogout() {
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
+    
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/logout';
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    if (csrfToken) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = '_token';
+        input.value = csrfToken;
+        form.appendChild(input);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+}
+
 // Global Frontend Route Protection
 const token = getToken();
 const isLoginPage = window.location.pathname === '/' || window.location.pathname === '/login';
@@ -12,8 +33,12 @@ const isServerLoggedIn = document.querySelector('meta[name="user-logged-in"]')?.
 if (isLoginPage && !isServerLoggedIn) {
     localStorage.removeItem('token');
     sessionStorage.removeItem('token');
-} else if (!token && !isLoginPage && !isServerLoggedIn) {
-    window.location.href = '/';
+} else if (!token && !isLoginPage) {
+    if (isServerLoggedIn) {
+        performWebLogout();
+    } else {
+        window.location.href = '/';
+    }
 } else if (token && isLoginPage && isServerLoggedIn) {
     window.location.href = '/pembelajaran';
 }
@@ -35,9 +60,13 @@ window.axios.interceptors.response.use(
     function (error) {
         if (error.response && error.response.status === 401 && !isLoginPage) {
             // Remove token and clear session on server side failure
-            localStorage.removeItem('token');
-            sessionStorage.removeItem('token');
-            window.location.href = '/';
+            if (isServerLoggedIn) {
+                performWebLogout();
+            } else {
+                localStorage.removeItem('token');
+                sessionStorage.removeItem('token');
+                window.location.href = '/';
+            }
         }
         return Promise.reject(error);
     }

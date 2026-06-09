@@ -61,7 +61,7 @@
                             <select x-model="filters.status"
                                 class="w-full border-gray-200 dark:border-slate-700 rounded-lg text-xs p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-white">
                                 <option value="">Semua Status</option>
-                                <option value="Menunggu">Belum Disetujui</option>
+                                <option value="Belum Disetujui">Belum Disetujui</option>
                                 <option value="Disetujui">Disetujui</option>
                                 <option value="Ditolak">Tidak Disetujui</option>
                             </select>
@@ -125,10 +125,10 @@
                                                     class="font-bold text-[10px] px-2.5 py-1 rounded-full border"
                                                     :class="{
                                                         'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800': item.status === 'Disetujui',
-                                                        'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800': item.status === 'Menunggu',
-                                                        'bg-red-50 text-red-600 border-red-100 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800': item.status === 'Ditolak'
+                                                        'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800': item.status === 'Belum Disetujui' || item.status === 'Menunggu',
+                                                        'bg-red-50 text-red-600 border-red-100 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800': item.status === 'Tidak Disetujui' || item.status === 'Ditolak',
                                                     }"
-                                                    x-text="item.status">
+                                                    x-text="item.status === 'Ditolak' ? 'Tidak Disetujui' : item.status">
                                                 </span>
                                             </td>
                                             <td class="py-4 px-6 text-center">

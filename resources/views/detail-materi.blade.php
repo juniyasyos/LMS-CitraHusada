@@ -125,21 +125,21 @@ function renderSteps(steps, urutanSelesai, materiStatus) {
 
         container.innerHTML += `
         <div ${onclickAction}
-            class="flex items-center justify-between p-4 sm:p-5 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-xl transition ${cursorStyle}"
+            class="flex items-center justify-between p-4 sm:p-5 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-xl transition ${cursorStyle}">
 
             <!-- LEFT -->
-            <div class="flex items-center gap-3 sm:gap-4">
-                <i class="fa-solid ${icon} text-xl sm:text-2xl"></i>
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <i class="fa-solid ${icon} text-xl sm:text-2xl shrink-0"></i>
 
-                <div>
-                    <p class="font-medium text-sm sm:text-base text-gray-900 dark:text-white">
+                <div class="min-w-0">
+                    <p class="font-medium text-sm sm:text-base text-gray-900 dark:text-white break-words">
                         ${step.judul}
                     </p>
                 </div>
             </div>
 
             <!-- STATUS -->
-            <span class="text-white ${warna} px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm shadow-sm">
+            <span class="text-white ${warna} px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm shadow-sm shrink-0">
                 ${statusText}
             </span>
 

@@ -50,7 +50,7 @@
                     </li>
                     <li class="flex items-center gap-2">
                         <span class="text-gray-300 dark:text-gray-600"> > </span>
-                        <span class="text-gray-800 dark:text-white font-semibold">Review Pelatihan</span>
+                        <span class="text-gray-800 dark:text-white font-semibold">Validasi Pelatihan</span>
                     </li>
                 </ol>
             </nav>
@@ -70,7 +70,7 @@
                         :class="{
                             'bg-emerald-50 text-emerald-600 border-emerald-100': status === 'Disetujui',
                             'bg-amber-50 text-amber-600 border-amber-100': status === 'Belum Disetujui' || status === 'Menunggu',
-                            'bg-red-50 text-red-600 border-red-100': status === 'Ditolak'
+                            'bg-red-50 text-red-600 border-red-100 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800': status === 'Ditolak' || status === 'Tidak Disetujui'
                         }"
                         x-text="status"></span>
                 </div>
@@ -136,7 +136,7 @@
 
                         <div class="pt-5 flex justify-center"> 
                             <button @click="openModalVerifikasi = true" class="bg-blue-600 hover:bg-blue-700 text-white px-10 py-3 rounded-xl text-[12px] font-bold shadow-lg shadow-blue-200 dark:shadow-none transition-all active:scale-95">
-                                Simpan Verifikasi
+                                Simpan Validasi
                             </button>
                         </div>
                     </div>

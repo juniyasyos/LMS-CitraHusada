@@ -120,9 +120,9 @@ Route::middleware('auth')->group(function () {
                 return view('Admin_Views.kelola-ttd');
             })->name('kelola-ttd');
 
-            Route::get('/review-pelatihan/{sertifikatEksternalId}', [\App\Http\Controllers\Api\LaporanMonitoringController::class, 'showReviewPelatihan'])->name('admin.review-pelatihan');
+            Route::get('/validasi-pelatihan/{sertifikatEksternalId}', [\App\Http\Controllers\Api\LaporanMonitoringController::class, 'showReviewPelatihan'])->name('admin.review-pelatihan');
             
-            Route::get('/validasi-pelatihan/{userId}/{materiId}', [\App\Http\Controllers\Api\SertifikatController::class, 'showValidasi'])->name('admin.validasi-pelatihan');
+            Route::get('/verifikasi-pelatihan/{userId}/{materiId}', [\App\Http\Controllers\Api\SertifikatController::class, 'showValidasi'])->name('admin.validasi-pelatihan');
         });
     });
 

@@ -26,8 +26,6 @@
             <p id="dynamicText" class="text-gray-500 text-xs sm:text-sm mt-1">
             </p>
         </div>
-        {{-- Error Container --}}
-        <div id="errorContainer" class="mb-4 text-red-600 hidden text-sm"></div>
         
         {{-- Form --}}
         <form id="loginForm" class="space-y-5" onsubmit="handleLogin(event)">
@@ -81,6 +79,12 @@
                 </div>
             </div>
 
+            {{-- Error Container --}}
+            <div id="errorContainer" class="hidden text-red-600 text-xs font-semibold bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
+                <i class="fa-solid fa-circle-exclamation text-sm shrink-0 text-red-500"></i>
+                <span id="errorText"></span>
+            </div>
+
             {{-- Remember me --}}
             <div class="flex items-center gap-2">
                 <input type="checkbox" id="rememberInput" name="remember" class="w-4 h-4 text-blue-600 rounded">
@@ -111,8 +115,13 @@ async function handleLogin(event) {
     const password = document.getElementById('passwordInput').value;
     const loginBtn = document.getElementById('loginBtn');
     const errorContainer = document.getElementById('errorContainer');
+    const errorText = document.getElementById('errorText');
 
     console.log('Input values:', { nik, password });
+
+    // Reset error container
+    errorContainer.classList.add('hidden');
+    errorContainer.classList.remove('flex');
 
     // Disable button dan show loading
     loginBtn.disabled = true;
@@ -154,8 +163,9 @@ async function handleLogin(event) {
         else {
             // Login gagal
             console.log('Step 3b: Login failed:', response.data.message);
-            errorContainer.textContent = response.data.message;
+            if (errorText) errorText.textContent = response.data.message;
             errorContainer.classList.remove('hidden');
+            errorContainer.classList.add('flex');
         }
     } catch (error) {
         // Handle error
@@ -182,9 +192,9 @@ async function handleLogin(event) {
             errorMsg = error.message;
         }
         
-        errorContainer.textContent = errorMsg;
+        if (errorText) errorText.textContent = errorMsg;
         errorContainer.classList.remove('hidden');
-        alert('🚨 ' + errorMsg); // Also show alert to make sure user sees the error
+        errorContainer.classList.add('flex');
     } finally {
         // Re-enable button
         loginBtn.disabled = false;

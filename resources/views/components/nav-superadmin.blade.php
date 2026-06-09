@@ -24,14 +24,14 @@
         @if(auth()->user()->role_id == 1 && !session()->has('impersonate_by'))
         <!-- BERANDA -->
         <a href="/beranda-superadmin" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
-        {{ request()->is('beranda-superadmin*') ? $active : $inactive }}">
+        {{ request()->is('beranda-superadmin*', 'detail-leaderboard*') ? $active : $inactive }}">
             <i class="fa-brands fa-microsoft text-sm"></i>
             Beranda
         </a>
 
         <!-- MANAJEMEN PENGGUNA -->
         <a href="/manajemen-pengguna" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
-        {{ request()->is('manajemen-pengguna*') ? $active : $inactive }}">
+        {{ request()->is('manajemen-pengguna*', 'tambah-peran*') ? $active : $inactive }}">
             <i class="fa-solid fa-users text-sm"></i>
             Manajemen Pengguna
         </a>
@@ -45,7 +45,7 @@
 
         <!-- MANAJEMEN PELATIHAN -->
         <a href="/manajemen-pelatihan" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
-        {{ request()->is('manajemen-pelatihan*') ? $active : $inactive }}">
+        {{ request()->is('manajemen-pelatihan*', 'daftar-materi-kuis*', 'arsip-pelatihan/daftar-materi-kuis*', 'arsip-pelatihan', 'sampah-pelatihan') ? $active : $inactive }}">
             <i class="fa-solid fa-circle-play text-sm"></i>
             Manajemen Media
         </a>
@@ -84,7 +84,7 @@
 
         <!-- LAPORAN -->
         <a href="/laporan-monitoring" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
-        {{ request()->is('laporan-monitoring*') ? $active : $inactive }}">
+        {{ request()->is('laporan-monitoring*', 'validasi-pelatihan*', 'review-pelatihan*') ? $active : $inactive }}">
             <i class="fa-solid fa-file-lines text-sm"></i>
             Laporan & Monitoring
         </a>
@@ -100,7 +100,7 @@
 
         <!-- MANAJEMEN PELATIHAN -->
         <a href="/manajemen-pelatihan" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
-        {{ request()->is('manajemen-pelatihan*') ? $active : $inactive }}">
+        {{ request()->is('manajemen-pelatihan*', 'daftar-materi-kuis*', 'arsip-pelatihan/daftar-materi-kuis*') ? $active : $inactive }}">
             <i class="fa-solid fa-circle-play text-sm"></i>
             Manajemen Media
         </a>

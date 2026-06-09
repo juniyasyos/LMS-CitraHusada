@@ -29,6 +29,8 @@
 
                 <!-- HAMBURGER -->
                 <button id="toggleSidebar" class="lg:hidden text-gray-600 dark:text-gray-300 text-xl">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
 
                 <!-- DESKTOP TEXT -->
                 <div class="hidden lg:block">
@@ -87,19 +89,19 @@
         <div class="grid grid-cols-3 gap-3 mb-8"> 
 
             <button onclick="setActive(this); filterMateri('belum')"
-            class="filter-btn flex-1 flex items-center justify-between px-6 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-slate-800 transition"
+            class="filter-btn flex-1 flex items-center justify-between px-6 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-slate-800 transition">
             <span>Belum Mulai</span>
             <i class="fa-solid fa-exclamation-circle text-gray-400"></i>
             </button>
 
             <button onclick="setActive(this); filterMateri('progres')"
-            class="filter-btn flex-1 flex items-center justify-between px-6 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-slate-800 transition"
+            class="filter-btn flex-1 flex items-center justify-between px-6 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-slate-800 transition">
             <span>Sedang Berjalan</span>
             <i class="fa-solid fa-clock text-gray-400"></i>
             </button>
 
             <button onclick="setActive(this); filterMateri('selesai')"
-            class="filter-btn flex-1 flex items-center justify-between px-6 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-slate-800 transition"
+            class="filter-btn flex-1 flex items-center justify-between px-6 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-slate-800 transition">
             <span>Selesai</span>
             <i class="fa-solid fa-check-circle text-gray-400"></i>
             </button>

@@ -75,7 +75,7 @@
         </div>
         <a href="{{ route('impersonate.stop') }}" 
            class="bg-white text-amber-600 px-4 py-1.5 rounded-full text-[10px] font-black uppercase hover:bg-amber-50 transition active:scale-95 shadow-sm">
-            Kembali ke Admin
+            Kembali ke SuperAdmin
         </a>
     </div>
     <style>

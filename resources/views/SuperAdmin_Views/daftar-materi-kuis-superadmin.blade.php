@@ -196,7 +196,7 @@
                                     @change="formTambahMateri.file = $event.target.files[0]; formTambahMateri.uploadType = $event.target.files.length ? 'video' : null"
                                     class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                                 <i class="fa-solid fa-film text-blue-500 text-2xl mb-2"></i>
-                                <p class="text-[11px] font-bold text-gray-700 dark:text-white uppercase"
+                                <p class="text-[11px] font-bold text-gray-700 dark:text-white uppercase w-full text-center break-all"
                                     x-text="formTambahMateri.uploadType === 'video' ? formTambahMateri.file.name : 'Upload Video'">
                                 </p>
                                 <p class="text-[9px] text-gray-400 mt-1">MP4, MOV (Max 10MB)</p>
@@ -209,7 +209,7 @@
                                     @change="formTambahMateri.file = $event.target.files[0]; formTambahMateri.uploadType = $event.target.files.length ? 'doc' : null"
                                     class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                                 <i class="fa-solid fa-file-pdf text-red-500 text-2xl mb-2"></i>
-                                <p class="text-[11px] font-bold text-gray-700 dark:text-white uppercase"
+                                <p class="text-[11px] font-bold text-gray-700 dark:text-white uppercase w-full text-center break-all"
                                     x-text="formTambahMateri.uploadType === 'doc' ? formTambahMateri.file.name : 'Upload Dokumen'">
                                 </p>
                                 <p class="text-[9px] text-gray-400 mt-1">PDF, PPT (Max 5MB)</p>
@@ -269,7 +269,7 @@
                                     @change="selectedMateri.file = $event.target.files[0]; selectedMateri.uploadType = $event.target.files.length ? 'video' : null"
                                     class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                                 <i class="fa-solid fa-film text-blue-500 text-2xl mb-2"></i>
-                                <p class="text-[11px] font-bold text-gray-700 dark:text-white uppercase"
+                                <p class="text-[11px] font-bold text-gray-700 dark:text-white uppercase w-full text-center break-all"
                                     x-text="selectedMateri.uploadType === 'video' ? selectedMateri.file.name : 'Ganti Video'">
                                 </p>
                                 <p class="text-[9px] text-gray-400 mt-1">Kosongkan jika tidak ingin ganti</p>
@@ -282,7 +282,7 @@
                                     @change="selectedMateri.file = $event.target.files[0]; selectedMateri.uploadType = $event.target.files.length ? 'doc' : null"
                                     class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                                 <i class="fa-solid fa-file-pdf text-red-500 text-2xl mb-2"></i>
-                                <p class="text-[11px] font-bold text-gray-700 dark:text-white uppercase"
+                                <p class="text-[11px] font-bold text-gray-700 dark:text-white uppercase w-full text-center break-all"
                                     x-text="selectedMateri.uploadType === 'doc' ? selectedMateri.file.name : 'Ganti Dokumen'">
                                 </p>
                                 <p class="text-[9px] text-gray-400 mt-1">Kosongkan jika tidak ingin ganti</p>
@@ -324,9 +324,11 @@
                                     <span class="text-xs font-bold text-gray-700 dark:text-white uppercase">Pretest</span>
                                     <span class="text-[10px] text-gray-400 dark:text-gray-500">Aktifkan jika kuis ini merupakan ujian pretest sebelum materi dimulai.</span>
                                 </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
+                                <label class="relative inline-flex items-center cursor-pointer shrink-0">
                                     <input type="checkbox" x-model="formTambahKuis.pretest" class="sr-only peer">
-                                    <div class="w-11 h-6 bg-gray-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-emerald-500"></div>
+
+                                    <div class="w-11 h-6 bg-gray-200 dark:bg-slate-700 rounded-full relative peer-checked:bg-emerald-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:w-5 after:h-5 after:bg-white after:rounded-full after:transition-all peer-checked:after:translate-x-5">
+                                    </div>
                                 </label>
                             </div>
                         </div>

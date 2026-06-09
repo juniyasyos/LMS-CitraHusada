@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\UnitKerjaController;
 use App\Http\Controllers\Api\LogAktivitasController;
 use App\Http\Controllers\Api\ManajemenPelatihanController;
 use App\Http\Controllers\Api\SertifikatController;
+use App\Http\Controllers\Api\RestoreController;
 
 /*
 |--------------------------------------------------------------------------
@@ -132,6 +133,14 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/settings', [BackupController::class, 'updateSettings'])->name('api.backup.settings');
             Route::post('/delete-selected', [BackupController::class, 'deleteSelected'])->name('api.backup.delete-selected');
             Route::post('/reset', [BackupController::class, 'reset'])->name('api.backup.reset');
+        });
+
+        //Restore Backup
+        Route::prefix('restore')->group(function () {
+            Route::get('/backups', [RestoreController::class, 'getBackupFiles'])->name('api.restore.backups');
+            Route::get('/download', [RestoreController::class, 'downloadBackup'])->name('api.restore.download');
+            Route::post('/run', [RestoreController::class, 'restore'])->name('api.restore.run');
+            Route::get('/logs', [RestoreController::class, 'getRestoreLogs'])->name('api.restore.logs');
         });
 
         //Log Aktivitas

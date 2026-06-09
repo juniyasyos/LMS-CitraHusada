@@ -277,6 +277,10 @@ class LaporanMonitoringController extends Controller
             'sertifikat_status' => \App\Models\Sertifikat::select('status')
                 ->whereColumn('sertifikats.user_id', 'user_progress.user_id')
                 ->whereColumn('sertifikats.materi_id', 'user_progress.materi_id')
+                ->limit(1),
+            'sertifikat_image_path' => \App\Models\Sertifikat::select('image_path')
+                ->whereColumn('sertifikats.user_id', 'user_progress.user_id')
+                ->whereColumn('sertifikats.materi_id', 'user_progress.materi_id')
                 ->limit(1)
         ]);
 
