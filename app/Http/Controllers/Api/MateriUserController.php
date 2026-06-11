@@ -132,7 +132,7 @@ class MateriUserController extends Controller
                 'materi_id' => $materi->materi_id,
                 'judul' => $materi->judul,
                 'subjudul' => $materi->subjudul,
-                'image' => $materi->image_path,
+                'image' => $materi->image_path ? Storage::disk('s3')->url($materi->image_path) : null,
                 'jam_pelajaran' => $materi->jam_pelajaran,
                 'tanggal_selesai' => $materi->tanggal_selesai,
                 'progress_percent' => $progressPercent,
@@ -283,8 +283,8 @@ class MateriUserController extends Controller
             $steps->push([
                 'type' => 'sub_materi',
                 'judul' => $sub->judul,
-                'urutan' => $sub->urutan_sub_materi,
-                'file' => $sub->file_materi,
+                'file' => $sub->file_materi ? Storage::disk('s3')->url($sub->file_materi): null,
+                // 'urutan' => $sub->urutan_sub_materi,
                 'deskripsi' => $sub->deskripsi
 
             ]);
