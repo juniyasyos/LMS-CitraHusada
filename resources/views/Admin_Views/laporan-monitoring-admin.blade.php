@@ -613,7 +613,7 @@
                     alert('File sertifikat tidak tersedia.');
                     return;
                 }
-                this.pdfUrl = '/storage/' + imagePath;
+                this.pdfUrl = '{{ Storage::url('') }}' + imagePath;
                 this.openPdfViewer = true;
             },
 
@@ -623,7 +623,7 @@
 
                 if (report.sertifikat_status === 'Disetujui' && report.sertifikat_image_path) {
                     this.sertifikatLoading = false;
-                    this.sertifikatPdfUrl = '/storage/' + report.sertifikat_image_path;
+                    this.sertifikatPdfUrl = '{{ Storage::url('') }}' + report.sertifikat_image_path;
                     return;
                 }
 

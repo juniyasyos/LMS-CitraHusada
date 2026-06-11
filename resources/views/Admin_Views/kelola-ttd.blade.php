@@ -121,7 +121,7 @@
                                     <i class="fa-solid fa-circle-notch fa-spin text-2xl text-blue-500"></i>
                                 </div>
                                 <img 
-                                    :src="previewSertifikatUrl || '{{ asset('storage/materi/Sertifikat/Master_Sertifikat_Depan.png') }}'" 
+                                    :src="previewSertifikatUrl || '{{ Storage::url('materi/Sertifikat/Master_Sertifikat_Depan.png') }}'" 
                                     class="w-full h-auto transition-all duration-500 shadow-lg"
                                     alt="Master Sertifikat Depan"
                                     onerror="this.onerror=null; this.src='https://via.placeholder.com/800x600?text=Gambar+Sertifikat+Depan+Tidak+Ditemukan';"
@@ -137,7 +137,7 @@
                                     <i class="fa-solid fa-circle-notch fa-spin text-2xl text-blue-500"></i>
                                 </div>
                                 <img 
-                                    :src="previewSertifikatUrlBelakang || '{{ asset('storage/materi/Sertifikat/Master_Sertifikat_Belakang.png') }}'" 
+                                    :src="previewSertifikatUrlBelakang || '{{ Storage::url('materi/Sertifikat/Master_Sertifikat_Belakang.png') }}'" 
                                     class="w-full h-auto transition-all duration-500 shadow-lg"
                                     alt="Master Sertifikat Belakang"
                                     onerror="this.onerror=null; this.src='https://via.placeholder.com/800x600?text=Gambar+Sertifikat+Belakang+Tidak+Ditemukan';"
@@ -198,7 +198,7 @@ function kelolaTtdData() {
                     this.form.jabatan = res.data.jabatan || '';
                     this.form.nik = res.data.nik || '';
                     if(res.data.ttd_path) {
-                        this.form.ttd_preview = '/storage/' + res.data.ttd_path;
+                        this.form.ttd_preview = '{{ Storage::url('') }}' + res.data.ttd_path;
                     }
                 }
             } catch(e) {
@@ -250,7 +250,7 @@ function kelolaTtdData() {
                 if(res.success) {
                     // Update preview path if newly uploaded
                     if (res.data && res.data.ttd_path) {
-                        this.form.ttd_preview = '/storage/' + res.data.ttd_path;
+                        this.form.ttd_preview = '{{ Storage::url('') }}' + res.data.ttd_path;
                     }
                     this.form.file_ttd = null; // Clear file after upload
                     Toast.fire({
