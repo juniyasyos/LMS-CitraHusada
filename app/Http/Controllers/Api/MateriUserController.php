@@ -12,6 +12,7 @@ use App\Models\Sertifikat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class MateriUserController extends Controller
 {
@@ -284,7 +285,7 @@ class MateriUserController extends Controller
                 'type' => 'sub_materi',
                 'judul' => $sub->judul,
                 'file' => $sub->file_materi ? Storage::disk('s3')->url($sub->file_materi): null,
-                // 'urutan' => $sub->urutan_sub_materi,
+                'urutan' => $sub->urutan_sub_materi,
                 'deskripsi' => $sub->deskripsi
 
             ]);
