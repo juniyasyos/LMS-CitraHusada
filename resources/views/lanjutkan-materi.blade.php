@@ -322,9 +322,7 @@
                 return;
             }
             
-            const STORAGE_URL = "{{ env('AWS_URL') }}";
-            const file = step.file ?? "";
-            const url = `${STORAGE_URL}/${file}`;
+            const url = step.file ?? "";
             // const url = `/storage/${file}`;
             const ext = file.split('.').pop().toLowerCase();
 
@@ -376,7 +374,7 @@
             // }
 
             else if (["pdf", "ppt", "pptx", "doc", "docx"].includes(ext)) {
-                const fullUrl = window.location.origin + url;
+                const fullUrl = url;
                 let iframeSrc = url;
 
                 if (ext !== 'pdf') {
