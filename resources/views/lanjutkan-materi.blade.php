@@ -321,9 +321,11 @@
 
                 return;
             }
-
+            
+            const STORAGE_URL = "{{ env('AWS_URL') }}";
             const file = step.file ?? "";
-            const url = `/storage/${file}`;
+            const url = `${STORAGE_URL}/${file}`;
+            // const url = `/storage/${file}`;
             const ext = file.split('.').pop().toLowerCase();
 
             if (!file) {
