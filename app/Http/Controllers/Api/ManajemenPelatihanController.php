@@ -85,7 +85,7 @@ class ManajemenPelatihanController extends Controller
         try {
             $imagePath = null;
             if ($request->hasFile('thumbnail')) {
-                $imagePath = $request->file('thumbnail')->store('materi/Cover', 's3');
+                $imagePath = $request->file('thumbnail')->store('materi/Cover');
             }
 
             $materi = Materi::create([
@@ -144,8 +144,8 @@ class ManajemenPelatihanController extends Controller
         try {
             if ($request->hasFile('thumbnail')) {
                 if ($materi->image_path)
-                    Storage::disk('s3')->delete($materi->image_path);
-                $materi->image_path = $request->file('thumbnail')->store('materi/Cover', 's3');
+                    Storage::delete($materi->image_path);
+                $materi->image_path = $request->file('thumbnail')->store('materi/Cover');
             }
 
             $materi->update([
@@ -308,13 +308,13 @@ class ManajemenPelatihanController extends Controller
         try {
             // 1. Hapus file thumbnail fisik
             if ($materi->image_path) {
-                Storage::disk('s3')->delete($materi->image_path);
+                Storage::delete($materi->image_path);
             }
             
             // 2. Hapus file sub-materi fisik & null-kan path-nya
             foreach ($materi->subMateris as $subMateri) {
                 if ($subMateri->file_materi) {
-                    Storage::disk('s3')->delete($subMateri->file_materi);
+                    Storage::delete($subMateri->file_materi);
                 }
                 $subMateri->update(['file_materi' => null]);
             }
@@ -432,7 +432,7 @@ class ManajemenPelatihanController extends Controller
             $folder = 'materi/PPT';
         }
 
-        $path = $file->store($folder, 's3');
+        $path = $file->store($folder);
 
         SubMateri::create([
             'materi_id' => $materiId,
@@ -482,7 +482,7 @@ class ManajemenPelatihanController extends Controller
 
         if ($request->hasFile('file_materi')) {
             if ($sub->file_materi)
-                Storage::disk('s3')->delete($sub->file_materi);
+                Storage::delete($sub->file_materi);
             $file = $request->file('file_materi');
             $ext = $file->getClientOriginalExtension();
             $folder = 'materi/PDF';
@@ -491,7 +491,7 @@ class ManajemenPelatihanController extends Controller
             } elseif (in_array(strtolower($ext), ['ppt', 'pptx'])) {
                 $folder = 'materi/PPT';
             }
-            $sub->file_materi = $file->store($folder, 's3');
+            $sub->file_materi = $file->store($folder);
         }
 
         $sub->update([
@@ -512,7 +512,7 @@ class ManajemenPelatihanController extends Controller
         $judul = $sub->judul;
 
         if ($sub->file_materi)
-            Storage::disk('s3')->delete($sub->file_materi);
+            Storage::delete($sub->file_materi);
         $sub->delete();
 
         $this->logActivity($request, 'Delete', 'sub_materis', $id, "Menghapus materi: [{$judul}]");
@@ -654,21 +654,21 @@ class ManajemenPelatihanController extends Controller
     /**
      * Download file sub-materi dan catat log.
      */
-    public function downloadSubMateri(Request $request, $id)
-    {
-        $sub = SubMateri::findOrFail($id);
-        $filePath = $sub->file_materi;
-        $judul = $sub->judul;
+    // public function downloadSubMateri(Request $request, $id)
+    // {
+    //     $sub = SubMateri::findOrFail($id);
+    //     $filePath = $sub->file_materi;
+    //     $judul = $sub->judul;
 
-        if (!$filePath || !Storage::disk('s3')->exists($filePath)) {
-            return back()->with('error', 'File tidak ditemukan di server.');
-        }
+    //     if (!$filePath || !Storage::disk('s3')->exists($filePath)) {
+    //         return back()->with('error', 'File tidak ditemukan di server.');
+    //     }
 
-        // Log Aktivitas
-        $this->logActivity($request, 'Download', 'sub_materis', $id, "Mengunduh file materi: [{$judul}]");
+    //     // Log Aktivitas
+    //     $this->logActivity($request, 'Download', 'sub_materis', $id, "Mengunduh file materi: [{$judul}]");
 
-        return Storage::disk('s3')->download($filePath);
-    }
+    //     return Storage::disk('s3')->download($filePath);
+    // }
 
     /**
      * Auto-cleanup: Dipanggil oleh scheduler, hapus permanen materi
@@ -685,13 +685,13 @@ class ManajemenPelatihanController extends Controller
         foreach ($oldTrashed as $materi) {
             // Hapus thumbnail
             if ($materi->image_path) {
-                Storage::disk('s3')->delete($materi->image_path);
+                Storage::delete($materi->image_path);
             }
 
             // Hapus file sub_materi
             foreach ($materi->subMateris as $subMateri) {
                 if ($subMateri->file_materi) {
-                    Storage::disk('s3')->delete($subMateri->file_materi);
+                    Storage::delete($subMateri->file_materi);
                 }
                 $subMateri->delete();
             }

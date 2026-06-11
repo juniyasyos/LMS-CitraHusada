@@ -328,7 +328,7 @@
                     return;
                 }
                 this.selectedTitle = item.judul || 'Sertifikat';
-                this.pdfUrl = '/storage/' + item.image_path;
+                this.pdfUrl = '{{ Storage::url('') }}' + item.image_path;
                 this.openPdfViewer = true;
             }
         }));

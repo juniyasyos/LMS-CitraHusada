@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class SertifikatController extends Controller
 {
@@ -45,11 +46,11 @@ class SertifikatController extends Controller
 
             if ($request->hasFile('file_ttd')) {
                 // Hapus file lama jika ada
-                if ($direktur->ttd_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($direktur->ttd_path)) {
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($direktur->ttd_path);
+                if ($direktur->ttd_path && Storage::exists($direktur->ttd_path)) {
+                    Storage::delete($direktur->ttd_path);
                 }
 
-                $path = $request->file('file_ttd')->store('sertifikat/ttd', 'public');
+                $path = $request->file('file_ttd')->store('sertifikat/ttd');
                 $direktur->ttd_path = $path;
             }
 
@@ -82,8 +83,8 @@ class SertifikatController extends Controller
             $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
             
             $masterPath = $type === 'belakang' 
-                ? storage_path('app/public/materi/Sertifikat/Master_Sertifikat_Belakang.png')
-                : storage_path('app/public/materi/Sertifikat/Master_Sertifikat_Depan.png');
+                ? Storage::path('materi/Sertifikat/Master_Sertifikat_Belakang.png')
+                : Storage::path('materi/Sertifikat/Master_Sertifikat_Depan.png');
 
             if (!file_exists($masterPath)) {
                 return response('Master sertifikat tidak ditemukan.', 404);
@@ -136,7 +137,7 @@ class SertifikatController extends Controller
                 $lebar_ttd = 700; // Lebar gambar tanda tangan (pixels)
 
                 if ($direktur && $direktur->ttd_path) {
-                    $ttdPath = storage_path('app/public/' . $direktur->ttd_path);
+                    $ttdPath = Storage::path($direktur->ttd_path);
                     if (file_exists($ttdPath)) {
                         $ttd = $manager->read($ttdPath);
                         $ttd->scale(width: $lebar_ttd);
@@ -188,7 +189,7 @@ class SertifikatController extends Controller
                 $lebar_ttd = 700; // Lebar gambar tanda tangan (pixels)
 
                 if ($direktur && $direktur->ttd_path) {
-                    $ttdPath = storage_path('app/public/' . $direktur->ttd_path);
+                    $ttdPath = Storage::path($direktur->ttd_path);
                     if (file_exists($ttdPath)) {
                         $ttd = $manager->read($ttdPath);
                         $ttd->scale(width: $lebar_ttd);
@@ -247,8 +248,8 @@ class SertifikatController extends Controller
             $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
             
             $masterPath = $type === 'belakang' 
-                ? storage_path('app/public/materi/Sertifikat/Master_Sertifikat_Belakang.png')
-                : storage_path('app/public/materi/Sertifikat/Master_Sertifikat_Depan.png');
+                ? Storage::path('materi/Sertifikat/Master_Sertifikat_Belakang.png')
+                : Storage::path('materi/Sertifikat/Master_Sertifikat_Depan.png');
 
             if (!file_exists($masterPath)) {
                 return response('Master sertifikat tidak ditemukan.', 404);
@@ -305,7 +306,7 @@ class SertifikatController extends Controller
                 $lebar_ttd = 700;
 
                 if ($direktur && $direktur->ttd_path) {
-                    $ttdPath = storage_path('app/public/' . $direktur->ttd_path);
+                    $ttdPath = Storage::path($direktur->ttd_path);
                     if (file_exists($ttdPath)) {
                         $ttd = $manager->read($ttdPath);
                         $ttd->scale(width: $lebar_ttd);
@@ -423,7 +424,7 @@ class SertifikatController extends Controller
                 $lebar_ttd = 700;
 
                 if ($direktur && $direktur->ttd_path) {
-                    $ttdPath = storage_path('app/public/' . $direktur->ttd_path);
+                    $ttdPath = Storage::path($direktur->ttd_path);
                     if (file_exists($ttdPath)) {
                         $ttd = $manager->read($ttdPath);
                         $ttd->scale(width: $lebar_ttd);
@@ -571,7 +572,7 @@ class SertifikatController extends Controller
                 $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML($html)->setPaper('a4', 'landscape');
                 
                 $path = 'materi/Sertifikat/Generate/' . $fileName;
-                \Illuminate\Support\Facades\Storage::disk('public')->put($path, $pdf->output());
+                Storage::put($path, $pdf->output());
                 
                 if ($sertifikat->status !== 'Disetujui') {
                     if ($user && $materi) {
@@ -641,7 +642,7 @@ class SertifikatController extends Controller
             $fileName = 'Sertifikat_Eksternal_' . $user->user_id . '_' . time() . '_' . $safeJudul . '.pdf';
             
             // Simpan file ke storage public
-            $path = $file->storeAs('materi/Sertifikat/SertifikatEksternal', $fileName, 'public');
+            $path = $file->storeAs('materi/Sertifikat/SertifikatEksternal', $fileName);
 
             \App\Models\SertifikatEksternal::create([
                 'user_id' => $user->user_id,

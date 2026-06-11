@@ -716,7 +716,7 @@
 
                 if (report.sertifikat_status === 'Disetujui' && report.sertifikat_image_path) {
                     this.sertifikatLoading = false;
-                    this.sertifikatPdfUrl = '/storage/' + report.sertifikat_image_path;
+                    this.sertifikatPdfUrl = '{{ Storage::url('') }}' + report.sertifikat_image_path;
                     return;
                 }
 
