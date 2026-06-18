@@ -60,11 +60,11 @@
                             <div class="border border-red-100 dark:border-red-900/30 rounded-xl overflow-hidden opacity-75 hover:opacity-100 transition-all group relative"
                                 x-data="{ menuOpen: false }">
                                 <div class="h-40 bg-slate-100 dark:bg-slate-800 overflow-hidden relative">
-                                    <template x-if="materi.image_path">
-                                        <img :src="'{{ Storage::url('') }}' + materi.image_path" :alt="materi.judul"
+                                    <template x-if="materi.thumbnail_url">
+                                        <img :src="materi.thumbnail_url" :alt="materi.judul"
                                             class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300">
                                     </template>
-                                    <template x-if="!materi.image_path">
+                                    <template x-if="!materi.thumbnail_url">
                                         <div class="w-full h-full flex items-center justify-center">
                                             <i class="fa-solid fa-folder text-gray-300 dark:text-slate-600 text-5xl"></i>
                                         </div>

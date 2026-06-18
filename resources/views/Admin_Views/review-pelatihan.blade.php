@@ -80,7 +80,7 @@
                     <div class="lg:col-span-7 space-y-6">
                         <div class="rounded-xl overflow-hidden border-2 border-gray-100 dark:border-slate-800 shadow-md bg-white dark:bg-slate-900 h-[650px] relative">
                             @if($sertifikat->image_path)
-                                <iframe src="{{ asset('storage/' . $sertifikat->image_path) }}" class="w-full h-full" frameborder="0"></iframe>
+                                <iframe src="{{ $pdfUrl }}" class="w-full h-full" frameborder="0"></iframe>
                             @else
                                 <div class="flex flex-col items-center justify-center h-full text-gray-400">
                                     <i class="fa-solid fa-file-pdf text-5xl mb-3"></i>

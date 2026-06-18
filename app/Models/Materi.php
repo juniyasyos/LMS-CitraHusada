@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class Materi extends Model
@@ -28,10 +29,24 @@ class Materi extends Model
         'is_cleaned',
     ];
 
+    protected $appends = ['thumbnail_url'];
+
     protected $casts = [
         'tanggal_upload' => 'datetime',
         'tanggal_selesai' => 'datetime',
     ];
+
+    /**
+     * Accessor: Mengembalikan URL lengkap untuk thumbnail,
+     * menggunakan disk default (local/public/s3) secara dinamis.
+     */
+    public function getThumbnailUrlAttribute()
+    {
+        if (!$this->image_path) {
+            return null;
+        }
+        return Storage::url($this->image_path);
+    }
 
     /**
      * Scope: Hanya mengambil materi yang filenya BELUM dibersihkan (bukan hapus permanen).

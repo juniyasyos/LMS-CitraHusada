@@ -82,15 +82,15 @@ class SertifikatController extends Controller
             // Inisialisasi ImageManager dengan driver GD
             $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
             
-            $masterPath = $type === 'belakang' 
-                ? Storage::path('materi/Sertifikat/Master_Sertifikat_Belakang.png')
-                : Storage::path('materi/Sertifikat/Master_Sertifikat_Depan.png');
+            $masterFile = $type === 'belakang' 
+                ? 'materi/Sertifikat/Master_Sertifikat_Belakang.png'
+                : 'materi/Sertifikat/Master_Sertifikat_Depan.png';
 
-            if (!file_exists($masterPath)) {
+            if (!Storage::disk('public')->exists($masterFile)) {
                 return response('Master sertifikat tidak ditemukan.', 404);
             }
 
-            $image = $manager->read($masterPath);
+            $image = $manager->read(Storage::disk('public')->get($masterFile));
 
             if ($type === 'depan') {
                 // ==========================================
@@ -136,13 +136,10 @@ class SertifikatController extends Controller
                 $y_ttd = 2250;
                 $lebar_ttd = 700; // Lebar gambar tanda tangan (pixels)
 
-                if ($direktur && $direktur->ttd_path) {
-                    $ttdPath = Storage::path($direktur->ttd_path);
-                    if (file_exists($ttdPath)) {
-                        $ttd = $manager->read($ttdPath);
+                if ($direktur && $direktur->ttd_path && Storage::exists($direktur->ttd_path)) {
+                        $ttd = $manager->read(Storage::get($direktur->ttd_path));
                         $ttd->scale(width: $lebar_ttd);
                         $image->place($ttd, 'top-left', $x_ttd, $y_ttd); 
-                    }
                 }
             } else {
                 // ==========================================
@@ -188,13 +185,10 @@ class SertifikatController extends Controller
                 $y_ttd = 2100;
                 $lebar_ttd = 700; // Lebar gambar tanda tangan (pixels)
 
-                if ($direktur && $direktur->ttd_path) {
-                    $ttdPath = Storage::path($direktur->ttd_path);
-                    if (file_exists($ttdPath)) {
-                        $ttd = $manager->read($ttdPath);
+                if ($direktur && $direktur->ttd_path && Storage::exists($direktur->ttd_path)) {
+                        $ttd = $manager->read(Storage::get($direktur->ttd_path));
                         $ttd->scale(width: $lebar_ttd);
                         $image->place($ttd, 'top-left', $x_ttd, $y_ttd); 
-                    }
                 }
             }
 
@@ -247,15 +241,15 @@ class SertifikatController extends Controller
 
             $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
             
-            $masterPath = $type === 'belakang' 
-                ? Storage::path('materi/Sertifikat/Master_Sertifikat_Belakang.png')
-                : Storage::path('materi/Sertifikat/Master_Sertifikat_Depan.png');
+            $masterFile = $type === 'belakang' 
+                ? 'materi/Sertifikat/Master_Sertifikat_Belakang.png'
+                : 'materi/Sertifikat/Master_Sertifikat_Depan.png';
 
-            if (!file_exists($masterPath)) {
+            if (!Storage::disk('public')->exists($masterFile)) {
                 return response('Master sertifikat tidak ditemukan.', 404);
             }
 
-            $image = $manager->read($masterPath);
+            $image = $manager->read(Storage::disk('public')->get($masterFile));
 
             if ($type === 'depan') {
                 // ==========================================
@@ -305,13 +299,10 @@ class SertifikatController extends Controller
                 $y_ttd = 2250;
                 $lebar_ttd = 700;
 
-                if ($direktur && $direktur->ttd_path) {
-                    $ttdPath = Storage::path($direktur->ttd_path);
-                    if (file_exists($ttdPath)) {
-                        $ttd = $manager->read($ttdPath);
+                if ($direktur && $direktur->ttd_path && Storage::exists($direktur->ttd_path)) {
+                        $ttd = $manager->read(Storage::get($direktur->ttd_path));
                         $ttd->scale(width: $lebar_ttd);
                         $image->place($ttd, 'top-left', $x_ttd, $y_ttd); 
-                    }
                 }
             } else {
                 // ==========================================
@@ -423,13 +414,10 @@ class SertifikatController extends Controller
                 $y_ttd = 2100;
                 $lebar_ttd = 700;
 
-                if ($direktur && $direktur->ttd_path) {
-                    $ttdPath = Storage::path($direktur->ttd_path);
-                    if (file_exists($ttdPath)) {
-                        $ttd = $manager->read($ttdPath);
+                if ($direktur && $direktur->ttd_path && Storage::exists($direktur->ttd_path)) {
+                        $ttd = $manager->read(Storage::get($direktur->ttd_path));
                         $ttd->scale(width: $lebar_ttd);
                         $image->place($ttd, 'top-left', $x_ttd, $y_ttd); 
-                    }
                 }
             }
 

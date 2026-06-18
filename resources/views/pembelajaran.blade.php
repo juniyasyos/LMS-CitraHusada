@@ -263,7 +263,7 @@ function renderMateri(materis){
         <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl shadow-md overflow-hidden">
 
             <div class="h-40 bg-gray-300 relative">
-                <img src="${storageUrl}/${materi.image}" 
+                <img src="${materi.image}" 
                      class="w-full h-full object-cover">
 
                 <span class="absolute top-3 right-3 ${statusColor} text-white text-xs px-3 py-1 rounded-full">
