@@ -135,18 +135,10 @@ class LaporanMonitoringController extends Controller
         // Total Keseluruhan
         $totalJpl = $internalJpl + $eksternalJpl;
 
-        // Generate PDF URL (mendukung Temporary URL jika disk default adalah S3/MinIO dan bucket private)
+        // Selalu gunakan URL publik karena file diupload menggunakan disk 'public'
         $pdfUrl = '';
         if ($sertifikat->image_path) {
-            try {
-                if (config('filesystems.default') === 's3') {
-                    $pdfUrl = Storage::temporaryUrl($sertifikat->image_path, now()->addMinutes(30));
-                } else {
-                    $pdfUrl = Storage::url($sertifikat->image_path);
-                }
-            } catch (\Exception $e) {
-                $pdfUrl = Storage::url($sertifikat->image_path);
-            }
+            $pdfUrl = Storage::disk(config('filesystems.default', 'local'))->url($sertifikat->image_path);
         }
 
         return view('Admin_Views.review-pelatihan', compact('sertifikat', 'user', 'internalJpl', 'eksternalJpl', 'totalJpl', 'pdfUrl'));
