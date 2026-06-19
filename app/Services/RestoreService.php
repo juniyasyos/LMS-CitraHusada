@@ -143,7 +143,7 @@ class RestoreService
     {
         // Catat file backup yang ada sebelum menjalankan backup baru
         $backupName = config('backup.backup.name', 'Laravel');
-        $disk = Storage::disk('backups');
+        $disk = Storage::disk(config('filesystems.default', 'local'));
         $existingFiles = collect($disk->allFiles($backupName))
             ->filter(fn($f) => str_ends_with($f, '.zip'))
             ->values()
@@ -182,7 +182,7 @@ class RestoreService
      */
     protected function extractBackup(string $backupFile): array
     {
-        $disk = Storage::disk('backups');
+        $disk = Storage::disk(config('filesystems.default', 'local'));
 
         if (!$disk->exists($backupFile)) {
             throw new \RuntimeException('File backup tidak ditemukan: ' . $backupFile);
@@ -415,7 +415,7 @@ class RestoreService
      */
     protected function restoreStorage(string $extractedStoragePath): void
     {
-        $disk = Storage::disk('backups');
+        $disk = Storage::disk(config('filesystems.default', 'local'));
         $backupName = config('backup.backup.name', 'Laravel');
         $storagePrefix = $backupName . '/storage';
 
@@ -489,9 +489,9 @@ class RestoreService
             File::makeDirectory($rollbackTempDir, 0755, true);
         }
 
-        $disk = Storage::disk('backups');
+        $disk = Storage::disk(config('filesystems.default', 'local'));
         
-        if (config('filesystems.disks.backups.driver') === 's3') {
+        if (config('filesystems.disks.' . config('filesystems.default', 'local') . '.driver') === 's3') {
             $zipPath = $rollbackTempDir . '/' . basename($this->preRestoreBackupFile);
             Log::info('[Restore] Mengunduh file pre-restore backup dari MinIO (S3) ke temporary lokal untuk rollback...');
             file_put_contents($zipPath, $disk->get($this->preRestoreBackupFile));
@@ -517,7 +517,7 @@ class RestoreService
         // Restore storage ke MinIO dari rollback ZIP
         $rollbackStoragePath = $this->findStoragePath($rollbackTempDir);
         if ($rollbackStoragePath) {
-            $rollbackDisk = Storage::disk('backups');
+            $rollbackDisk = Storage::disk(config('filesystems.default', 'local'));
             $backupName = config('backup.backup.name', 'Laravel');
             $storagePrefix = $backupName . '/storage';
 

@@ -51,7 +51,7 @@ class RestoreBackupRequest extends FormRequest
             }
 
             // Validasi file backup ada di disk
-            if ($this->backup_file && !Storage::disk('backups')->exists($this->backup_file)) {
+            if ($this->backup_file && !Storage::disk(config('filesystems.default', 'local'))->exists($this->backup_file)) {
                 $validator->errors()->add('backup_file', 'File backup tidak ditemukan di server.');
             }
         });

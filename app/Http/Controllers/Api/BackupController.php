@@ -49,7 +49,7 @@ class BackupController extends Controller
         
         // Disk Space Calculation (menggunakan disk backup di MinIO)
         try {
-            $backupDisk = Storage::disk('backups');
+            $backupDisk = Storage::disk(config('filesystems.default', 'local'));
             $backupName = config('backup.backup.name');
             $totalSize = collect($backupDisk->allFiles($backupName))
                 ->sum(fn($file) => $backupDisk->size($file));
@@ -132,7 +132,7 @@ class BackupController extends Controller
 
         foreach ($logs as $log) {
             if ($log->filename) {
-                Storage::disk('backups')->delete($log->filename);
+                Storage::disk(config('filesystems.default', 'local'))->delete($log->filename);
             }
             $log->delete();
         }
@@ -150,7 +150,7 @@ class BackupController extends Controller
     {
         try {
             $backupName = config('backup.backup.name');
-            Storage::disk('backups')->deleteDirectory($backupName);
+            Storage::disk(config('filesystems.default', 'local'))->deleteDirectory($backupName);
             BackupLog::truncate();
 
             return response()->json([
