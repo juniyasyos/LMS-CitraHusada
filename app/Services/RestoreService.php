@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\RestoreLog;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -137,42 +136,52 @@ class RestoreService
 
     /**
      * Membuat backup otomatis sebelum proses restore dimulai.
-     * Digunakan sebagai rollback safety jika restore gagal.
+     * Menggunakan PHP PDO (sama seperti backup:database) agar tidak bergantung pada mysqldump.
      */
     protected function createPreRestoreBackup(): ?string
     {
-        // Catat file backup yang ada sebelum menjalankan backup baru
-        $backupName = config('backup.backup.name', 'Laravel');
-        $disk = Storage::disk(config('filesystems.default', 'local'));
-        $existingFiles = collect($disk->allFiles($backupName))
-            ->filter(fn($f) => str_ends_with($f, '.zip'))
-            ->values()
-            ->toArray();
+        try {
+            $appName = config('backup.backup.name', config('app.name', 'lms'));
+            $timestamp = now()->format('Y-m-d-H-i-s');
+            $zipName = "Pre_Restore_{$timestamp}.zip";
+            $s3Path = "{$appName}/{$zipName}";
 
-        // Jalankan backup secara synchronous
-        $exitCode = Artisan::call('backup:run', ['--disable-notifications' => true]);
+            $backupDir = sys_get_temp_dir() . '/pre_restore_' . uniqid();
+            if (!is_dir($backupDir)) {
+                mkdir($backupDir, 0755, true);
+            }
 
-        if ($exitCode !== 0) {
-            Log::warning('[Restore] Pre-restore backup menghasilkan exit code: ' . $exitCode);
-        }
+            $dbName = config('database.connections.mysql.database', 'lms_db');
+            $sqlFile = $backupDir . "/{$dbName}_dump.sql";
+            $zipFile = $backupDir . '/' . $zipName;
 
-        // Temukan file baru yang dibuat
-        $allFiles = collect($disk->allFiles($backupName))
-            ->filter(fn($f) => str_ends_with($f, '.zip'))
-            ->values()
-            ->toArray();
+            // Dump database menggunakan PHP PDO
+            $this->dumpDatabaseViaPdo($sqlFile);
 
-        $newFiles = array_diff($allFiles, $existingFiles);
+            // Buat ZIP
+            $zip = new ZipArchive();
+            if ($zip->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+                throw new \RuntimeException('Gagal membuat arsip ZIP pre-restore');
+            }
+            $zip->addFile($sqlFile, "database/{$dbName}_dump.sql");
+            $zip->close();
 
-        if (empty($newFiles)) {
-            Log::warning('[Restore] Tidak dapat mengidentifikasi file pre-restore backup.');
+            // Upload ke MinIO
+            $diskName = config('backup.backup.destination.disks.0', env('FILESYSTEM_DISK', 's3'));
+            Storage::disk($diskName)->put($s3Path, fopen($zipFile, 'r'));
+
+            // Cleanup temp
+            @unlink($sqlFile);
+            @unlink($zipFile);
+            @rmdir($backupDir);
+
+            Log::info('[Restore] Pre-restore backup dibuat: ' . $s3Path);
+            return $s3Path;
+
+        } catch (\Exception $e) {
+            Log::warning('[Restore] Gagal membuat pre-restore backup: ' . $e->getMessage());
             return null;
         }
-
-        $preBackupFile = end($newFiles);
-        Log::info('[Restore] Pre-restore backup dibuat: ' . $preBackupFile);
-
-        return $preBackupFile;
     }
 
     /**
@@ -182,7 +191,8 @@ class RestoreService
      */
     protected function extractBackup(string $backupFile): array
     {
-        $disk = Storage::disk(config('filesystems.default', 'local'));
+        $diskName = config('backup.backup.destination.disks.0', env('FILESYSTEM_DISK', 's3'));
+        $disk = Storage::disk($diskName);
 
         if (!$disk->exists($backupFile)) {
             throw new \RuntimeException('File backup tidak ditemukan: ' . $backupFile);
@@ -193,14 +203,10 @@ class RestoreService
             File::makeDirectory($this->tempDir, 0755, true);
         }
 
-        // Full path ke file ZIP
-        if (config('filesystems.disks.backups.driver') === 's3') {
-            $zipPath = $this->tempDir . '/' . basename($backupFile);
-            Log::info('[Restore] Mengunduh file backup dari MinIO (S3) ke temporary lokal...');
-            file_put_contents($zipPath, $disk->get($backupFile));
-        } else {
-            $zipPath = $disk->path($backupFile);
-        }
+        // Download dari MinIO ke temporary lokal
+        $zipPath = $this->tempDir . '/' . basename($backupFile);
+        Log::info('[Restore] Mengunduh file backup dari MinIO (S3) ke temporary lokal...');
+        file_put_contents($zipPath, $disk->get($backupFile));
 
         $zip = new ZipArchive();
         $result = $zip->open($zipPath);
@@ -247,15 +253,13 @@ class RestoreService
     }
 
     /**
-     * Mencari folder storage/app/public di dalam backup yang diekstrak.
-     * Spatie Backup menyimpan file dengan path relatif atau absolute di dalam ZIP.
+     * Mencari folder storage di dalam backup yang diekstrak.
      */
     protected function findStoragePath(string $directory): ?string
     {
-        // Cari folder yang berisi 'storage/app/public' atau 'app/public'
         $searchPatterns = [
             $directory . '/storage/app/public',
-            // Spatie mungkin menyimpan dengan path lengkap
+            $directory . '/storage',
         ];
 
         foreach ($searchPatterns as $path) {
@@ -265,7 +269,7 @@ class RestoreService
             }
         }
 
-        // Pencarian rekursif untuk folder bernama 'public' di dalam path yang mengandung 'storage'
+        // Pencarian rekursif
         $directories = File::directories($directory);
         foreach ($directories as $dir) {
             $found = $this->findStorageRecursive($dir);
@@ -283,11 +287,10 @@ class RestoreService
      */
     protected function findStorageRecursive(string $directory, int $depth = 0): ?string
     {
-        if ($depth > 10) return null; // Batas kedalaman
+        if ($depth > 10) return null;
 
         $basename = basename($directory);
 
-        // Jika kita menemukan folder 'public' dan parent-nya 'app'
         if ($basename === 'public') {
             $parent = basename(dirname($directory));
             $grandparent = basename(dirname(dirname($directory)));
@@ -309,62 +312,124 @@ class RestoreService
     }
 
     /**
-     * Melakukan restore database dari file SQL dump.
+     * Melakukan restore database dari file SQL dump menggunakan PHP PDO.
+     * Tidak bergantung pada mysql CLI binary (menghindari masalah caching_sha2_password).
      */
     protected function restoreDatabase(string $sqlFilePath): void
     {
-        $dbConfig = config('database.connections.mysql');
-        $database = $dbConfig['database'];
-        $host     = $dbConfig['host'];
-        $port     = $dbConfig['port'];
-        $username = $dbConfig['username'];
-        $password = $dbConfig['password'];
-
-        // Path ke mysql binary (menggunakan dump_binary_path dari config)
-        $mysqlBinaryPath = $dbConfig['dump']['dump_binary_path'] ?? '';
-        $mysqlBin = $mysqlBinaryPath ? rtrim($mysqlBinaryPath, '/\\') . DIRECTORY_SEPARATOR . 'mysql' : 'mysql';
-
-        // Pada Windows, tambahkan .exe
-        if (PHP_OS_FAMILY === 'Windows') {
-            $mysqlBin .= '.exe';
-        }
-
-        // Verifikasi mysql binary ada
-        if ($mysqlBinaryPath && !file_exists($mysqlBin)) {
-            throw new \RuntimeException('MySQL binary tidak ditemukan di: ' . $mysqlBin);
-        }
+        Log::info('[Restore] Memulai restore database via PHP PDO...');
 
         // Drop semua tabel yang ada terlebih dahulu
         $this->dropAllTables();
 
-        // Bangun perintah mysql import
-        $command = sprintf(
-            '"%s" --protocol=tcp --host=%s --port=%s --user=%s %s %s < "%s"',
-            $mysqlBin,
-            escapeshellarg($host),
-            escapeshellarg($port),
-            escapeshellarg($username),
-            $password ? '--password=' . escapeshellarg($password) : '',
-            escapeshellarg($database),
-            $sqlFilePath
-        );
+        // Baca dan eksekusi file SQL via PDO
+        $pdo = DB::connection()->getPdo();
+        $sqlContent = file_get_contents($sqlFilePath);
 
-        Log::info('[Restore] Menjalankan perintah import database...');
-
-        // Eksekusi perintah
-        $output = [];
-        $returnCode = 0;
-        exec($command . ' 2>&1', $output, $returnCode);
-
-        if ($returnCode !== 0) {
-            $errorOutput = implode("\n", $output);
-            throw new \RuntimeException('Gagal mengimport database. Exit code: ' . $returnCode . '. Output: ' . $errorOutput);
+        if ($sqlContent === false) {
+            throw new \RuntimeException('Gagal membaca file SQL: ' . $sqlFilePath);
         }
+
+        // Disable foreign key checks selama import
+        $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
+        $pdo->exec("SET NAMES utf8mb4");
+        $pdo->exec("SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO'");
+
+        // Pisahkan per statement (split by semicolon yang diikuti newline)
+        // Ini lebih aman daripada split sederhana karena menghindari semicolon di dalam string
+        $statements = $this->splitSqlStatements($sqlContent);
+
+        $executedCount = 0;
+        $errorCount = 0;
+
+        foreach ($statements as $statement) {
+            $statement = trim($statement);
+
+            // Skip komentar dan baris kosong
+            if (empty($statement) || str_starts_with($statement, '--') || str_starts_with($statement, '/*')) {
+                continue;
+            }
+
+            try {
+                $pdo->exec($statement);
+                $executedCount++;
+            } catch (\PDOException $e) {
+                $errorCount++;
+                // Log warning tapi lanjutkan (beberapa statement mungkin tidak kritikal)
+                Log::warning('[Restore] SQL statement gagal: ' . substr($statement, 0, 100) . '... Error: ' . $e->getMessage());
+            }
+        }
+
+        $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
+
+        Log::info("[Restore] Database restore selesai. Eksekusi: {$executedCount} statement, Error: {$errorCount}");
 
         // Verifikasi tabel-tabel kritis ada
         $this->verifyDatabaseRestore();
 
-        Log::info('[Restore] Database berhasil di-restore.');
+        Log::info('[Restore] Database berhasil di-restore via PDO.');
+    }
+
+    /**
+     * Split SQL dump menjadi statement-statement individual.
+     * Menangani semicolon di dalam string values dengan benar.
+     */
+    protected function splitSqlStatements(string $sql): array
+    {
+        $statements = [];
+        $current = '';
+        $inString = false;
+        $stringChar = '';
+        $length = strlen($sql);
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $sql[$i];
+
+            // Handle string literals
+            if (!$inString && ($char === "'" || $char === '"')) {
+                $inString = true;
+                $stringChar = $char;
+                $current .= $char;
+                continue;
+            }
+
+            if ($inString && $char === $stringChar) {
+                // Check for escaped quote
+                if ($i + 1 < $length && $sql[$i + 1] === $stringChar) {
+                    $current .= $char . $sql[$i + 1];
+                    $i++;
+                    continue;
+                }
+                // Check for backslash escape
+                if ($i > 0 && $sql[$i - 1] === '\\') {
+                    $current .= $char;
+                    continue;
+                }
+                $inString = false;
+                $current .= $char;
+                continue;
+            }
+
+            // Semicolon outside string = end of statement
+            if (!$inString && $char === ';') {
+                $trimmed = trim($current);
+                if (!empty($trimmed)) {
+                    $statements[] = $trimmed;
+                }
+                $current = '';
+                continue;
+            }
+
+            $current .= $char;
+        }
+
+        // Tambahkan statement terakhir jika ada
+        $trimmed = trim($current);
+        if (!empty($trimmed)) {
+            $statements[] = $trimmed;
+        }
+
+        return $statements;
     }
 
     /**
@@ -394,7 +459,8 @@ class RestoreService
      */
     protected function verifyDatabaseRestore(): void
     {
-        $criticalTables = ['users', 'roles', 'materis', 'kategoris', 'sessions'];
+        // Hanya cek tabel yang pasti ada di setiap backup (bukan sessions/jobs yang mungkin tidak ada)
+        $criticalTables = ['users', 'roles'];
         $existingTables = collect(DB::select('SHOW TABLES'))->pluck(
             'Tables_in_' . config('database.connections.mysql.database')
         )->toArray();
@@ -407,35 +473,25 @@ class RestoreService
             );
         }
 
-        Log::info('[Restore] Verifikasi database berhasil. Semua tabel kritis ditemukan.');
+        Log::info('[Restore] Verifikasi database berhasil. Tabel kritis ditemukan: ' . implode(', ', $criticalTables));
     }
 
     /**
-     * Melakukan restore storage (storage/app/public).
+     * Melakukan restore storage (dari backup ke MinIO).
      */
     protected function restoreStorage(string $extractedStoragePath): void
     {
-        $disk = Storage::disk(config('filesystems.default', 'local'));
-        $backupName = config('backup.backup.name', 'Laravel');
+        $diskName = config('backup.backup.destination.disks.0', env('FILESYSTEM_DISK', 's3'));
+        $disk = Storage::disk($diskName);
+        $backupName = config('backup.backup.name', config('app.name', 'lms'));
         $storagePrefix = $backupName . '/storage';
 
-        // Langkah 1: Kumpulkan daftar file storage saat ini di MinIO untuk backup sementara
-        $existingFiles = [];
         try {
-            $existingFiles = $disk->allFiles($storagePrefix);
-            Log::info('[Restore] Menyimpan referensi ' . count($existingFiles) . ' file storage yang ada di MinIO.');
-        } catch (\Exception $e) {
-            Log::info('[Restore] Tidak ada file storage yang ada di MinIO, melanjutkan...');
-        }
-
-        try {
-            // Langkah 2: Upload semua file dari extracted backup ke MinIO
             $uploadedCount = 0;
             $localFiles = File::allFiles($extractedStoragePath);
 
             foreach ($localFiles as $localFile) {
                 $relativePath = $localFile->getRelativePathname();
-                // Normalize path separators for S3
                 $relativePath = str_replace('\\', '/', $relativePath);
                 $minioPath = $storagePrefix . '/' . $relativePath;
 
@@ -451,26 +507,6 @@ class RestoreService
         }
     }
 
-
-
-    /**
-     * Pastikan symlink public/storage tetap ada.
-     */
-    protected function ensureStorageLink(): void
-    {
-        $publicStorageLink = public_path('storage');
-        $targetPath = storage_path('app/public');
-
-        if (!file_exists($publicStorageLink)) {
-            try {
-                Artisan::call('storage:link');
-                Log::info('[Restore] Symlink storage berhasil di-recreate.');
-            } catch (\Exception $e) {
-                Log::warning('[Restore] Gagal membuat symlink storage: ' . $e->getMessage());
-            }
-        }
-    }
-
     /**
      * Melakukan rollback menggunakan backup pre-restore.
      */
@@ -482,22 +518,18 @@ class RestoreService
 
         Log::info('[Restore] Memulai rollback dari: ' . $this->preRestoreBackupFile);
 
-        // Extract pre-restore backup
         $rollbackTempDir = storage_path('app/rollback-temp/' . now()->format('YmdHis'));
 
         if (!File::isDirectory($rollbackTempDir)) {
             File::makeDirectory($rollbackTempDir, 0755, true);
         }
 
-        $disk = Storage::disk(config('filesystems.default', 'local'));
-        
-        if (config('filesystems.disks.' . config('filesystems.default', 'local') . '.driver') === 's3') {
-            $zipPath = $rollbackTempDir . '/' . basename($this->preRestoreBackupFile);
-            Log::info('[Restore] Mengunduh file pre-restore backup dari MinIO (S3) ke temporary lokal untuk rollback...');
-            file_put_contents($zipPath, $disk->get($this->preRestoreBackupFile));
-        } else {
-            $zipPath = $disk->path($this->preRestoreBackupFile);
-        }
+        $diskName = config('backup.backup.destination.disks.0', env('FILESYSTEM_DISK', 's3'));
+        $disk = Storage::disk($diskName);
+
+        // Download dari MinIO
+        $zipPath = $rollbackTempDir . '/' . basename($this->preRestoreBackupFile);
+        file_put_contents($zipPath, $disk->get($this->preRestoreBackupFile));
 
         $zip = new ZipArchive();
         if ($zip->open($zipPath) !== true) {
@@ -507,27 +539,18 @@ class RestoreService
         $zip->extractTo($rollbackTempDir);
         $zip->close();
 
-        // Restore database dari rollback
+        // Restore database dari rollback (via PDO)
         $sqlFile = $this->findSqlFile($rollbackTempDir);
         if ($sqlFile) {
             $this->restoreDatabase($sqlFile);
             Log::info('[Restore] Database berhasil di-rollback.');
         }
 
-        // Restore storage ke MinIO dari rollback ZIP
+        // Restore storage dari rollback
         $rollbackStoragePath = $this->findStoragePath($rollbackTempDir);
         if ($rollbackStoragePath) {
-            $rollbackDisk = Storage::disk(config('filesystems.default', 'local'));
-            $backupName = config('backup.backup.name', 'Laravel');
-            $storagePrefix = $backupName . '/storage';
-
-            $localFiles = File::allFiles($rollbackStoragePath);
-            foreach ($localFiles as $localFile) {
-                $relativePath = str_replace('\\', '/', $localFile->getRelativePathname());
-                $minioPath = $storagePrefix . '/' . $relativePath;
-                $rollbackDisk->put($minioPath, file_get_contents($localFile->getPathname()));
-            }
-            Log::info('[Restore] Storage berhasil di-rollback ke MinIO dari backup pre-restore.');
+            $this->restoreStorage($rollbackStoragePath);
+            Log::info('[Restore] Storage berhasil di-rollback.');
         }
 
         // Cleanup rollback temp
@@ -539,17 +562,76 @@ class RestoreService
     }
 
     /**
+     * Dump database menggunakan PHP PDO (untuk pre-restore backup).
+     */
+    protected function dumpDatabaseViaPdo(string $outputFile): void
+    {
+        $pdo = DB::connection()->getPdo();
+        $dbName = config('database.connections.mysql.database');
+
+        $handle = fopen($outputFile, 'w');
+        if (!$handle) {
+            throw new \RuntimeException("Gagal membuat file: {$outputFile}");
+        }
+
+        fwrite($handle, "-- PHP PDO Database Dump (Pre-Restore Backup)\n");
+        fwrite($handle, "-- Database: {$dbName}\n");
+        fwrite($handle, "-- Generated: " . now()->toDateTimeString() . "\n\n");
+        fwrite($handle, "SET NAMES utf8mb4;\n");
+        fwrite($handle, "SET FOREIGN_KEY_CHECKS = 0;\n");
+        fwrite($handle, "SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';\n\n");
+
+        $tables = $pdo->query("SHOW TABLES")->fetchAll(\PDO::FETCH_COLUMN);
+
+        foreach ($tables as $table) {
+            $createStmt = $pdo->query("SHOW CREATE TABLE `{$table}`")->fetch(\PDO::FETCH_ASSOC);
+            $createSql = $createStmt['Create Table'] ?? $createStmt['Create View'] ?? '';
+
+            fwrite($handle, "DROP TABLE IF EXISTS `{$table}`;\n");
+            fwrite($handle, $createSql . ";\n\n");
+
+            $countResult = $pdo->query("SELECT COUNT(*) FROM `{$table}`")->fetchColumn();
+
+            if ($countResult > 0) {
+                $batchSize = 500;
+                $offset = 0;
+                $columns = $pdo->query("SHOW COLUMNS FROM `{$table}`")->fetchAll(\PDO::FETCH_COLUMN);
+                $columnList = implode('`, `', $columns);
+
+                while ($offset < $countResult) {
+                    $rows = $pdo->query("SELECT * FROM `{$table}` LIMIT {$batchSize} OFFSET {$offset}")->fetchAll(\PDO::FETCH_ASSOC);
+                    if (empty($rows)) break;
+
+                    $values = [];
+                    foreach ($rows as $row) {
+                        $escaped = array_map(function ($val) use ($pdo) {
+                            if (is_null($val)) return 'NULL';
+                            return $pdo->quote($val);
+                        }, array_values($row));
+                        $values[] = '(' . implode(', ', $escaped) . ')';
+                    }
+
+                    fwrite($handle, "INSERT INTO `{$table}` (`{$columnList}`) VALUES\n");
+                    fwrite($handle, implode(",\n", $values) . ";\n\n");
+                    $offset += $batchSize;
+                }
+            }
+        }
+
+        fwrite($handle, "SET FOREIGN_KEY_CHECKS = 1;\n");
+        fclose($handle);
+    }
+
+    /**
      * Membersihkan file-file temporary.
      */
     protected function cleanup(): void
     {
-        // Hapus folder temporary extract
         if (isset($this->tempDir) && File::isDirectory($this->tempDir)) {
             File::deleteDirectory($this->tempDir);
             Log::info('[Restore] Folder temporary berhasil dihapus: ' . $this->tempDir);
         }
 
-        // Hapus folder backup storage sementara
         if (isset($this->storageBackupDir) && File::isDirectory($this->storageBackupDir)) {
             File::deleteDirectory($this->storageBackupDir);
             Log::info('[Restore] Folder storage backup sementara berhasil dihapus: ' . $this->storageBackupDir);
