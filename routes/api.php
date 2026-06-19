@@ -129,6 +129,7 @@ Route::middleware('auth:sanctum')->group(function () {
         //Backup/Cadangan
         Route::prefix('backup')->group(function () {
             Route::get('/data', [BackupController::class, 'getBackupData'])->name('api.backup.data');
+            Route::get('/status', [BackupController::class, 'getBackupStatus'])->name('api.backup.status');
             Route::post('/run', [BackupController::class, 'runBackup'])->name('api.backup.run');
             Route::post('/settings', [BackupController::class, 'updateSettings'])->name('api.backup.settings');
             Route::post('/delete-selected', [BackupController::class, 'deleteSelected'])->name('api.backup.delete-selected');

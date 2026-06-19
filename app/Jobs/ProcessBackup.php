@@ -28,10 +28,12 @@ class ProcessBackup implements ShouldQueue
     public int $timeout = 1800;
 
     protected string $type;
+    protected ?int $backupLogId;
 
-    public function __construct(string $type = 'full')
+    public function __construct(string $type = 'full', ?int $backupLogId = null)
     {
         $this->type = $type;
+        $this->backupLogId = $backupLogId;
     }
 
     public function handle(): void
@@ -46,6 +48,9 @@ class ProcessBackup implements ShouldQueue
         $appName = config('backup.backup.name', config('app.name', 'lms'));
         $s3Path = "{$appName}/{$zipName}";
 
+        // Resolve existing log or prepare to create new one
+        $existingLog = $this->backupLogId ? BackupLog::find($this->backupLogId) : null;
+
         try {
             $backupDir = sys_get_temp_dir() . '/backups_' . uniqid();
             if (!is_dir($backupDir)) {
@@ -54,11 +59,21 @@ class ProcessBackup implements ShouldQueue
 
             Log::info("Backup dimulai: {$zipName} (tipe: {$this->type})");
 
+            // Update existing log with filename
+            if ($existingLog) {
+                $existingLog->update(['filename' => $s3Path, 'message' => 'Sedang membuat dump database...']);
+            }
+
             $zipFile = match ($this->type) {
                 'database' => $this->backupDatabase($backupDir, $zipName),
                 'files'    => $this->backupFiles($backupDir, $zipName),
                 default    => $this->backupFull($backupDir, $zipName),
             };
+
+            // Update progress
+            if ($existingLog) {
+                $existingLog->update(['message' => 'Mengupload file backup ke storage...']);
+            }
 
             // Upload ZIP ke MinIO (S3)
             $diskName = config('backup.backup.destination.disks.0', env('FILESYSTEM_DISK', 's3'));
@@ -70,24 +85,42 @@ class ProcessBackup implements ShouldQueue
             @unlink($zipFile);
             $this->cleanupTempDir($backupDir);
 
-            // Catat ke backup_logs
-            BackupLog::create([
-                'filename' => $s3Path,
-                'status'   => 'success',
-                'size'     => $fileSize,
-                'message'  => "Backup {$typeLabel} berhasil (via PHP PDO)",
-            ]);
+            // Update or create backup log
+            if ($existingLog) {
+                $existingLog->update([
+                    'filename' => $s3Path,
+                    'status'   => 'success',
+                    'size'     => $fileSize,
+                    'message'  => "Backup {$typeLabel} berhasil (via PHP PDO)",
+                ]);
+            } else {
+                BackupLog::create([
+                    'filename' => $s3Path,
+                    'status'   => 'success',
+                    'size'     => $fileSize,
+                    'message'  => "Backup {$typeLabel} berhasil (via PHP PDO)",
+                ]);
+            }
 
             Log::info("Backup selesai: {$s3Path}", ['size' => $fileSize]);
 
         } catch (\Throwable $e) {
-            // Catat kegagalan
-            BackupLog::create([
-                'filename' => $s3Path ?? $zipName,
-                'status'   => 'failed',
-                'size'     => 0,
-                'message'  => 'Gagal: ' . $e->getMessage(),
-            ]);
+            // Update or create failure log
+            if ($existingLog) {
+                $existingLog->update([
+                    'filename' => $s3Path ?? $zipName,
+                    'status'   => 'failed',
+                    'size'     => 0,
+                    'message'  => 'Gagal: ' . $e->getMessage(),
+                ]);
+            } else {
+                BackupLog::create([
+                    'filename' => $s3Path ?? $zipName,
+                    'status'   => 'failed',
+                    'size'     => 0,
+                    'message'  => 'Gagal: ' . $e->getMessage(),
+                ]);
+            }
 
             Log::error("Backup gagal: {$zipName}", ['error' => $e->getMessage()]);
 

@@ -71,36 +71,104 @@ class BackupController extends Controller
     }
 
     /**
-     * API: Menjalankan backup di background
+     * API: Menjalankan backup secara synchronous dengan progress tracking
      */
     public function runBackup(Request $request)
     {
         try {
             $type = $request->input('type', 'full');
-            $phpBinary = PHP_BINARY;
-            $artisan = base_path('artisan');
+            $typeLabel = match ($type) {
+                'database' => 'Database',
+                'files'    => 'Files',
+                default    => 'Full',
+            };
 
-            // Jalankan backup:database di background
-            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                $command = "start /B \"\" \"{$phpBinary}\" \"{$artisan}\" backup:database --type={$type} 2>&1";
-            } else {
-                $command = "{$phpBinary} {$artisan} backup:database --type={$type} > /dev/null 2>&1 &";
-            }
-            pclose(popen($command, 'r'));
+            // Naikkan batas waktu eksekusi untuk backup besar
+            set_time_limit(600);
+
+            // Buat log awal dengan status in_progress
+            $log = BackupLog::create([
+                'filename' => 'Menunggu...',
+                'status'   => 'in_progress',
+                'size'     => 0,
+                'message'  => "Memulai backup {$typeLabel}...",
+            ]);
 
             // Catat ke Log Aktivitas
-            $this->logActivity($request, 'Create', 'backup_logs', null, 'Memicu proses pencadangan manual (tipe: ' . $type . ')');
+            $this->logActivity($request, 'Create', 'backup_logs', $log->id, 'Memicu proses pencadangan manual (tipe: ' . $type . ')');
 
-            return response()->json([
-                'status'  => 'success',
-                'message' => 'Proses pencadangan sedang berjalan di latar belakang.'
-            ]);
+            // Jalankan backup secara langsung (synchronous)
+            try {
+                $job = new \App\Jobs\ProcessBackup($type, $log->id);
+                $job->handle();
+
+                // Refresh log untuk mendapatkan status terbaru
+                $log->refresh();
+
+                return response()->json([
+                    'status'  => $log->status === 'success' ? 'success' : 'error',
+                    'message' => $log->message,
+                    'data'    => [
+                        'log_id'   => $log->id,
+                        'filename' => $log->filename,
+                        'size'     => $log->size,
+                    ],
+                ], $log->status === 'success' ? 200 : 500);
+
+            } catch (\Throwable $e) {
+                // Jika terjadi error yang tidak tertangkap oleh ProcessBackup
+                $log->update([
+                    'status'  => 'failed',
+                    'message' => 'Error tidak terduga: ' . $e->getMessage(),
+                ]);
+
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Backup gagal: ' . $e->getMessage(),
+                ], 500);
+            }
+
         } catch (\Exception $e) {
             return response()->json([
                 'status'  => 'error',
                 'message' => 'Gagal memulai: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * API: Cek status backup yang sedang berjalan
+     */
+    public function getBackupStatus()
+    {
+        $inProgress = BackupLog::where('status', 'in_progress')
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if ($inProgress) {
+            return response()->json([
+                'is_running' => true,
+                'log_id'     => $inProgress->id,
+                'message'    => $inProgress->message,
+                'started_at' => $inProgress->created_at->toIso8601String(),
+            ]);
+        }
+
+        // Ambil backup terakhir yang selesai (untuk notifikasi)
+        $latest = BackupLog::whereIn('status', ['success', 'failed'])
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        return response()->json([
+            'is_running' => false,
+            'latest'     => $latest ? [
+                'log_id'   => $latest->id,
+                'status'   => $latest->status,
+                'message'  => $latest->message,
+                'filename' => $latest->filename,
+                'size'     => $latest->size,
+            ] : null,
+        ]);
     }
 
     /**

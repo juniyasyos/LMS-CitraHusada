@@ -33,8 +33,15 @@
                         :disabled="isBackingUp"
                         :class="isBackingUp ? 'opacity-70 cursor-not-allowed' : ''"
                         class="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 text-xs font-bold transition shadow-sm active:scale-95 shadow-blue-100 dark:shadow-none">
-                        <i class="fa-solid fa-triangle-exclamation text-[10px]" :class="isBackingUp ? 'animate-pulse' : ''"></i>
-                        <span x-text="isBackingUp ? 'Sedang Mencadangkan...' : 'Lakukan Pencadangan Sekarang'"></span>
+                        <template x-if="!isBackingUp">
+                            <span><i class="fa-solid fa-cloud-arrow-up text-[10px]"></i> Lakukan Pencadangan Sekarang</span>
+                        </template>
+                        <template x-if="isBackingUp">
+                            <span class="flex items-center gap-2">
+                                <i class="fa-solid fa-spinner fa-spin text-[10px]"></i>
+                                <span x-text="backupElapsedText"></span>
+                            </span>
+                        </template>
                     </button>
                     
                     {{-- Dropdown Pengaturan Cadangan --}}
@@ -184,7 +191,10 @@
                                             <template x-if="log.status === 'success'">
                                                 <span class="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full text-[10px] font-bold uppercase">Berhasil</span>
                                             </template>
-                                            <template x-if="log.status !== 'success'">
+                                            <template x-if="log.status === 'in_progress'">
+                                                <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-[10px] font-bold uppercase"><i class="fa-solid fa-spinner fa-spin mr-1"></i>Proses</span>
+                                            </template>
+                                            <template x-if="log.status === 'failed'">
                                                 <span class="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full text-[10px] font-bold uppercase">Gagal</span>
                                             </template>
                                         </td>
@@ -565,6 +575,9 @@ document.addEventListener('alpine:init', () => {
         executionTime: '00:00',
         selectedIds: [],
         isBackingUp: false,
+        backupElapsedText: 'Mencadangkan...',
+        backupElapsedTimer: null,
+        backupStartTime: null,
         isLoading: true,
         logs: [],
         stats: { total: 0, success: 0, failed: 0, free_space: '0 B' },
@@ -623,9 +636,43 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
+        startElapsedTimer() {
+            this.backupStartTime = Date.now();
+            this.backupElapsedText = 'Mencadangkan... 00:00';
+            this.backupElapsedTimer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - this.backupStartTime) / 1000);
+                const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
+                const secs = String(elapsed % 60).padStart(2, '0');
+                this.backupElapsedText = `Mencadangkan... ${mins}:${secs}`;
+            }, 1000);
+        },
+
+        stopElapsedTimer() {
+            if (this.backupElapsedTimer) {
+                clearInterval(this.backupElapsedTimer);
+                this.backupElapsedTimer = null;
+            }
+            this.backupElapsedText = 'Mencadangkan...';
+        },
+
         async runBackup() {
             if (this.isBackingUp) return;
+            
+            const confirm = await Swal.fire({
+                title: 'Mulai Pencadangan?',
+                text: 'Proses pencadangan akan dimulai. Ini mungkin memakan waktu beberapa menit.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#2563EB',
+                cancelButtonColor: '#6B7280',
+                confirmButtonText: 'Ya, Mulai!',
+                cancelButtonText: 'Batal'
+            });
+
+            if (!confirm.isConfirmed) return;
+
             this.isBackingUp = true;
+            this.startElapsedTimer();
             
             try {
                 const response = await fetch('/api/admin/backup/run', {
@@ -638,23 +685,35 @@ document.addEventListener('alpine:init', () => {
                 const data = await response.json();
                 
                 if (data.status === 'success') {
-                    Toast.fire({
+                    const sizeMB = data.data && data.data.size ? (data.data.size / 1024 / 1024).toFixed(2) + ' MB' : '';
+                    Swal.fire({
                         icon: 'success',
-                        title: 'Berhasil',
-                        text: data.message
+                        title: 'Pencadangan Berhasil!',
+                        html: `<p class="text-sm text-gray-600">${data.message}</p>` +
+                              (sizeMB ? `<p class="text-xs text-gray-400 mt-2">Ukuran file: <strong>${sizeMB}</strong></p>` : ''),
+                        confirmButtonColor: '#2563EB',
                     });
                 } else {
-                    Toast.fire({
+                    Swal.fire({
                         icon: 'error',
-                        title: 'Gagal',
-                        text: data.message
+                        title: 'Pencadangan Gagal',
+                        html: `<p class="text-sm text-gray-600">${data.message || 'Terjadi kesalahan saat proses pencadangan.'}</p>`,
+                        confirmButtonColor: '#DC2626',
                     });
                 }
             } catch (error) {
-                console.error(error);
+                console.error('[Backup] Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan Koneksi',
+                    text: 'Tidak dapat terhubung ke server. Silakan cek koneksi atau coba lagi.',
+                    confirmButtonColor: '#DC2626',
+                });
             } finally {
+                this.stopElapsedTimer();
                 this.isBackingUp = false;
-                setTimeout(() => this.fetchData(), 3000);
+                this.fetchData();
+                this.fetchBackupFiles();
             }
         },
 
