@@ -293,7 +293,10 @@
                     }
                     
                     console.log('Fetching certificate preview from:', apiPreviewUrl);
-                    const res = await fetch(apiPreviewUrl, { headers });
+                    const res = await fetch(apiPreviewUrl, { 
+                        headers,
+                        credentials: 'same-origin' 
+                    });
                     console.log('Certificate preview response:', { ok: res.ok, status: res.status });
                     
                     if (res.ok) {
@@ -330,12 +333,19 @@
                 this.isSubmitting = true;
 
                 try {
+                    const accessToken = localStorage.getItem('access_token');
+                    const headers = {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    };
+                    if (accessToken) {
+                        headers['Authorization'] = `Bearer ${accessToken}`;
+                    }
+
                     const response = await fetch(apiValidasiUrl, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
+                        headers: headers,
+                        credentials: 'same-origin',
                         body: JSON.stringify({ action: action, deskripsi: this.deskripsi, nomor_surat: this.nomor_surat })
                     });
 

@@ -144,7 +144,7 @@ class ManajemenPelatihanController extends Controller
         try {
             if ($request->hasFile('thumbnail')) {
                 if ($materi->image_path)
-                    Storage::delete($materi->image_path);
+                    Storage::disk(config('filesystems.default', 'local'))->delete($materi->image_path);
                 $materi->image_path = $request->file('thumbnail')->store('materi/Cover');
             }
 
@@ -308,13 +308,13 @@ class ManajemenPelatihanController extends Controller
         try {
             // 1. Hapus file thumbnail fisik
             if ($materi->image_path) {
-                Storage::delete($materi->image_path);
+                Storage::disk(config('filesystems.default', 'local'))->delete($materi->image_path);
             }
-            
+
             // 2. Hapus file sub-materi fisik & null-kan path-nya
             foreach ($materi->subMateris as $subMateri) {
                 if ($subMateri->file_materi) {
-                    Storage::delete($subMateri->file_materi);
+                    Storage::disk(config('filesystems.default', 'local'))->delete($subMateri->file_materi);
                 }
                 $subMateri->update(['file_materi' => null]);
             }
@@ -482,7 +482,7 @@ class ManajemenPelatihanController extends Controller
 
         if ($request->hasFile('file_materi')) {
             if ($sub->file_materi)
-                Storage::delete($sub->file_materi);
+                Storage::disk(config('filesystems.default', 'local'))->delete($sub->file_materi);
             $file = $request->file('file_materi');
             $ext = $file->getClientOriginalExtension();
             $folder = 'materi/PDF';
@@ -512,7 +512,7 @@ class ManajemenPelatihanController extends Controller
         $judul = $sub->judul;
 
         if ($sub->file_materi)
-            Storage::delete($sub->file_materi);
+            Storage::disk(config('filesystems.default', 'local'))->delete($sub->file_materi);
         $sub->delete();
 
         $this->logActivity($request, 'Delete', 'sub_materis', $id, "Menghapus materi: [{$judul}]");
@@ -685,13 +685,13 @@ class ManajemenPelatihanController extends Controller
         foreach ($oldTrashed as $materi) {
             // Hapus thumbnail
             if ($materi->image_path) {
-                Storage::delete($materi->image_path);
+                Storage::disk(config('filesystems.default', 'local'))->delete($materi->image_path);
             }
 
             // Hapus file sub_materi
             foreach ($materi->subMateris as $subMateri) {
                 if ($subMateri->file_materi) {
-                    Storage::delete($subMateri->file_materi);
+                    Storage::disk(config('filesystems.default', 'local'))->delete($subMateri->file_materi);
                 }
                 $subMateri->delete();
             }
