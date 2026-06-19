@@ -629,8 +629,9 @@ class SertifikatController extends Controller
             $safeJudul = preg_replace('/[^A-Za-z0-9\-]/', '_', $request->input('judul'));
             $fileName = 'Sertifikat_Eksternal_' . $user->user_id . '_' . time() . '_' . $safeJudul . '.pdf';
             
-            // Simpan file ke storage public
-            $path = $file->storeAs('materi/Sertifikat/SertifikatEksternal', $fileName);
+            // Simpan file ke storage
+            $path = 'materi/Sertifikat/SertifikatEksternal/' . $fileName;
+            Storage::disk(env('FILESYSTEM_DISK', 'local'))->put($path, file_get_contents($file));
 
             \App\Models\SertifikatEksternal::create([
                 'user_id' => $user->user_id,
