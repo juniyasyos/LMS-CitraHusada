@@ -65,7 +65,7 @@ return [
                 'dump_binary_path' => env('DUMP_BINARY_PATH', ''),
                 'use_single_transaction' => true,
                 'timeout' => 60 * 5,
-                'add_extra_option' => '--protocol=tcp --host=127.0.0.1 --skip-column-statistics',
+                'add_extra_option' => env('DUMP_EXTRA_OPTION', ''),
             ],
         ],
 
