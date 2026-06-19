@@ -143,7 +143,7 @@ class RestoreService
     {
         // Catat file backup yang ada sebelum menjalankan backup baru
         $backupName = config('backup.backup.name', 'Laravel');
-        $disk = Storage::disk('local');
+        $disk = Storage::disk(env('FILESYSTEM_DISK', 'local'));
         $existingFiles = collect($disk->allFiles($backupName))
             ->filter(fn($f) => str_ends_with($f, '.zip'))
             ->values()
@@ -182,7 +182,7 @@ class RestoreService
      */
     protected function extractBackup(string $backupFile): array
     {
-        $disk = Storage::disk('local');
+        $disk = Storage::disk(env('FILESYSTEM_DISK', 'local'));
 
         if (!$disk->exists($backupFile)) {
             throw new \RuntimeException('File backup tidak ditemukan: ' . $backupFile);
@@ -194,7 +194,13 @@ class RestoreService
         }
 
         // Full path ke file ZIP
-        $zipPath = $disk->path($backupFile);
+        if (env('FILESYSTEM_DISK') === 's3') {
+            $zipPath = $this->tempDir . '/' . basename($backupFile);
+            Log::info('[Restore] Mengunduh file backup dari S3 ke temporary lokal...');
+            file_put_contents($zipPath, $disk->get($backupFile));
+        } else {
+            $zipPath = $disk->path($backupFile);
+        }
 
         $zip = new ZipArchive();
         $result = $zip->open($zipPath);
@@ -488,8 +494,15 @@ class RestoreService
             File::makeDirectory($rollbackTempDir, 0755, true);
         }
 
-        $disk = Storage::disk('local');
-        $zipPath = $disk->path($this->preRestoreBackupFile);
+        $disk = Storage::disk(env('FILESYSTEM_DISK', 'local'));
+        
+        if (env('FILESYSTEM_DISK') === 's3') {
+            $zipPath = $rollbackTempDir . '/' . basename($this->preRestoreBackupFile);
+            Log::info('[Restore] Mengunduh file pre-restore backup dari S3 ke temporary lokal untuk rollback...');
+            file_put_contents($zipPath, $disk->get($this->preRestoreBackupFile));
+        } else {
+            $zipPath = $disk->path($this->preRestoreBackupFile);
+        }
 
         $zip = new ZipArchive();
         if ($zip->open($zipPath) !== true) {

@@ -28,7 +28,7 @@ class RestoreController extends Controller
     {
         try {
             $backupName = config('backup.backup.name', 'Laravel');
-            $disk = Storage::disk('local');
+            $disk = Storage::disk(env('FILESYSTEM_DISK', 'local'));
 
             $files = collect($disk->allFiles($backupName))
                 ->filter(fn($file) => str_ends_with($file, '.zip'))
@@ -72,7 +72,7 @@ class RestoreController extends Controller
         ]);
 
         $file = $request->query('file');
-        $disk = Storage::disk('local');
+        $disk = Storage::disk(env('FILESYSTEM_DISK', 'local'));
 
         if (!$disk->exists($file)) {
             return response()->json([

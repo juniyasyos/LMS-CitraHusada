@@ -124,7 +124,7 @@ class BackupController extends Controller
 
         foreach ($logs as $log) {
             if ($log->filename) {
-                Storage::disk('local')->delete($log->filename);
+                Storage::disk(env('FILESYSTEM_DISK', 'local'))->delete($log->filename);
             }
             $log->delete();
         }
@@ -142,7 +142,7 @@ class BackupController extends Controller
     {
         try {
             $backupName = config('backup.backup.name');
-            Storage::disk('local')->deleteDirectory($backupName);
+            Storage::disk(env('FILESYSTEM_DISK', 'local'))->deleteDirectory($backupName);
             BackupLog::truncate();
 
             return response()->json([
