@@ -61,12 +61,12 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 (PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
-            'dump' => [
+            'dump' => array_filter([
                 'dump_binary_path' => env('DUMP_BINARY_PATH', ''),
                 'use_single_transaction' => true,
                 'timeout' => 60 * 5,
                 'add_extra_option' => env('DUMP_EXTRA_OPTION', ''),
-            ],
+            ]),
         ],
 
         'mariadb' => [
