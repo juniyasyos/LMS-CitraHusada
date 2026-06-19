@@ -66,6 +66,7 @@ return [
                 'use_single_transaction' => true,
                 'timeout' => 60 * 5,
                 'skip_ssl' => env('DUMP_SKIP_SSL', true),
+                'ssl_flag' => env('DUMP_SSL_FLAG', ''),
                 'add_extra_option' => env('DUMP_EXTRA_OPTION', ''),
             ]),
         ],
