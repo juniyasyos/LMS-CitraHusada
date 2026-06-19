@@ -71,24 +71,18 @@ class BackupController extends Controller
     }
 
     /**
-     * API: Menjalankan backup di background
+     * API: Menjalankan backup di background via Queue Job
      */
     public function runBackup(Request $request)
     {
         try {
-            $phpBinary = PHP_BINARY;
-            $artisan = base_path('artisan');
+            $type = $request->input('type', 'full'); // 'database', 'files', atau 'full'
 
-            // Eksekusi background command yang cross-platform (Windows & Linux)
-            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                $command = "start /B \"\" \"{$phpBinary}\" \"{$artisan}\" backup:database 2>&1";
-            } else {
-                $command = "{$phpBinary} {$artisan} backup:database > /dev/null 2>&1 &";
-            }
-            pclose(popen($command, 'r'));
+            // Dispatch ke queue (atau jalankan langsung jika queue = sync)
+            \App\Jobs\ProcessBackup::dispatch($type);
 
             // Catat ke Log Aktivitas
-            $this->logActivity($request, 'Create', 'backup_logs', null, 'Memicu proses pencadangan (database & file) manual');
+            $this->logActivity($request, 'Create', 'backup_logs', null, 'Memicu proses pencadangan manual (tipe: ' . $type . ')');
 
             return response()->json([
                 'status'  => 'success',
