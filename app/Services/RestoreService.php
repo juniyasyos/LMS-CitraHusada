@@ -143,7 +143,7 @@ class RestoreService
     {
         // Catat file backup yang ada sebelum menjalankan backup baru
         $backupName = config('backup.backup.name', 'Laravel');
-        $disk = Storage::disk(env('FILESYSTEM_DISK', 'local'));
+        $disk = Storage::disk('backups');
         $existingFiles = collect($disk->allFiles($backupName))
             ->filter(fn($f) => str_ends_with($f, '.zip'))
             ->values()
@@ -182,7 +182,7 @@ class RestoreService
      */
     protected function extractBackup(string $backupFile): array
     {
-        $disk = Storage::disk(env('FILESYSTEM_DISK', 'local'));
+        $disk = Storage::disk('backups');
 
         if (!$disk->exists($backupFile)) {
             throw new \RuntimeException('File backup tidak ditemukan: ' . $backupFile);
@@ -194,9 +194,9 @@ class RestoreService
         }
 
         // Full path ke file ZIP
-        if (env('FILESYSTEM_DISK') === 's3') {
+        if (config('filesystems.disks.backups.driver') === 's3') {
             $zipPath = $this->tempDir . '/' . basename($backupFile);
-            Log::info('[Restore] Mengunduh file backup dari S3 ke temporary lokal...');
+            Log::info('[Restore] Mengunduh file backup dari MinIO (S3) ke temporary lokal...');
             file_put_contents($zipPath, $disk->get($backupFile));
         } else {
             $zipPath = $disk->path($backupFile);
@@ -415,48 +415,43 @@ class RestoreService
      */
     protected function restoreStorage(string $extractedStoragePath): void
     {
-        $targetPath = storage_path('app/public');
+        $disk = Storage::disk('backups');
+        $backupName = config('backup.backup.name', 'Laravel');
+        $storagePrefix = $backupName . '/storage';
 
-        // Langkah 1: Backup storage aktif sementara
-        if (File::isDirectory($targetPath)) {
-            if (!File::isDirectory($this->storageBackupDir)) {
-                File::makeDirectory($this->storageBackupDir, 0755, true);
-            }
-            File::copyDirectory($targetPath, $this->storageBackupDir);
-            Log::info('[Restore] Storage aktif di-backup ke: ' . $this->storageBackupDir);
+        // Langkah 1: Kumpulkan daftar file storage saat ini di MinIO untuk backup sementara
+        $existingFiles = [];
+        try {
+            $existingFiles = $disk->allFiles($storagePrefix);
+            Log::info('[Restore] Menyimpan referensi ' . count($existingFiles) . ' file storage yang ada di MinIO.');
+        } catch (\Exception $e) {
+            Log::info('[Restore] Tidak ada file storage yang ada di MinIO, melanjutkan...');
         }
 
         try {
-            // Langkah 2: Hapus isi storage lama
-            if (File::isDirectory($targetPath)) {
-                File::cleanDirectory($targetPath);
-                Log::info('[Restore] Isi storage lama berhasil dihapus.');
-            } else {
-                File::makeDirectory($targetPath, 0755, true);
+            // Langkah 2: Upload semua file dari extracted backup ke MinIO
+            $uploadedCount = 0;
+            $localFiles = File::allFiles($extractedStoragePath);
+
+            foreach ($localFiles as $localFile) {
+                $relativePath = $localFile->getRelativePathname();
+                // Normalize path separators for S3
+                $relativePath = str_replace('\\', '/', $relativePath);
+                $minioPath = $storagePrefix . '/' . $relativePath;
+
+                $disk->put($minioPath, file_get_contents($localFile->getPathname()));
+                $uploadedCount++;
             }
 
-            // Langkah 3: Salin file dari backup
-            File::copyDirectory($extractedStoragePath, $targetPath);
-            Log::info('[Restore] File storage dari backup berhasil disalin.');
+            Log::info('[Restore] ' . $uploadedCount . ' file storage berhasil di-upload ke MinIO.');
 
         } catch (\Exception $e) {
-            // Langkah 4: Jika gagal, kembalikan storage lama
-            Log::error('[Restore] Gagal restore storage: ' . $e->getMessage());
-
-            if (File::isDirectory($this->storageBackupDir)) {
-                if (File::isDirectory($targetPath)) {
-                    File::cleanDirectory($targetPath);
-                }
-                File::copyDirectory($this->storageBackupDir, $targetPath);
-                Log::info('[Restore] Storage lama berhasil dikembalikan dari backup sementara.');
-            }
-
-            throw new \RuntimeException('Gagal restore storage: ' . $e->getMessage());
+            Log::error('[Restore] Gagal restore storage ke MinIO: ' . $e->getMessage());
+            throw new \RuntimeException('Gagal restore storage ke MinIO: ' . $e->getMessage());
         }
-
-        // Pastikan symlink storage masih ada
-        $this->ensureStorageLink();
     }
+
+
 
     /**
      * Pastikan symlink public/storage tetap ada.
@@ -494,11 +489,11 @@ class RestoreService
             File::makeDirectory($rollbackTempDir, 0755, true);
         }
 
-        $disk = Storage::disk(env('FILESYSTEM_DISK', 'local'));
+        $disk = Storage::disk('backups');
         
-        if (env('FILESYSTEM_DISK') === 's3') {
+        if (config('filesystems.disks.backups.driver') === 's3') {
             $zipPath = $rollbackTempDir . '/' . basename($this->preRestoreBackupFile);
-            Log::info('[Restore] Mengunduh file pre-restore backup dari S3 ke temporary lokal untuk rollback...');
+            Log::info('[Restore] Mengunduh file pre-restore backup dari MinIO (S3) ke temporary lokal untuk rollback...');
             file_put_contents($zipPath, $disk->get($this->preRestoreBackupFile));
         } else {
             $zipPath = $disk->path($this->preRestoreBackupFile);
@@ -519,14 +514,20 @@ class RestoreService
             Log::info('[Restore] Database berhasil di-rollback.');
         }
 
-        // Restore storage dari backup sementara (lebih reliable daripada dari ZIP)
-        $targetPath = storage_path('app/public');
-        if (File::isDirectory($this->storageBackupDir)) {
-            if (File::isDirectory($targetPath)) {
-                File::cleanDirectory($targetPath);
+        // Restore storage ke MinIO dari rollback ZIP
+        $rollbackStoragePath = $this->findStoragePath($rollbackTempDir);
+        if ($rollbackStoragePath) {
+            $rollbackDisk = Storage::disk('backups');
+            $backupName = config('backup.backup.name', 'Laravel');
+            $storagePrefix = $backupName . '/storage';
+
+            $localFiles = File::allFiles($rollbackStoragePath);
+            foreach ($localFiles as $localFile) {
+                $relativePath = str_replace('\\', '/', $localFile->getRelativePathname());
+                $minioPath = $storagePrefix . '/' . $relativePath;
+                $rollbackDisk->put($minioPath, file_get_contents($localFile->getPathname()));
             }
-            File::copyDirectory($this->storageBackupDir, $targetPath);
-            Log::info('[Restore] Storage berhasil di-rollback dari backup sementara.');
+            Log::info('[Restore] Storage berhasil di-rollback ke MinIO dari backup pre-restore.');
         }
 
         // Cleanup rollback temp

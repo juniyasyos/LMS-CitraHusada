@@ -47,8 +47,16 @@ class BackupController extends Controller
 
         $settings = BackupSetting::first();
         
-        // Disk Space Calculation
-        $freeSpaceBytes = disk_free_space(storage_path());
+        // Disk Space Calculation (menggunakan disk backup di MinIO)
+        try {
+            $backupDisk = Storage::disk('backups');
+            $backupName = config('backup.backup.name');
+            $totalSize = collect($backupDisk->allFiles($backupName))
+                ->sum(fn($file) => $backupDisk->size($file));
+            $freeSpaceFormatted = $this->formatBytes($totalSize) . ' terpakai';
+        } catch (\Exception $e) {
+            $freeSpaceFormatted = 'N/A';
+        }
 
         return response()->json([
             'logs'     => $logs,
@@ -57,7 +65,7 @@ class BackupController extends Controller
                 'total'      => BackupLog::count(),
                 'success'    => BackupLog::where('status', 'success')->count(),
                 'failed'     => BackupLog::where('status', 'failed')->count(),
-                'free_space' => $this->formatBytes($freeSpaceBytes)
+                'free_space' => $freeSpaceFormatted
             ]
         ]);
     }
@@ -124,7 +132,7 @@ class BackupController extends Controller
 
         foreach ($logs as $log) {
             if ($log->filename) {
-                Storage::disk(config('filesystems.default', 'local'))->delete($log->filename);
+                Storage::disk('backups')->delete($log->filename);
             }
             $log->delete();
         }
@@ -142,7 +150,7 @@ class BackupController extends Controller
     {
         try {
             $backupName = config('backup.backup.name');
-            Storage::disk(config('filesystems.default', 'local'))->deleteDirectory($backupName);
+            Storage::disk('backups')->deleteDirectory($backupName);
             BackupLog::truncate();
 
             return response()->json([
