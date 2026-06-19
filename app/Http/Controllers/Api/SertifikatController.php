@@ -631,7 +631,7 @@ class SertifikatController extends Controller
             
             // Simpan file ke storage
             $path = 'materi/Sertifikat/SertifikatEksternal/' . $fileName;
-            Storage::disk(env('FILESYSTEM_DISK', 'local'))->put($path, file_get_contents($file));
+            Storage::disk(config('filesystems.default', 'local'))->put($path, file_get_contents($file));
 
             \App\Models\SertifikatEksternal::create([
                 'user_id' => $user->user_id,
