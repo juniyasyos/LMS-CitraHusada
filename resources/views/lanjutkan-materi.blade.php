@@ -323,10 +323,9 @@
             }
             
             const url = step.file ?? "";
-            // const url = `/storage/${file}`;
-            const ext = file.split('.').pop().toLowerCase();
+            const ext = url.split('.').pop().toLowerCase();
 
-            if (!file) {
+            if (!url) {
                 viewer.innerHTML = "File tidak tersedia";
                 return;
             }
