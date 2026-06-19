@@ -100,9 +100,11 @@ class SertifikatController extends Controller
                 $x_jabatan = 2250; $y_jabatan = 2280;
                 $x_nik = 2250; $y_nik = 2650;
 
-                // Pastikan font tersedia.
-                $fontPath = public_path('fonts/roboto/Roboto-Regular.ttf');
-                
+                // Pastikan font tersedia (dari resources/fonts agar tidak hilang saat deploy).
+                $fontPath = resource_path('fonts/roboto/Roboto-Regular.ttf');
+                if (!file_exists($fontPath)) {
+                    $fontPath = public_path('fonts/roboto/Roboto-Regular.ttf');
+                }
 
                 if (file_exists($fontPath)) {
                     $image->text($nama, $x_nama, $y_nama, function ($font) use ($fontPath) {
@@ -150,9 +152,11 @@ class SertifikatController extends Controller
                 $x_jabatan = 3450; $y_jabatan = 2080;
                 $x_nik = 3450; $y_nik = 2750;
 
-                // Pastikan font tersedia.
-                $fontPath = public_path('fonts/roboto/Roboto-Regular.ttf');
-                
+                // Pastikan font tersedia (dari resources/fonts agar tidak hilang saat deploy).
+                $fontPath = resource_path('fonts/roboto/Roboto-Regular.ttf');
+                if (!file_exists($fontPath)) {
+                    $fontPath = public_path('fonts/roboto/Roboto-Regular.ttf');
+                }
 
                 if (file_exists($fontPath)) {
                     $image->text($nama, $x_nama, $y_nama, function ($font) use ($fontPath) {
@@ -274,10 +278,18 @@ class SertifikatController extends Controller
                 $x_tanggalCetak = 2250; $y_tanggalCetak = 2140;
                 $tanggalHariIni = \Carbon\Carbon::now()->translatedFormat('d F Y');
 
-                $fontPath = public_path('fonts/arial/ARIAL.ttf');
-                //cek lagi ini bener apa ndak pathnya
-                $fontGaret = public_path('fonts/garet/Garet-Heavy.ttf');
-                $fontRoboto = public_path('fonts/roboto/Roboto-Regular.ttf');
+                $fontPath = resource_path('fonts/arial/ARIAL.TTF');
+                if (!file_exists($fontPath)) {
+                    $fontPath = public_path('fonts/arial/ARIAL.TTF');
+                }
+                $fontGaret = resource_path('fonts/garet/Garet-Heavy.ttf');
+                if (!file_exists($fontGaret)) {
+                    $fontGaret = public_path('fonts/garet/Garet-Heavy.ttf');
+                }
+                $fontRoboto = resource_path('fonts/roboto/Roboto-Regular.ttf');
+                if (!file_exists($fontRoboto)) {
+                    $fontRoboto = public_path('fonts/roboto/Roboto-Regular.ttf');
+                }
                 
                 if (file_exists($fontPath)) {
                     // Render Teks Direktur
@@ -317,7 +329,10 @@ class SertifikatController extends Controller
                 $x_jabatanDir = 3450; $y_jabatanDir = 2080;
                 $x_nikDir = 3450; $y_nikDir = 2750;
 
-                $fontPath = public_path('fonts/arial/ARIAL.ttf');
+                $fontPath = resource_path('fonts/arial/ARIAL.TTF');
+                if (!file_exists($fontPath)) {
+                    $fontPath = public_path('fonts/arial/ARIAL.TTF');
+                }
 
                 if (file_exists($fontPath)) {
                     // Render Teks Direktur
