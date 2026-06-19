@@ -79,8 +79,12 @@ class BackupController extends Controller
             $phpBinary = PHP_BINARY;
             $artisan = base_path('artisan');
 
-            // Detached process khusus Windows (karena kamu pakai Laragon/Windows)
-            $command = "start /B \"\" \"{$phpBinary}\" \"{$artisan}\" backup:run 2>&1";
+            // Eksekusi background command yang cross-platform (Windows & Linux)
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                $command = "start /B \"\" \"{$phpBinary}\" \"{$artisan}\" backup:run 2>&1";
+            } else {
+                $command = "{$phpBinary} {$artisan} backup:run > /dev/null 2>&1 &";
+            }
             pclose(popen($command, 'r'));
 
             // Catat ke Log Aktivitas
