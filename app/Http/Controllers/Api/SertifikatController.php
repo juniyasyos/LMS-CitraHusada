@@ -102,6 +102,11 @@ class SertifikatController extends Controller
 
                 // Pastikan font tersedia. Menggunakan font default Windows untuk kemudahan tes di local
                 $fontPath = public_path('fonts/arial/ARIAL.ttf');
+                dd([
+                    'font_path' => $fontPath,
+                    'exists' => file_exists($fontPath),
+                    'readable' => is_readable($fontPath),
+                ]);
                 
                 if (file_exists($fontPath)) {
                     $image->text($nama, $x_nama, $y_nama, function ($font) use ($fontPath) {
