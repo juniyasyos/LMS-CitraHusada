@@ -21,26 +21,9 @@ class DatabaseSeeder extends Seeder
         $this->call(JenisTenagaSeeder::class);
         $this->call(UnitKerjasSeeder::class); // Menggunakan UnitKerjasSeeder hasil export DB
         $this->call(KategoriSeeder::class);
-        $this->call(BackupSettingSeeder::class);
-
-        // create default admin user
         $this->call(UserSeeder::class);
-
-        // Seed data pelatihan & sub-data dari database asli
-        $this->call([
-            MaterisSeeder::class,
-            SubMaterisSeeder::class,
-            PostTestsSeeder::class,
-            SoalsSeeder::class,
-            MateriJenisTenagasSeeder::class,
-            MateriUnitKerjasSeeder::class,
-            SkorUsersSeeder::class,
-        ]);
-
-        // Optional default data
-        $this->call([
-            NotificationSeeder::class,
-            MotivationQuoteSeeder::class,
-        ]);
+        
+        $this->call(BackupSettingSeeder::class);
+        $this->call(MotivationQuoteSeeder::class);
     }
 }
