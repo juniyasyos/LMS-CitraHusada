@@ -81,9 +81,9 @@ class BackupController extends Controller
 
             // Eksekusi background command yang cross-platform (Windows & Linux)
             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                $command = "start /B \"\" \"{$phpBinary}\" \"{$artisan}\" backup:run 2>&1";
+                $command = "start /B \"\" \"{$phpBinary}\" \"{$artisan}\" backup:database 2>&1";
             } else {
-                $command = "{$phpBinary} {$artisan} backup:run > /dev/null 2>&1 &";
+                $command = "{$phpBinary} {$artisan} backup:database > /dev/null 2>&1 &";
             }
             pclose(popen($command, 'r'));
 
