@@ -16,17 +16,28 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Hash all existing plain-text passwords in the database
-        User::chunk(100, function ($users) {
-            foreach ($users as $user) {
-                // Check if password needs rehashing (i.e., it's plain text, not bcrypt)
-                if (Hash::needsRehash($user->password)) {
-                    // Hash the plain-text password
-                    $user->update([
-                        'password' => Hash::make($user->password)
-                    ]);
-                }
-            }
-        });
+        // Create admin user
+        User::factory()->create([
+            'nama' => 'admin',
+            'email' => 'admin@admin.com',
+            'nik' => '1234567',
+            'password' => Hash::make('password'),
+        ]);
+
+        // // Create 20 dummy users
+        // User::factory(20)->create();
+
+        // // Hash all existing plain-text passwords in the database
+        // User::chunk(100, function ($users) {
+        //     foreach ($users as $user) {
+        //         // Check if password needs rehashing (i.e., it's plain text, not bcrypt)
+        //         if (Hash::needsRehash($user->password)) {
+        //             // Hash the plain-text password
+        //             $user->update([
+        //                 'password' => Hash::make($user->password)
+        //             ]);
+        //         }
+        //     }
+        // });
     }
 }
