@@ -101,7 +101,7 @@ class SertifikatController extends Controller
                 $x_nik = 2250; $y_nik = 2650;
 
                 // Pastikan font tersedia. Menggunakan font default Windows untuk kemudahan tes di local
-                $fontPath = 'C:\Windows\Fonts\arial.ttf';
+                $fontPath = public_path('fonts/arial/ARIAL.ttf');
                 
                 if (file_exists($fontPath)) {
                     $image->text($nama, $x_nama, $y_nama, function ($font) use ($fontPath) {
@@ -150,7 +150,7 @@ class SertifikatController extends Controller
                 $x_nik = 3450; $y_nik = 2750;
 
                 // Pastikan font tersedia. Menggunakan font default Windows untuk kemudahan tes di local
-                $fontPath = 'C:\Windows\Fonts\arial.ttf';
+                $fontPath = public_path('fonts/arial/ARIAL.ttf');
                 
                 if (file_exists($fontPath)) {
                     $image->text($nama, $x_nama, $y_nama, function ($font) use ($fontPath) {
@@ -272,10 +272,10 @@ class SertifikatController extends Controller
                 $x_tanggalCetak = 2250; $y_tanggalCetak = 2140;
                 $tanggalHariIni = \Carbon\Carbon::now()->translatedFormat('d F Y');
 
-                $fontPath = 'C:\Windows\Fonts\arial.ttf';
+                $fontPath = public_path('fonts/arial/ARIAL.ttf');
                 //cek lagi ini bener apa ndak pathnya
-                $fontGaret = public_path('storage/materi/Sertifikat/Font/garet/Garet-Heavy.ttf');
-                $fontRoboto = public_path('storage/materi/Sertifikat/Font/roboto/Roboto-Regular.ttf');
+                $fontGaret = public_path('fonts/garet/Garet-Heavy.ttf');
+                $fontRoboto = public_path('fonts/roboto/Roboto-Regular.ttf');
                 
                 if (file_exists($fontPath)) {
                     // Render Teks Direktur
@@ -315,7 +315,7 @@ class SertifikatController extends Controller
                 $x_jabatanDir = 3450; $y_jabatanDir = 2080;
                 $x_nikDir = 3450; $y_nikDir = 2750;
 
-                $fontPath = 'C:\Windows\Fonts\arial.ttf';
+                $fontPath = public_path('fonts/arial/ARIAL.ttf');
 
                 if (file_exists($fontPath)) {
                     // Render Teks Direktur
