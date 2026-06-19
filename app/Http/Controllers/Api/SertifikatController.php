@@ -46,8 +46,8 @@ class SertifikatController extends Controller
 
             if ($request->hasFile('file_ttd')) {
                 // Hapus file lama jika ada
-                if ($direktur->ttd_path && Storage::exists($direktur->ttd_path)) {
-                    Storage::delete($direktur->ttd_path);
+                if ($direktur->ttd_path && Storage::disk(config('filesystems.default', 'local'))->exists($direktur->ttd_path)) {
+                    Storage::disk(config('filesystems.default', 'local'))->delete($direktur->ttd_path);
                 }
 
                 $path = $request->file('file_ttd')->store('sertifikat/ttd');
@@ -86,11 +86,11 @@ class SertifikatController extends Controller
                 ? 'materi/Sertifikat/Master_Sertifikat_Belakang.png'
                 : 'materi/Sertifikat/Master_Sertifikat_Depan.png';
 
-            if (!Storage::disk('public')->exists($masterFile)) {
+            if (!Storage::disk(config('filesystems.default', 'local'))->exists($masterFile)) {
                 return response('Master sertifikat tidak ditemukan.', 404);
             }
 
-            $image = $manager->read(Storage::disk('public')->get($masterFile));
+            $image = $manager->read(Storage::disk(config('filesystems.default', 'local'))->get($masterFile));
 
             if ($type === 'depan') {
                 // ==========================================
@@ -136,8 +136,8 @@ class SertifikatController extends Controller
                 $y_ttd = 2250;
                 $lebar_ttd = 700; // Lebar gambar tanda tangan (pixels)
 
-                if ($direktur && $direktur->ttd_path && Storage::exists($direktur->ttd_path)) {
-                        $ttd = $manager->read(Storage::get($direktur->ttd_path));
+                if ($direktur && $direktur->ttd_path && Storage::disk(config('filesystems.default', 'local'))->exists($direktur->ttd_path)) {
+                        $ttd = $manager->read(Storage::disk(config('filesystems.default', 'local'))->get($direktur->ttd_path));
                         $ttd->scale(width: $lebar_ttd);
                         $image->place($ttd, 'top-left', $x_ttd, $y_ttd); 
                 }
@@ -185,8 +185,8 @@ class SertifikatController extends Controller
                 $y_ttd = 2100;
                 $lebar_ttd = 700; // Lebar gambar tanda tangan (pixels)
 
-                if ($direktur && $direktur->ttd_path && Storage::exists($direktur->ttd_path)) {
-                        $ttd = $manager->read(Storage::get($direktur->ttd_path));
+                if ($direktur && $direktur->ttd_path && Storage::disk(config('filesystems.default', 'local'))->exists($direktur->ttd_path)) {
+                        $ttd = $manager->read(Storage::disk(config('filesystems.default', 'local'))->get($direktur->ttd_path));
                         $ttd->scale(width: $lebar_ttd);
                         $image->place($ttd, 'top-left', $x_ttd, $y_ttd); 
                 }
@@ -245,11 +245,11 @@ class SertifikatController extends Controller
                 ? 'materi/Sertifikat/Master_Sertifikat_Belakang.png'
                 : 'materi/Sertifikat/Master_Sertifikat_Depan.png';
 
-            if (!Storage::disk('public')->exists($masterFile)) {
+            if (!Storage::disk(config('filesystems.default', 'local'))->exists($masterFile)) {
                 return response('Master sertifikat tidak ditemukan.', 404);
             }
 
-            $image = $manager->read(Storage::disk('public')->get($masterFile));
+            $image = $manager->read(Storage::disk(config('filesystems.default', 'local'))->get($masterFile));
 
             if ($type === 'depan') {
                 // ==========================================
@@ -273,6 +273,7 @@ class SertifikatController extends Controller
                 $tanggalHariIni = \Carbon\Carbon::now()->translatedFormat('d F Y');
 
                 $fontPath = 'C:\Windows\Fonts\arial.ttf';
+                //cek lagi ini bener apa ndak pathnya
                 $fontGaret = public_path('storage/materi/Sertifikat/Font/garet/Garet-Heavy.ttf');
                 $fontRoboto = public_path('storage/materi/Sertifikat/Font/roboto/Roboto-Regular.ttf');
                 
@@ -299,8 +300,8 @@ class SertifikatController extends Controller
                 $y_ttd = 2250;
                 $lebar_ttd = 700;
 
-                if ($direktur && $direktur->ttd_path && Storage::exists($direktur->ttd_path)) {
-                        $ttd = $manager->read(Storage::get($direktur->ttd_path));
+                if ($direktur && $direktur->ttd_path && Storage::disk(config('filesystems.default', 'local'))->exists($direktur->ttd_path)) {
+                        $ttd = $manager->read(Storage::disk(config('filesystems.default', 'local'))->get($direktur->ttd_path));
                         $ttd->scale(width: $lebar_ttd);
                         $image->place($ttd, 'top-left', $x_ttd, $y_ttd); 
                 }
@@ -414,8 +415,8 @@ class SertifikatController extends Controller
                 $y_ttd = 2100;
                 $lebar_ttd = 700;
 
-                if ($direktur && $direktur->ttd_path && Storage::exists($direktur->ttd_path)) {
-                        $ttd = $manager->read(Storage::get($direktur->ttd_path));
+                if ($direktur && $direktur->ttd_path && Storage::disk(config('filesystems.default', 'local'))->exists($direktur->ttd_path)) {
+                        $ttd = $manager->read(Storage::disk(config('filesystems.default', 'local'))->get($direktur->ttd_path));
                         $ttd->scale(width: $lebar_ttd);
                         $image->place($ttd, 'top-left', $x_ttd, $y_ttd); 
                 }
@@ -560,7 +561,7 @@ class SertifikatController extends Controller
                 $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML($html)->setPaper('a4', 'landscape');
                 
                 $path = 'materi/Sertifikat/Generate/' . $fileName;
-                Storage::put($path, $pdf->output());
+                Storage::disk(config('filesystems.default', 'local'))->put($path, $pdf->output());
                 
                 if ($sertifikat->status !== 'Disetujui') {
                     if ($user && $materi) {
@@ -632,6 +633,7 @@ class SertifikatController extends Controller
             // Simpan file ke storage
             $path = 'materi/Sertifikat/SertifikatEksternal/' . $fileName;
             Storage::disk(config('filesystems.default', 'local'))->put($path, file_get_contents($file));
+            // Storage::disk('public')->put($path, file_get_contents($file));
 
             \App\Models\SertifikatEksternal::create([
                 'user_id' => $user->user_id,
