@@ -16,7 +16,7 @@ class DirekturSeeder extends Seeder
             'nama' => 'Nama Direktur',
             'jabatan' => 'Direktur Utama',
             'nik' => '123456789',
-            'ttd_path' => 'sertifikat/ttd/contoh-ttd.png',
+            'ttd_path' => 'Sertifikat/ttd/contoh-ttd.png',
         ]);
     }
 }

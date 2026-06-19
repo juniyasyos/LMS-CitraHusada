@@ -100,14 +100,10 @@ class SertifikatController extends Controller
                 $x_jabatan = 2250; $y_jabatan = 2280;
                 $x_nik = 2250; $y_nik = 2650;
 
-                // Pastikan font tersedia. Menggunakan font default Windows untuk kemudahan tes di local
-                $fontPath = public_path('fonts/arial/ARIAL.ttf');
-                dd([
-                    'font_path' => $fontPath,
-                    'exists' => file_exists($fontPath),
-                    'readable' => is_readable($fontPath),
-                ]);
+                // Pastikan font tersedia.
+                $fontPath = public_path('fonts/roboto/Roboto-Regular.ttf');
                 
+
                 if (file_exists($fontPath)) {
                     $image->text($nama, $x_nama, $y_nama, function ($font) use ($fontPath) {
                         $font->file($fontPath);
@@ -154,9 +150,10 @@ class SertifikatController extends Controller
                 $x_jabatan = 3450; $y_jabatan = 2080;
                 $x_nik = 3450; $y_nik = 2750;
 
-                // Pastikan font tersedia. Menggunakan font default Windows untuk kemudahan tes di local
-                $fontPath = public_path('fonts/arial/ARIAL.ttf');
+                // Pastikan font tersedia.
+                $fontPath = public_path('fonts/roboto/Roboto-Regular.ttf');
                 
+
                 if (file_exists($fontPath)) {
                     $image->text($nama, $x_nama, $y_nama, function ($font) use ($fontPath) {
                         $font->file($fontPath);
