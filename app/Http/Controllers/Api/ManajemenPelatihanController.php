@@ -711,6 +711,43 @@ class ManajemenPelatihanController extends Controller
         }
     }
 
+    public function reorderContent(Request $request, $materiId)
+    {
+        $request->validate([
+            'items' => 'required|array|min:1',
+            'items.*.type' => 'required|in:materi,kuis',
+            'items.*.id' => 'required|integer',
+            'items.*.sort_order' => 'required|integer|min:1',
+        ]);
+
+        $materi = Materi::find($materiId);
+        if (!$materi) {
+            return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+        }
+
+        DB::beginTransaction();
+        try {
+            foreach ($request->items as $item) {
+                if ($item['type'] === 'materi') {
+                    SubMateri::where('sub_materi_id', $item['id'])
+                        ->where('materi_id', $materiId)
+                        ->update(['urutan_sub_materi' => $item['sort_order']]);
+                } else {
+                    PostTest::where('post_test_id', $item['id'])
+                        ->where('materi_id', $materiId)
+                        ->update(['urutan_post_test' => $item['sort_order']]);
+                }
+            }
+
+            $this->logActivity($request, 'Update', 'materis', $materiId, "Mengubah urutan konten pada pelatihan: [{$materi->judul}]");
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Urutan berhasil diperbarui!']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Gagal memperbarui urutan: ' . $e->getMessage()], 500);
+        }
+    }
+
     private function logActivity(Request $request, $tipe, $tabel, $subjectId, $perubahan)
     {
         try {

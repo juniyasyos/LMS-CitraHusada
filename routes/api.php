@@ -204,6 +204,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/content/{id}/quiz', [ManajemenPelatihanController::class, 'storePostTest']);
             Route::put('/post-test/{id}', [ManajemenPelatihanController::class, 'updatePostTest']);
             Route::delete('/post-test/{id}', [ManajemenPelatihanController::class, 'destroyPostTest']);
+
+            Route::put('/content/{id}/reorder', [ManajemenPelatihanController::class, 'reorderContent']);
         });
     });
 

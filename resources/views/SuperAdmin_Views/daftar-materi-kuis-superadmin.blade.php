@@ -66,6 +66,7 @@
                             class="text-gray-500 dark:text-white font-bold border-b dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50">
                             <tr>
                                 <th class="py-4 px-6 uppercase tracking-wider">No</th>
+                                <th class="py-4 px-3 uppercase tracking-wider text-center" x-show="!readOnly">Urutan</th>
                                 <th class="py-4 px-6 uppercase tracking-wider">Daftar materi dan kuis</th>
                                 <th class="py-4 px-6 uppercase tracking-wider text-center">Jumlah Pengerjaan</th>
                                 <th class="py-4 px-6 uppercase tracking-wider" x-show="!readOnly">Keterangan</th>
@@ -77,6 +78,22 @@
                             <template x-for="(item, index) in contents" :key="index">
                                 <tr class="hover:bg-gray-50 dark:hover:bg-slate-800 transition">
                                     <td class="py-5 px-6 font-bold text-gray-400 dark:text-gray-500" x-text="index + 1">
+                                    </td>
+                                    <td class="py-5 px-3 text-center" x-show="!readOnly">
+                                        <div class="flex flex-col items-center gap-1">
+                                            <button @click="moveItem(index, 'up')" :disabled="index === 0"
+                                                class="w-7 h-7 rounded-md flex items-center justify-center transition-all active:scale-90"
+                                                :class="index === 0 ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' : 'text-gray-500 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400'"
+                                                title="Pindah ke atas">
+                                                <i class="fa-solid fa-chevron-up text-[11px]"></i>
+                                            </button>
+                                            <button @click="moveItem(index, 'down')" :disabled="index === contents.length - 1"
+                                                class="w-7 h-7 rounded-md flex items-center justify-center transition-all active:scale-90"
+                                                :class="index === contents.length - 1 ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' : 'text-gray-500 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400'"
+                                                title="Pindah ke bawah">
+                                                <i class="fa-solid fa-chevron-down text-[11px]"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                     <td class="py-5 px-6">
                                         <div class="flex items-center gap-4">
@@ -144,7 +161,7 @@
 
                             <template x-if="contents.length === 0">
                                 <tr>
-                                    <td colspan="5" class="py-16 text-center text-gray-400 dark:text-gray-500 italic">
+                                    <td colspan="6" class="py-16 text-center text-gray-400 dark:text-gray-500 italic">
                                         Belum ada materi atau kuis di pelatihan ini.
                                     </td>
                                 </tr>
@@ -857,6 +874,47 @@
                             cancelButton: 'rounded-lg px-6 py-2.5 text-xs font-bold'
                         }
                     });
+                },
+
+                async moveItem(index, direction) {
+                    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+                    if (targetIndex < 0 || targetIndex >= this.contents.length) return;
+
+                    // Swap items in the array
+                    const temp = this.contents[index];
+                    this.contents[index] = this.contents[targetIndex];
+                    this.contents[targetIndex] = temp;
+
+                    // Reassign sort_order based on new positions
+                    const items = this.contents.map((item, i) => ({
+                        type: item.type,
+                        id: item.type === 'materi' ? item.sub_materi_id : item.post_test_id,
+                        sort_order: i + 1
+                    }));
+
+                    try {
+                        const response = await fetch(`/api/admin/manajemen-pelatihan/content/${this.materiId}/reorder`, {
+                            method: 'PUT',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Bearer ' + localStorage.getItem('token')
+                            },
+                            body: JSON.stringify({ items })
+                        });
+                        const res = await response.json();
+                        if (res.success) {
+                            Toast.fire({ icon: 'success', title: 'Berhasil', text: res.message });
+                            this.fetchData();
+                        } else {
+                            Toast.fire({ icon: 'error', title: 'Gagal', text: res.message || 'Gagal mengubah urutan.' });
+                            this.fetchData(); // Revert by refetching
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        Toast.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan saat mengubah urutan.' });
+                        this.fetchData();
+                    }
                 }
             }
         }
