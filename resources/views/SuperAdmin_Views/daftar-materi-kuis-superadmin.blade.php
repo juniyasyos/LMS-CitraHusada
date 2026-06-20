@@ -199,7 +199,7 @@
                                 <p class="text-[11px] font-bold text-gray-700 dark:text-white uppercase w-full text-center break-all"
                                     x-text="formTambahMateri.uploadType === 'video' ? formTambahMateri.file.name : 'Upload Video'">
                                 </p>
-                                <p class="text-[9px] text-gray-400 mt-1">MP4, MOV (Max 10MB)</p>
+                                <p class="text-[9px] text-gray-400 mt-1">MP4, MOV (Max 50MB)</p>
                             </label>
                             <label
                                 :class="formTambahMateri.uploadType === 'video' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
@@ -212,7 +212,7 @@
                                 <p class="text-[11px] font-bold text-gray-700 dark:text-white uppercase w-full text-center break-all"
                                     x-text="formTambahMateri.uploadType === 'doc' ? formTambahMateri.file.name : 'Upload Dokumen'">
                                 </p>
-                                <p class="text-[9px] text-gray-400 mt-1">PDF, PPT (Max 5MB)</p>
+                                <p class="text-[9px] text-gray-400 mt-1">PDF, PPT (Max 10MB)</p>
                             </label>
                         </div>
 

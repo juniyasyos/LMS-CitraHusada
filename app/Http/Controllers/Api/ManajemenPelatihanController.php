@@ -400,12 +400,12 @@ class ManajemenPelatihanController extends Controller
                     $videoExt = ['mp4', 'mov', 'avi', 'mkv'];
 
                     if (in_array($ext, $videoExt)) {
-                        if ($size > 10240) { // 10MB = 10240 KB
+                        if ($size > 51200) { // 50MB = 51200 KB
                             $fail('Ukuran file video terlalu besar, maksimal 10MB.');
                         }
                     } else {
-                        if ($size > 5120) { // 5MB = 5120 KB
-                            $fail('Ukuran file dokumen terlalu besar, maksimal 5MB.');
+                        if ($size > 10240) { // 10MB = 10240 KB
+                            $fail('Ukuran file dokumen terlalu besar, maksimal 10MB.');
                         }
                     }
                 },
