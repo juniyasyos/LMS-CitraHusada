@@ -106,7 +106,7 @@
                                 @forelse($sertifikatsInternal as $sertif)
                                 <tr class="hover:bg-gray-50/80 dark:hover:bg-slate-800/50 transition-colors">
                                     <td class="py-5 px-6">
-                                        <div class="flex flex-col gap-1 cursor-pointer group" @click="previewPdf('{{ Storage::url($sertif->image_path) }}')">
+                                        <div class="flex flex-col gap-1 cursor-pointer group" @click="previewPdf('{{ $sertif->image_path ? Storage::url($sertif->image_path) : '' }}')">
                                             <div class="flex items-center gap-4">
                                                 <div class="w-9 h-9 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-lg flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-900/30">
                                                     <i class="fa-solid fa-building-circle-check"></i>
@@ -126,7 +126,7 @@
                                     </td>
                                     <td class="py-5 px-6 text-right">
                                         @if($sertif->status === 'Disetujui')
-                                            <a href="{{ Storage::url($sertif->image_path) }}" download class="inline-block text-blue-600 hover:text-blue-700 transition p-2">
+                                            <a href="{{ $sertif->image_path ? Storage::url($sertif->image_path) : '#' }}" download class="inline-block text-blue-600 hover:text-blue-700 transition p-2">
                                                 <i class="fa-solid fa-download"></i>
                                             </a>
                                         @else
@@ -159,7 +159,7 @@
                                 @forelse($sertifikatsEksternal as $ext)
                                 <tr class="hover:bg-gray-50/80 dark:hover:bg-slate-800/50 transition-colors">
                                     <td class="py-5 px-6">
-                                        <div class="flex flex-col gap-1 min-w-0 cursor-pointer group" @click="previewPdf('{{ Storage::url($ext->image_path) }}')">
+                                        <div class="flex flex-col gap-1 min-w-0 cursor-pointer group" @click="previewPdf('{{ $ext->image_path ? Storage::url($ext->image_path) : '' }}')">
                                             <span class="font-bold uppercase tracking-tight truncate group-hover:text-blue-600 transition-colors">{{ $ext->judul }}</span>
                                             @if($ext->deskripsi)
                                                 <span class="text-[10px] text-gray-500 font-medium italic">Catatan: {{ $ext->deskripsi }}</span>
@@ -174,7 +174,7 @@
                                     </td>
                                     <td class="py-5 px-6 text-right">
                                         @if($ext->status === 'Disetujui')
-                                            <a href="{{ Storage::url($ext->image_path) }}" download class="inline-block text-blue-600 p-2 transition">
+                                            <a href="{{ $ext->image_path ? Storage::url($ext->image_path) : '#' }}" download class="inline-block text-blue-600 p-2 transition">
                                                 <i class="fa-solid fa-download"></i>
                                             </a>
                                         @else
