@@ -76,14 +76,15 @@
                         <p id="navProfileName"
                             class="font-bold mt-3 text-gray-800 dark:text-white">
                         </p>
+                        
+                        <p id="navProfileNIK"
+                            class="text-[10px] text-gray-400 dark:text-gray-500">
+                        </p>
 
                         <p id="navProfileJabatan"
-                            class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-tighter">
+                            class="mt-2 text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-tighter">
                         </p>
 
-                        <p id="navProfileNIK"
-                            class="mt-2 text-[10px] text-gray-400 dark:text-gray-500">
-                        </p>
                     </div>
 
                     <div class="border-t dark:border-slate-700 pt-3" x-data="{ 
