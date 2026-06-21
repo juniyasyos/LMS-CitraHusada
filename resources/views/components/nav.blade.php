@@ -84,6 +84,11 @@
                         <p id="navProfileNIK"
                             class="mt-2 text-[10px] text-gray-400 dark:text-gray-500">
                         </p>
+
+                        <div id="navProfileJPL" class="mt-3 inline-flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1.5 rounded-lg">
+                            <i class="fa-solid fa-clock text-[10px]"></i>
+                            <span class="text-[11px] font-bold">JPL: <span id="navProfileJPLValue">0</span></span>
+                        </div>
                     </div>
 
                     <div class="border-t dark:border-slate-700 pt-3" x-data="{ 
@@ -174,6 +179,7 @@ async function loadUserProfile(){
                 document.getElementById("navProfileName").innerText = nama;
                 document.getElementById("navProfileJabatan").innerText = "Unit " + unitKerja;
                 document.getElementById("navProfileNIK").innerText = nik;
+                document.getElementById("navProfileJPLValue").innerText = user.total_jpl ?? 0;
         }
     }catch(error){
         console.error("Gagal load profile:", error);
