@@ -38,7 +38,9 @@
                 </label>
 
                 <div class="relative">
-                    <i class="fa-solid fa-id-card absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <span class="absolute left-3 inset-y-0 flex items-center text-gray-400 pointer-events-none">
+                        <i class="fa-solid fa-id-card"></i>
+                    </span>
 
                     <input 
                         type="text"
@@ -63,7 +65,9 @@
                 </label>
 
                 <div class="relative">
-                    <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <span class="absolute left-3 inset-y-0 flex items-center text-gray-400 pointer-events-none">
+                        <i class="fa-solid fa-lock"></i>
+                    </span>
 
                     <input 
                         type="password"
@@ -81,7 +85,7 @@
                         type="button" 
                         id="togglePassword"
                         onclick="togglePasswordVisibility()"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition duration-200"
+                        class="absolute right-3 inset-y-0 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none transition duration-200"
                         tabindex="-1"
                     >
                         <i id="eyeIcon" class="fa-solid fa-eye"></i>
