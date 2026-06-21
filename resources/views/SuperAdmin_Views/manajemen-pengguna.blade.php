@@ -120,7 +120,7 @@
                                                 class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-gray-200 px-3 py-1 rounded-md font-semibold"
                                                 x-text="user.unit_kerja ? user.unit_kerja.unit_kerja : '-'"></span>
                                         </td>
-                                        <td class="py-5 px-4 text-gray-500 dark:text-gray-300" x-text="(user.total_jpl || 0) + (user.jpl_eksternal || 0)">
+                                        <td class="py-5 px-4 text-gray-500 dark:text-gray-300" x-text="(parseInt(user.total_jpl) || 0) + (parseInt(user.jpl_eksternal) || 0)">
                                         </td>
                                         <td class="py-5 px-4 text-center">
                                             <span
@@ -437,7 +437,7 @@
                         user_id: user.user_id,
                         nama: user.nama,
                         nik: user.nik,
-                        total_jpl: (user.total_jpl || 0) + (user.jpl_eksternal || 0),
+                        total_jpl: (parseInt(user.total_jpl) || 0) + (parseInt(user.jpl_eksternal) || 0),
                         unit_kerja_id: user.unit_kerja_id,
                         jenis_tenaga_id: user.jenis_tenaga_id,
                         role_id: user.role_id,
