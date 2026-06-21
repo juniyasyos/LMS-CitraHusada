@@ -67,7 +67,7 @@ class ManajemenPenggunaController extends Controller
             'role_id' => 'required|exists:roles,role_id',
         ]);
 
-        $status = $request->has('status') && $request->status == 'on' ? 'active' : 'inactive';
+        $status = $request->input('status', 'inactive');
 
         $user = User::create([
             'nama' => $request->nama,
