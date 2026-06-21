@@ -13,6 +13,9 @@ class PembelajaranController extends Controller
     public function getProfile()
     {
         $user = User::with(['unitKerja', 'jenisTenaga'])
+            ->withSum(['sertifikatEksternals as jpl_eksternal' => function ($q) {
+                $q->where('status', 'Disetujui');
+            }], 'jpl')
             ->where('user_id', Auth::id())
             ->first();
 

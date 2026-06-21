@@ -34,6 +34,9 @@ class ManajemenPenggunaController extends Controller
         $search = $request->input('search');
 
         $query = User::with(['jenisTenaga', 'unitKerja', 'role'])
+            ->withSum(['sertifikatEksternals as jpl_eksternal' => function ($q) {
+                $q->where('status', 'Disetujui');
+            }], 'jpl')
             ->when($search, function ($query, $search) {
                 return $query->where(function ($q) use ($search) {
                     $q->where('nama', 'like', "%{$search}%")

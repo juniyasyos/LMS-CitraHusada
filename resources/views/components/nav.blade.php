@@ -180,7 +180,7 @@ async function loadUserProfile(){
                 document.getElementById("navProfileName").innerText = nama;
                 document.getElementById("navProfileJabatan").innerText = "Unit " + unitKerja;
                 document.getElementById("navProfileNIK").innerText = nik;
-                document.getElementById("navProfileJPLValue").innerText = user.total_jpl ?? 0;
+                document.getElementById("navProfileJPLValue").innerText = (user.total_jpl || 0) + (user.jpl_eksternal || 0);
         }
     }catch(error){
         console.error("Gagal load profile:", error);
