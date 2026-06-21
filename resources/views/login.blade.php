@@ -70,12 +70,22 @@
                         id="passwordInput"
                         name="password"
                         placeholder="kata sandi"
-                        class="w-full pl-10 pr-4 py-3 
+                        class="w-full pl-10 pr-10 py-3 
                             rounded-lg border border-gray-300 
                             focus:outline-none 
                             focus:ring-2 focus:ring-blue-500"
                         required
                     >
+
+                    <button 
+                        type="button" 
+                        id="togglePassword"
+                        onclick="togglePasswordVisibility()"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition duration-200"
+                        tabindex="-1"
+                    >
+                        <i id="eyeIcon" class="fa-solid fa-eye"></i>
+                    </button>
                 </div>
             </div>
 
@@ -207,6 +217,21 @@ console.log('Login page loaded, checking for required elements...');
 console.log('Form element:', document.getElementById('loginForm'));
 console.log('Button element:', document.getElementById('loginBtn'));
 console.log('Error container:', document.getElementById('errorContainer'));
+
+function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('passwordInput');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.classList.remove('fa-eye');
+        eyeIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        eyeIcon.classList.remove('fa-eye-slash');
+        eyeIcon.classList.add('fa-eye');
+    }
+}
 </script>
 
 @endsection
