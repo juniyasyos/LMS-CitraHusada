@@ -499,7 +499,7 @@
                             <div>
                                 <label
                                     class="block text-[10px] font-bold text-gray-400 dark:text-white uppercase mb-2">Waktu
-                                    (Menit)</label>
+                                    (Detik)</label>
                                 <input type="number" x-model="selectedKuis.waktu_pengerjaan" required min="1"
                                     class="w-full bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-lg h-10 px-4 text-sm dark:text-white">
                             </div>
