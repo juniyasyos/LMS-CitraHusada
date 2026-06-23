@@ -98,7 +98,7 @@
                                     :class="errors.unit_kerja_id ? 'border-red-500' : 'border-gray-200 dark:border-slate-700'">
                                     <option disabled value="">Pilih Unit Kerja</option>
                                     @foreach($unit_kerjas as $uk)
-                                        <option value="{{ $uk->unit_kerja_id }}">{{ $uk->unit_kerja }}</option>
+                                        <option value="{{ $uk->unit_kerja_id }}">{{ $uk->unit_name }}</option>
                                     @endforeach
                                 </select>
                                 <template x-if="errors.unit_kerja_id">

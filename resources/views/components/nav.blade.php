@@ -173,7 +173,7 @@ async function loadUserProfile(){
             const user = response.data.data;
 
             const nama = user.nama;
-            const unitKerja = user.unit_kerja?.unit_kerja ?? '-';
+            const unitKerja = (user.unit_kerjas?.map(u => u.unit_name).join(', ') || '-');
             // const jenisTenaga = user.jenis_tenaga?.jenis_tenaga ?? '-';
             const nik = user.nik ?? '-';
 

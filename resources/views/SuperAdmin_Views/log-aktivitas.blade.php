@@ -131,7 +131,7 @@
                                     </td>
                                     <td class="py-5 px-4 leading-tight min-w-[200px]">
                                         <p class="font-bold text-gray-800 dark:text-white" x-text="log.user ? log.user.nama : 'System'"></p>
-                                        <p class="text-[10px] text-gray-400 dark:text-gray-500 italic truncate" x-text="(log.user?.role?.role_name || 'Staff') + ' • ' + (log.user?.nik || 'N/A')"></p>
+                                        <p class="text-[10px] text-gray-400 dark:text-gray-500 italic truncate" x-text="(log.user?.role?.role_name || 'Staff') + ' • ' + (log.user?.nip || 'N/A')"></p>
                                     </td>
                                     <td class="py-5 px-4 text-center">
                                         <div class="inline-flex items-center gap-2 px-3 py-1.5 border rounded-lg font-bold text-[9px] uppercase tracking-tighter transition-colors"

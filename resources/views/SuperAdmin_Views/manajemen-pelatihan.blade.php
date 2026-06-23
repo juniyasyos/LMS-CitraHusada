@@ -226,7 +226,7 @@
                                     <label class="flex items-center gap-2 cursor-pointer group">
                                         <input type="checkbox" :value="uk.unit_kerja_id" x-model="formTambah.unit_kerja_ids"
                                             class="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-blue-600">
-                                        <span class="text-[11px] font-bold text-gray-600 dark:text-gray-300 group-hover:text-gray-900 transition-colors" x-text="uk.unit_kerja"></span>
+                                        <span class="text-[11px] font-bold text-gray-600 dark:text-gray-300 group-hover:text-gray-900 transition-colors" x-text="uk.unit_name"></span>
                                     </label>
                                 </template>
                             </div>
@@ -355,7 +355,7 @@
                                     <label class="flex items-center gap-2 cursor-pointer group">
                                         <input type="checkbox" :value="uk.unit_kerja_id" x-model="selectedMateri.unit_kerja_ids"
                                             class="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-blue-600">
-                                        <span class="text-[11px] font-bold text-gray-600 dark:text-gray-300 group-hover:text-gray-900 transition-colors" x-text="uk.unit_kerja"></span>
+                                        <span class="text-[11px] font-bold text-gray-600 dark:text-gray-300 group-hover:text-gray-900 transition-colors" x-text="uk.unit_name"></span>
                                     </label>
                                 </template>
                             </div>

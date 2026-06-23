@@ -118,11 +118,11 @@
                                                     <div class="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded flex items-center justify-center font-bold text-gray-500 dark:text-white text-[10px] uppercase transition-colors shrink-0" x-text="getInitials(user.nama)"></div>
                                                     <div class="truncate">
                                                         <p class="font-bold text-gray-800 dark:text-white transition-colors truncate" x-text="user.nama"></p>
-                                                        <p class="text-[10px] text-gray-400 dark:text-gray-300">NIP: <span x-text="user.nik"></span></p>
+                                                        <p class="text-[10px] text-gray-400 dark:text-gray-300">NIP: <span x-text="user.nip"></span></p>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="py-5 px-4 text-gray-500 dark:text-gray-300 leading-tight transition-colors" x-text="user.unit_kerja ? user.unit_kerja.unit_kerja : '-'"></td>
+                                            <td class="py-5 px-4 text-gray-500 dark:text-gray-300 leading-tight transition-colors" x-text="(user.unit_kerjas && user.unit_kerjas.length > 0) ? user.unit_kerjas.map(u => u.unit_name).join(', ') : '-'"></td>
                                             <td class="py-5 px-4 text-center font-bold text-gray-800 dark:text-white transition-colors" x-text="user.pelatihan_selesai"></td>
                                             <td class="py-5 px-4 text-center font-bold text-gray-800 dark:text-white transition-colors" x-text="user.total_jpl || 0"></td>
                                             <td class="py-5 px-6 text-center">

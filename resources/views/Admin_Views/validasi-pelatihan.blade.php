@@ -43,7 +43,7 @@
                         <div class="w-16 h-16 bg-gray-200 dark:bg-slate-800 rounded-lg flex items-center justify-center text-gray-400 font-bold text-xl uppercase">{{ substr($sertifikat->user->nama ?? 'A', 0, 2) }}</div>
                         <div>
                             <h3 class="font-bold text-gray-800 dark:text-white">{{ $sertifikat->user->nama ?? '-' }}</h3>
-                            <p class="text-[11px] text-gray-500 dark:text-gray-400 italic font-medium tracking-wide uppercase">{{ $sertifikat->user->unitKerja->unit_kerja ?? '-' }}</p>
+                            <p class="text-[11px] text-gray-500 dark:text-gray-400 italic font-medium tracking-wide uppercase">{{ $sertifikat->user?->unitKerjas->pluck('unit_name')->join(', ') ?: '-' }}</p>
                             <p class="text-[10px] text-gray-400 mt-1 transition-colors"><i class="fa-regular fa-clock mr-1"></i> {{ $progress->updated_at ? $progress->updated_at->diffForHumans() : '-' }}</p>
                         </div>
                     </div>
@@ -60,12 +60,12 @@
                         <div class="p-8 flex flex-col items-center text-center">
                             <div class="w-20 h-20 bg-gray-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-gray-400 font-bold text-2xl mb-4 uppercase">{{ substr($sertifikat->user->nama ?? 'A', 0, 2) }}</div>
                             <h3 class="font-bold text-gray-800 dark:text-white">{{ $sertifikat->user->nama ?? '-' }}</h3>
-                            <p class="text-xs text-gray-400 transition-colors">NIK {{ $sertifikat->user->nik ?? '-' }}</p>
+                            <p class="text-xs text-gray-400 transition-colors">NIP {{ $sertifikat->user->nip ?? '-' }}</p>
                         </div>
                         <div class="border-t dark:border-slate-800 grid grid-cols-2 divide-x dark:divide-slate-800 transition-colors">
                             <div class="p-4 text-center">
                                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Unit Kerja</p>
-                                <p class="text-xs font-bold text-gray-700 dark:text-white">{{ $sertifikat->user->unitKerja->unit_kerja ?? '-' }}</p>
+                                <p class="text-xs font-bold text-gray-700 dark:text-white">{{ $sertifikat->user?->unitKerjas->pluck('unit_name')->join(', ') ?: '-' }}</p>
                             </div>
                             <div class="p-4 text-center">
                                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Jenis Tenaga</p>

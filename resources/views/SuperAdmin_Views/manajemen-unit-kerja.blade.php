@@ -118,7 +118,7 @@
                                             <i class="fa-solid text-lg" :class="type === 'unit' ? 'fa-building' : 'fa-user-doctor'"></i>
                                         </div>
                                         <div>
-                                            <p class="font-bold text-gray-800 dark:text-white leading-tight text-sm tracking-tight" x-text="type === 'unit' ? item.unit_kerja : item.jenis_tenaga"></p>
+                                            <p class="font-bold text-gray-800 dark:text-white leading-tight text-sm tracking-tight" x-text="type === 'unit' ? item.unit_name : item.jenis_tenaga"></p>
                                             <p class="text-gray-400 dark:text-gray-500 mt-1 font-mono text-[10px] italic" x-text="'ID: ' + (type === 'unit' ? item.unit_kerja_id : item.jenis_tenaga_id)"></p>
                                         </div>
                                     </div>
@@ -359,7 +359,7 @@
                 this.errors = {};
                 this.editData = {
                     id: this.type === 'unit' ? item.unit_kerja_id : item.jenis_tenaga_id,
-                    name: this.type === 'unit' ? item.unit_kerja : item.jenis_tenaga,
+                    name: this.type === 'unit' ? item.unit_name : item.jenis_tenaga,
                     desc: item.deskripsi || ''
                 };
                 this.openEdit = true;

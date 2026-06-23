@@ -110,7 +110,7 @@
                 <tr>
                     <td style="text-align: center;">{{ $index + 1 }}</td>
                     <td><strong>{{ $user->nama }}</strong></td>
-                    <td>{{ $user->unitKerja ? $user->unitKerja->unit_kerja : '-' }}</td>
+                    <td>{{ $user->unitKerjas->isNotEmpty() ? $user->unitKerjas->pluck('unit_name')->join(', ') : '-' }}</td>
                     <td>{{ $user->pelatihan_selesai }} Selesai</td>
                     <td>{{ $user->total_jpl ?? 0 }}</td>
                     <td>

@@ -29,7 +29,7 @@
                 <div class="flex items-center gap-3 pl-4 border-l dark:border-slate-800">
                     <div class="text-right hidden sm:block">
                         <p class="text-xs font-bold text-gray-800 dark:text-white leading-tight">{{ auth()->user()->nama }}</p>
-                        <p class="text-[10px] text-gray-500 dark:text-gray-400 font-medium">{{ auth()->user()->unitKerja->unit_kerja ?? '-' }}</p>
+                        <p class="text-[10px] text-gray-500 dark:text-gray-400 font-medium">{{ auth()->user()->unitKerjas->pluck('unit_name')->join(', ') ?: '-' }}</p>
                     </div>
                     <div class="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded-full flex items-center justify-center shrink-0">
                         <i class="fa-solid fa-user text-gray-500 dark:text-white text-xs"></i>

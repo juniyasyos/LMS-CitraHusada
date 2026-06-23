@@ -135,11 +135,11 @@
                             <label
                                 class="text-[11px] font-bold text-gray-500 dark:text-white uppercase mb-2 block tracking-tight">Unit
                                 Kerja</label>
-                            <select x-model="filters.unit_kerja"
+                            <select x-model="filters.unit_name"
                                 class="w-full border-gray-200 dark:border-slate-700 rounded-lg text-xs p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-white">
                                 <option value="">Semua Unit</option>
-                                @foreach($unitKerjas as $unit)
-                                    <option value="{{ $unit->unit_kerja_id }}">{{ $unit->unit_kerja }}</option>
+                                @foreach($unit_kerjas as $unit)
+                                    <option value="{{ $unit->unit_kerja_id }}">{{ $unit->unit_name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -217,7 +217,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="py-4 px-4 text-gray-500 dark:text-gray-200" x-text="(report.user && report.user.unit_kerja) ? report.user.unit_kerja.unit_kerja : '-'"></td>
+                                            <td class="py-4 px-4 text-gray-500 dark:text-gray-200" x-text="(report.user && report.user.unit_kerjas && report.user.unit_kerjas.length > 0) ? report.user.unit_kerjas.map(u => u.unit_name).join(', ') : '-'"></td>
                                             <td class="py-4 px-4 font-bold text-gray-800 dark:text-white truncate max-w-[200px]" x-text="report.materi ? report.materi.judul : '-'"></td>
                                             <td class="py-4 px-4">
                                                 <div class="flex items-center gap-2 justify-center">
@@ -326,7 +326,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="py-4 px-4 text-gray-500 dark:text-gray-200" x-text="item.unit_kerja ? item.unit_kerja.unit_kerja : '-'"></td>
+                                            <td class="py-4 px-4 text-gray-500 dark:text-gray-200" x-text="(item.user && item.user.unit_kerjas && item.user.unit_kerjas.length > 0) ? item.user.unit_kerjas.map(u => u.unit_name).join(', ') : '-'"></td>
                                             <td class="py-4 px-4 text-center">
                                                 <span class="inline-flex items-center gap-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold px-2.5 py-1 rounded-full border border-indigo-100 dark:border-indigo-800">
                                                     <span x-text="item.jumlah_sertifikat"></span>
@@ -581,7 +581,7 @@
                     const end = new URLSearchParams(window.location.search).get('end_date');
                     return (start && end) ? `${start} to ${end}` : '';
                 })(),
-                unit_kerja: new URLSearchParams(window.location.search).get('unit_kerja') || '',
+                unit_name: new URLSearchParams(window.location.search).get('unit_name') || '',
                 status: new URLSearchParams(window.location.search).get('status') || ''
             },
 
@@ -619,7 +619,7 @@
                             url.searchParams.append('end_date', dates[0]);
                         }
                     }
-                    if (this.filters.unit_kerja) url.searchParams.append('unit_kerja', this.filters.unit_kerja);
+                    if (this.filters.unit_name) url.searchParams.append('unit_name', this.filters.unit_name);
                     if (this.filters.status) url.searchParams.append('status', this.filters.status);
 
                     const params = new URLSearchParams(url.search);
@@ -660,7 +660,7 @@
                             url.searchParams.append('end_date', dates[0]);
                         }
                     }
-                    if (this.filters.unit_kerja) url.searchParams.append('unit_kerja', this.filters.unit_kerja);
+                    if (this.filters.unit_name) url.searchParams.append('unit_name', this.filters.unit_name);
 
                     const response = await fetch(url.toString(), {
                         headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
@@ -704,7 +704,7 @@
                         params.append('end_date', dates[0]);
                     }
                 }
-                if (this.filters.unit_kerja) params.append('unit_kerja', this.filters.unit_kerja);
+                if (this.filters.unit_name) params.append('unit_name', this.filters.unit_name);
                 if (this.filters.status) params.append('status', this.filters.status);
                 const str = params.toString();
                 return str ? '?' + str : '';

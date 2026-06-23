@@ -63,7 +63,7 @@
                     <div>
                         <h3 class="text-lg font-bold text-gray-800 dark:text-white uppercase tracking-wider">Detail Sertifikat Eksternal</h3>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            Karyawan: <span class="font-bold text-gray-700 dark:text-gray-200">{{ $user->nama }}</span> ({{ $user->nik }})
+                            Karyawan: <span class="font-bold text-gray-700 dark:text-gray-200">{{ $user->nama }}</span> ({{ $user->nip }})
                         </p>
                     </div>
                     <span class="font-bold text-xs px-3 py-1.5 rounded-full border uppercase tracking-wider"

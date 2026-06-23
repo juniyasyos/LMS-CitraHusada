@@ -25,15 +25,15 @@ class MonitoringExport implements FromCollection, WithHeadings, WithMapping, Sho
     public function collection()
     {
         $search = $this->request->input('search');
-        $unitFilter = $this->request->input('unit_kerja');
+        $unitFilter = $this->request->input('unit_name');
         $statusFilter = $this->request->input('status');
 
-        $query = UserProgress::with(['user.unitKerja', 'materi']);
+        $query = UserProgress::with(['user.unitKerjas', 'materi']);
 
         if ($search) {
             $query->whereHas('user', function ($q) use ($search) {
                 $q->where('nama', 'LIKE', "%{$search}%")
-                    ->orWhere('nik', 'LIKE', "%{$search}%");
+                    ->orWhere('nip', 'LIKE', "%{$search}%");
             })->orWhereHas('materi', function ($q) use ($search) {
                 $q->where('judul', 'LIKE', "%{$search}%");
             });
@@ -41,7 +41,7 @@ class MonitoringExport implements FromCollection, WithHeadings, WithMapping, Sho
 
         if ($unitFilter) {
             $query->whereHas('user', function ($q) use ($unitFilter) {
-                $q->where('unit_kerja_id', $unitFilter);
+                $q->whereHas('unitKerjas', function($q2) use ($unitFilter) { $q2->where('unit_kerjas.unit_kerja_id', $unitFilter); });
             });
         }
 
@@ -56,7 +56,7 @@ class MonitoringExport implements FromCollection, WithHeadings, WithMapping, Sho
     {
         return [
             'Nama Karyawan',
-            'NIK',
+            'NIP',
             'Unit Kerja',
             'Nama Pelatihan',
             'Progres (%)',
@@ -73,8 +73,8 @@ class MonitoringExport implements FromCollection, WithHeadings, WithMapping, Sho
 
         return [
             $report->user->nama,
-            "'" . $report->user->nik, // Force string for NIK
-            $report->user->unitKerja->unit_kerja ?? '-',
+            "'" . $report->user->nip, // Force string for NIP
+            $report->user?->unitKerjas->pluck('unit_name')->join(', ') ?: '-',
             $report->materi->judul,
             $percent . '%',
             $report->status,
