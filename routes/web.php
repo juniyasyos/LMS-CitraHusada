@@ -4,11 +4,23 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\DevApiDocsController;
 
-Route::get('/', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/', [AuthController::class, 'login'])->name('login.post');
+if (config('iam.enabled')) {
+    Route::get('/', function (\Illuminate\Http\Request $request) {
+        if (\Illuminate\Support\Facades\Auth::check()) {
+            $user = \Illuminate\Support\Facades\Auth::user();
+            $redirectUrl = ($user->role_id == 1) ? '/beranda-superadmin' : '/pembelajaran';
+            return redirect($redirectUrl);
+        }
+        return app(\Juniyasyos\IamClient\Http\Controllers\SsoLoginRedirectController::class)($request);
+    })->name('login');
+} else {
+    Route::get('/', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/', [AuthController::class, 'login'])->name('login.post');
+}
 
-// Rute Terproteksi (Hanya yang sudah Login via Session Web)
-Route::middleware('auth')->group(function () {
+// Rute Terproteksi
+$authMiddleware = config('iam.enabled') ? 'iam.auth:web' : 'auth';
+Route::middleware($authMiddleware)->group(function () {
     Route::get('/dev/api-docs', [DevApiDocsController::class, 'index'])
         ->middleware('can:view-api-docs')
         ->name('dev.api-docs');
@@ -167,6 +179,10 @@ Route::middleware('auth')->group(function () {
     });
 
     // Logout bersifat global untuk semua role yang login
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    if (config('iam.enabled')) {
+        Route::post('/logout', \Juniyasyos\IamClient\Http\Controllers\LogoutController::class)->name('logout');
+    } else {
+        Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    }
 
 }); // END auth

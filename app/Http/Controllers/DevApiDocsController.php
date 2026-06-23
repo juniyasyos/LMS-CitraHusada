@@ -18,7 +18,7 @@ class DevApiDocsController extends Controller
                     'Content-Type' => 'application/json',
                 ],
                 'body' => [
-                    'nik' => 'user@example.com',
+                    'nip' => 'user@example.com',
                     'password' => 'password',
                 ],
                 'response' => [
@@ -45,7 +45,7 @@ class DevApiDocsController extends Controller
                         'uri' => '/api/login',
                         'description' => 'Login API dan terima Bearer token Sanctum.',
                         'headers' => ['Accept' => 'application/json', 'Content-Type' => 'application/json'],
-                        'body' => ['nik' => 'string', 'password' => 'string'],
+                        'body' => ['nip' => 'string', 'password' => 'string'],
                         'response' => ['success' => true, 'message' => 'Login berhasil', 'data' => ['token' => 'string']],
                     ],
                     [
@@ -105,8 +105,8 @@ class DevApiDocsController extends Controller
                         'uri' => '/api/admin/manajemen-pengguna',
                         'description' => 'Buat pengguna baru.',
                         'headers' => ['Authorization' => 'Bearer {token}', 'Accept' => 'application/json', 'Content-Type' => 'application/json'],
-                        'body' => ['nama' => 'string', 'nik' => 'string', 'password' => 'string', 'role_id' => 1, 'unit_kerja_id' => 1, 'jenis_tenaga_id' => 1],
-                        'default_body' => '{"nama":"John Doe","nik":"johndoe@example.com","password":"password123","role_id":4,"unit_kerja_id":1,"jenis_tenaga_id":1}',
+                        'body' => ['nama' => 'string', 'nip' => 'string', 'password' => 'string', 'role_id' => 1, 'unit_kerja_id' => 1, 'jenis_tenaga_id' => 1],
+                        'default_body' => '{"nama":"John Doe","nip":"johndoe@example.com","password":"password123","role_id":4,"unit_kerja_id":1,"jenis_tenaga_id":1}',
                         'response' => ['success' => true, 'message' => 'User berhasil dibuat', 'data' => ['user' => []]],
                     ],
                     [

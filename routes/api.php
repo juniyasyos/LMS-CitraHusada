@@ -47,7 +47,8 @@ Route::get('/debug-users', function () {
     ]);
 });
 
-Route::middleware('auth:sanctum')->group(function () {
+$apiAuthMiddleware = config('iam.enabled') ? 'iam.auth:api' : 'auth:sanctum';
+Route::middleware($apiAuthMiddleware)->group(function () {
 
     // Global User Endpoint
     Route::post('/logout', [AuthController::class, 'logoutApi']);

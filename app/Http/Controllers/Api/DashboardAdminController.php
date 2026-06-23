@@ -96,7 +96,7 @@ class DashboardAdminController extends Controller
             ->get()
             ->map(function ($unit, $index) use ($colors) {
                 return [
-                    'label' => $unit->unit_kerja,
+                    'label' => $unit->unit_name,
                     'val' => $unit->users_count,
                     'color' => $colors[$index % count($colors)]
                 ];
@@ -127,7 +127,7 @@ class DashboardAdminController extends Controller
             $search = $request->input('search');
             $perPage = $request->input('per_page', 10);
 
-            $query = User::with('unitKerja')
+            $query = User::with('unitKerjas')
                 ->withCount([
                     'progresses' => function ($query) {
                         $query->where('status', 'Selesai');
@@ -142,7 +142,7 @@ class DashboardAdminController extends Controller
                 ->when($search, function ($query, $search) {
                     return $query->where(function ($q) use ($search) {
                         $q->where('nama', 'like', "%{$search}%")
-                            ->orWhere('nik', 'like', "%{$search}%");
+                            ->orWhere('nip', 'like', "%{$search}%");
                     });
                 })
                 ->orderBy('total_jpl', 'desc');
@@ -187,7 +187,7 @@ class DashboardAdminController extends Controller
         $statusFilter = $request->query('status');
         $search = $request->query('search');
 
-        $query = User::with('unitKerja')
+        $query = User::with('unitKerjas')
             ->withCount([
                 'progresses as pelatihan_selesai' => function ($query) {
                     $query->where('status', 'Selesai');
@@ -204,7 +204,7 @@ class DashboardAdminController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('nama', 'LIKE', "%{$search}%")
-                    ->orWhere('nik', 'LIKE', "%{$search}%");
+                    ->orWhere('nip', 'LIKE', "%{$search}%");
             });
         }
 

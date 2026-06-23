@@ -33,14 +33,14 @@ class ManajemenPenggunaController extends Controller
     {
         $search = $request->input('search');
 
-        $query = User::with(['jenisTenaga', 'unitKerja', 'role'])
+        $query = User::with(['jenisTenaga', 'unitKerjas', 'role'])
             ->withSum(['sertifikatEksternals as jpl_eksternal' => function ($q) {
                 $q->where('status', 'Disetujui');
             }], 'jpl')
             ->when($search, function ($query, $search) {
                 return $query->where(function ($q) use ($search) {
                     $q->where('nama', 'like', "%{$search}%")
-                      ->orWhere('nik', 'like', "%{$search}%");
+                      ->orWhere('nip', 'like', "%{$search}%");
                 });
             })
             ->latest('user_id');
@@ -63,7 +63,7 @@ class ManajemenPenggunaController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:255',
-            'nik' => 'required|string|max:50|unique:users,nik',
+            'nip' => 'required|string|max:50|unique:users,nip',
             'password' => 'required|string|min:3',
             'unit_kerja_id' => 'required|exists:unit_kerjas,unit_kerja_id',
             'jenis_tenaga_id' => 'required|exists:jenis_tenagas,jenis_tenaga_id',
@@ -74,14 +74,16 @@ class ManajemenPenggunaController extends Controller
 
         $user = User::create([
             'nama' => $request->nama,
-            'nik' => $request->nik,
+            'nip' => $request->nip,
             'password' => Hash::make($request->password),
             'total_jpl' => $request->total_jpl ?? 0,
-            'unit_kerja_id' => $request->unit_kerja_id,
             'jenis_tenaga_id' => $request->jenis_tenaga_id,
             'role_id' => $request->role_id,
             'status' => $status,
         ]);
+        if ($request->filled('unit_kerja_id')) {
+            $user->unitKerjas()->sync([$request->unit_kerja_id]);
+        }
 
         $this->logActivity($request, 'Create', 'users', $user->user_id, "Menambah pengguna baru: [{$user->nama}]");
 
@@ -100,15 +102,15 @@ class ManajemenPenggunaController extends Controller
 
         $request->validate([
             'nama' => 'required|string|max:255',
-            'nik' => 'required|string|max:50|unique:users,nik,' . $user->user_id . ',user_id',
+            'nip' => 'required|string|max:50|unique:users,nip,' . $user->user_id . ',user_id',
             'unit_kerja_id' => 'required|exists:unit_kerjas,unit_kerja_id',
             'jenis_tenaga_id' => 'required|exists:jenis_tenagas,jenis_tenaga_id',
             'role_id' => 'required|exists:roles,role_id',
         ]);
 
         $user->nama = $request->nama;
-        $user->nik = $request->nik;
-        $user->unit_kerja_id = $request->unit_kerja_id;
+        $user->nip = $request->nip;
+        
         $user->jenis_tenaga_id = $request->jenis_tenaga_id;
         $user->role_id = $request->role_id;
         $user->status = $request->status;
@@ -118,6 +120,7 @@ class ManajemenPenggunaController extends Controller
         }
 
         $user->save();
+        if ($request->filled('unit_kerja_id')) { $user->unitKerjas()->sync([$request->unit_kerja_id]); }
 
         $this->logActivity($request, 'Update', 'users', $id, "Memperbarui data pengguna: [{$user->nama}]");
 

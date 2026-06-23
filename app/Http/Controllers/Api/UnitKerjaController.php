@@ -30,7 +30,7 @@ class UnitKerjaController extends Controller
         } else {
             $query = UnitKerja::withCount('users');
             if ($search) {
-                $query->where('unit_kerja', 'like', '%' . $search . '%');
+                $query->where('unit_name', 'like', '%' . $search . '%');
             }
             $data = $query->latest('unit_kerja_id')->get();
             $total = UnitKerja::count();
@@ -74,7 +74,7 @@ class UnitKerjaController extends Controller
             $this->logActivity($request, 'Create', 'jenis_tenagas', $record->jenis_tenaga_id, "Menambah jenis tenaga baru: " . $request->nama);
         } else {
             $record = UnitKerja::create([
-                'unit_kerja' => $request->nama,
+                'unit_name' => $request->nama,
                 'deskripsi' => $request->deskripsi,
             ]);
             $this->logActivity($request, 'Create', 'unit_kerjas', $record->unit_kerja_id, "Menambah unit kerja baru: " . $request->nama);
@@ -121,7 +121,7 @@ class UnitKerjaController extends Controller
             if (!$record) return $this->notFoundResponse();
 
             $record->update([
-                'unit_kerja' => $request->nama,
+                'unit_name' => $request->nama,
                 'deskripsi' => $request->deskripsi,
             ]);
             $this->logActivity($request, 'Update', 'unit_kerjas', $id, "Memperbarui unit kerja: " . $request->nama);
@@ -152,7 +152,7 @@ class UnitKerjaController extends Controller
             $record = UnitKerja::find($id);
             if (!$record) return $this->notFoundResponse();
 
-            $nama = $record->unit_kerja;
+            $nama = $record->unit_name;
             $record->delete();
             $this->logActivity($request, 'Delete', 'unit_kerjas', $id, "Menghapus unit kerja: " . $nama);
         }
