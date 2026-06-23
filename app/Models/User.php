@@ -23,7 +23,7 @@ class User extends Authenticatable
         'nama',
         'jenis_tenaga_id',
         'unit_kerja_id',
-        'nik',
+        'nip',
         'password',
         'role_id',
         'status',
@@ -49,9 +49,9 @@ class User extends Authenticatable
         return $this->belongsTo(JenisTenaga::class, 'jenis_tenaga_id', 'jenis_tenaga_id');
     }
 
-    public function unitKerja()
+    public function unitKerjas()
     {
-        return $this->belongsTo(UnitKerja::class, 'unit_kerja_id', 'unit_kerja_id');
+        return $this->belongsToMany(UnitKerja::class, 'user_unit_kerja', 'user_id', 'unit_kerja_id');
     }
 
     public function sertifikats()

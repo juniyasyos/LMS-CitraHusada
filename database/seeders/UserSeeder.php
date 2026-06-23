@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
         User::factory()->create([
             'nama' => 'admin',
             'email' => 'admin@admin.com',
-            'nik' => '1234567',
+            'nip' => '1234567',
             'password' => Hash::make('password'),
         ]);
 
