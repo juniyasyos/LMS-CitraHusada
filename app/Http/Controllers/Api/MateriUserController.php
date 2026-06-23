@@ -676,13 +676,10 @@ class MateriUserController extends Controller
             $progress->status = 'Progres';
             $progress->save();
 
-            // Reset percobaan agar user bisa memulai kembali kuis (hanya post-test)
-            $nonPretestIds = $nonPretests->pluck('post_test_id')->toArray();
+            // Reset percobaan agar user bisa memulai kembali kuis
             foreach ($skorUsers as $skorUser) {
-                if (in_array($skorUser->post_test_id, $nonPretestIds)) {
-                    $skorUser->percobaan = 0;
-                    $skorUser->save();
-                }
+                $skorUser->percobaan = 0;
+                $skorUser->save();
             }
 
             return [
