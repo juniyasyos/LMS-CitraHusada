@@ -535,7 +535,9 @@ class MateriUserController extends Controller
         }
 
         // 3. Hitung Rata-rata Skor dari SEMUA kuis (selain pretest) yang ada di materi ini
-        $nonPretests = $materi->postTests->where('pretest', false);
+        $nonPretests = $materi->postTests->filter(function ($test) {
+            return !$test->pretest;
+        });
         $totalPostTestCount = $nonPretests->count();
 
         // Ambil semua skor yang sudah dikerjakan untuk materi ini
@@ -610,7 +612,9 @@ class MateriUserController extends Controller
         if (!$progress)
             return null;
 
-        $nonPretests = $materi->postTests->where('pretest', false);
+        $nonPretests = $materi->postTests->filter(function ($test) {
+            return !$test->pretest;
+        });
         $totalPostTestCount = $nonPretests->count();
 
         if ($totalPostTestCount == 0)
@@ -650,10 +654,13 @@ class MateriUserController extends Controller
             $progress->status = 'Progres';
             $progress->save();
 
-            // Reset percobaan agar user bisa memulai kembali kuis
+            // Reset percobaan agar user bisa memulai kembali kuis (hanya post-test)
+            $nonPretestIds = $nonPretests->pluck('post_test_id')->toArray();
             foreach ($skorUsers as $skorUser) {
-                $skorUser->percobaan = 0;
-                $skorUser->save();
+                if (in_array($skorUser->post_test_id, $nonPretestIds)) {
+                    $skorUser->percobaan = 0;
+                    $skorUser->save();
+                }
             }
 
             return [
