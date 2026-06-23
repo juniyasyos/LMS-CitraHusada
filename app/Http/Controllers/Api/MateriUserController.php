@@ -277,6 +277,16 @@ class MateriUserController extends Controller
 
         $progress = $materi->progresses->first();
         $urutanSelesai = $progress->urutan_selesai ?? 0;
+        
+        $isLockedForToday = false;
+        if ($progress && $progress->status === 'Gagal') {
+            if ($progress->updated_at->isToday()) {
+                $isLockedForToday = true;
+            } else {
+                $progress->status = 'Progres';
+                $progress->save();
+            }
+        }
 
         $steps = collect();
 
@@ -327,7 +337,8 @@ class MateriUserController extends Controller
                 'judul' => $materi->judul,
                 'steps' => $steps,
                 'urutan_selesai' => $urutanSelesai,
-                'progress_percent' => $progressPercent
+                'progress_percent' => $progressPercent,
+                'is_locked_for_today' => $isLockedForToday
             ]
         ]);
     }
@@ -359,6 +370,17 @@ class MateriUserController extends Controller
                 'status' => 'Progres'
             ]
         );
+
+        if ($progress->status === 'Gagal') {
+            if ($progress->updated_at->isToday()) {
+                return response()->json([
+                    'message' => 'Anda telah mencapai batas percobaan hari ini. Silakan mulai kembali materi ini besok hari.'
+                ], 403);
+            } else {
+                $progress->status = 'Progres';
+                $progress->save();
+            }
+        }
 
         if ($urutan > $progress->urutan_selesai + 1) {
             return response()->json([
@@ -699,6 +721,17 @@ class MateriUserController extends Controller
                 'status' => 'Progres'
             ]
         );
+
+        if ($progress->status === 'Gagal') {
+            if ($progress->updated_at->isToday()) {
+                return response()->json([
+                    'message' => 'Anda telah mencapai batas percobaan hari ini. Silakan mulai kembali materi ini besok hari.'
+                ], 403);
+            } else {
+                $progress->status = 'Progres';
+                $progress->save();
+            }
+        }
 
         if ($progress->urutan_selesai < $postTest->urutan_post_test - 1) {
             return response()->json([

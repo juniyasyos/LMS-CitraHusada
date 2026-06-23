@@ -114,6 +114,24 @@
                 const response = await axios.get('/api/materi-lanjutkan/' + materiId);
                 const data = response.data.data;
 
+                if (data.is_locked_for_today) {
+                    document.querySelector('main').innerHTML = `
+                        <div class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-8 rounded-xl text-center border border-red-200 dark:border-red-800 mt-10 shadow-sm">
+                            <i class="fa-solid fa-lock text-5xl mb-4"></i>
+                            <h2 class="text-2xl font-bold mb-3">Akses Dikunci Sementara</h2>
+                            <p class="text-sm sm:text-base mb-4">Anda telah kehabisan kesempatan percobaan kuis hari ini. Silakan kembali besok hari untuk mengulang materi.</p>
+                            <a href="/detail-materi/${materiId}" class="inline-block mt-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-lg transition">Kembali ke Detail Materi</a>
+                        </div>
+                    `;
+                    document.getElementById("daftarMateri").innerHTML = `
+                        <div class="text-center p-4 text-gray-500 dark:text-gray-400">
+                            <i class="fa-solid fa-lock mb-2 text-xl"></i>
+                            <p class="text-sm">Materi terkunci hingga besok.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
                 allSteps = data.steps;
                 globalUrutanSelesai = data.urutan_selesai;
 
