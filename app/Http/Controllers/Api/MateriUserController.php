@@ -673,7 +673,7 @@ class MateriUserController extends Controller
         // Kunci kembali progress jika kesempatan habis dan rata-rata tidak lulus
         if ($rataRataSkor < $kkm) {
             $progress->urutan_selesai = 0;
-            $progress->status = 'Progres';
+            $progress->status = 'Gagal';
             $progress->save();
 
             // Reset percobaan agar user bisa memulai kembali kuis
