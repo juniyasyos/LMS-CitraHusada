@@ -124,6 +124,12 @@
 
         </main>
 
+        <!-- RIGHT SIDEBAR (Navigasi Soal) -->
+        <aside class="order-3 lg:order-3 w-full lg:w-72 bg-white dark:bg-slate-900 border-t lg:border-t-0 lg:border-l dark:border-slate-800 p-4 lg:p-6 transition-colors duration-300">
+            <h2 class="font-bold text-base lg:text-lg mb-4 text-gray-900 dark:text-white">Navigasi Soal</h2>
+            <div id="navigasiSoal" class="grid grid-cols-5 gap-2"></div>
+        </aside>
+
     </div>
 
     <!-- MODAL -->
@@ -302,6 +308,8 @@
                 } else {
                     showWelcomePopup();
                 }
+                
+                renderNavigasiSoal();
 
             } catch (error) {
                 if (error.response && error.response.status === 403) {
@@ -339,9 +347,19 @@
                 soal.pilihan_5
             ];
 
+            // Cek jika jawaban sudah tersimpan sebelumnya
+            let savedJawabanSoal = jawabanUser[soal.soal_id] || [];
+
+            let prevButton = currentQuestion > 0 ? `
+                <button onclick="prevSoal()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-colors duration-300">
+                    Sebelumnya
+                </button>
+            ` : `<button disabled class="bg-gray-300 text-white px-6 py-2 rounded-lg cursor-not-allowed">Sebelumnya</button>`;
+
             if (currentQuestion < totalQuestion - 1) {
                 tombolHTML = `
-                <div class="flex justify-end mt-8">
+                <div class="flex justify-between mt-8">
+                    ${prevButton}
                     <button id="btnLanjut" onclick="nextSoal()" disabled
                     class="bg-blue-300 pointer-events-none text-white px-6 py-2 rounded-lg transition-colors duration-300">
                         Selanjutnya
@@ -349,7 +367,8 @@
                 </div>`;
             } else {
                 tombolHTML = `
-                <div class="flex justify-center mt-8">
+                <div class="flex justify-between mt-8">
+                    ${prevButton}
                     <button id="btnKirim" onclick="bukaModal()" disabled
                     class="bg-blue-300 pointer-events-none text-white px-8 py-2 rounded-lg transition-colors duration-300">
                         Kirim
@@ -359,11 +378,13 @@
 
             pilihan.forEach((p, index) => {
                 if (p) {
+                    let isChecked = savedJawabanSoal.includes((index + 1).toString()) ? 'checked' : '';
                     pilihanHTML += `
                     <label class="flex items-start gap-3 p-3 border dark:border-slate-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-gray-200">
                         <input type="${soal.status_pilihan ? 'checkbox' : 'radio'}"
                         name="soal"
                         value="${index + 1}"
+                        ${isChecked}
                         onchange="cekPilihan()"
                         class="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 dark:bg-slate-700 dark:border-slate-600">
                         <span>${p}</span>
@@ -386,6 +407,9 @@
 
                 ${tombolHTML}
             `;
+            
+            cekPilihan();
+            renderNavigasiSoal();
         }
 
         function showWelcomePopup() {
@@ -406,9 +430,53 @@
             popup.classList.remove('flex');
             startTimer();
             renderSoal();
+            renderNavigasiSoal();
+        }
+
+        function renderNavigasiSoal() {
+            let navHTML = '';
+            for (let i = 0; i < totalQuestion; i++) {
+                let soalId = soalList[i].soal_id;
+                let isAnswered = jawabanUser[soalId] && jawabanUser[soalId].length > 0;
+                let isCurrent = i === currentQuestion;
+                
+                let bgClass = "bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300"; // Belum dijawab (abu-abu)
+                
+                if (isCurrent) {
+                    bgClass = "bg-blue-500 text-white border-2 border-blue-700 dark:border-blue-400 shadow-md"; // Sedang dibuka (biru)
+                } else if (isAnswered) {
+                    bgClass = "bg-green-500 text-white shadow-md"; // Sudah dijawab (hijau)
+                }
+
+                navHTML += `
+                <button onclick="goToSoal(${i})" class="${bgClass} font-semibold py-2 rounded-lg text-sm transition-colors duration-200">
+                    ${i + 1}
+                </button>
+                `;
+            }
+            document.getElementById("navigasiSoal").innerHTML = navHTML;
+        }
+
+        function goToSoal(index) {
+            simpanJawaban();
+            currentQuestion = index;
+            localStorage.setItem("quiz_current_question", currentQuestion);
+            renderSoal();
+        }
+
+        function prevSoal() {
+            if (currentQuestion > 0) {
+                simpanJawaban();
+                currentQuestion--;
+                localStorage.setItem("quiz_current_question", currentQuestion);
+                renderSoal();
+            }
         }
 
         function cekPilihan() {
+            simpanJawaban();
+            renderNavigasiSoal();
+
             const checked = document.querySelectorAll('input[name="soal"]:checked');
             const btn = document.getElementById("btnLanjut");
             const btnKirim = document.getElementById("btnKirim");

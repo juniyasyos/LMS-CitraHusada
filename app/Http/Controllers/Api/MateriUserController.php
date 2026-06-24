@@ -277,6 +277,16 @@ class MateriUserController extends Controller
 
         $progress = $materi->progresses->first();
         $urutanSelesai = $progress->urutan_selesai ?? 0;
+        
+        $isLockedForToday = false;
+        if ($progress && $progress->status === 'Gagal') {
+            if ($progress->updated_at->isToday()) {
+                $isLockedForToday = true;
+            } else {
+                $progress->status = 'Progres';
+                $progress->save();
+            }
+        }
 
         $steps = collect();
 
@@ -327,7 +337,8 @@ class MateriUserController extends Controller
                 'judul' => $materi->judul,
                 'steps' => $steps,
                 'urutan_selesai' => $urutanSelesai,
-                'progress_percent' => $progressPercent
+                'progress_percent' => $progressPercent,
+                'is_locked_for_today' => $isLockedForToday
             ]
         ]);
     }
@@ -359,6 +370,17 @@ class MateriUserController extends Controller
                 'status' => 'Progres'
             ]
         );
+
+        if ($progress->status === 'Gagal') {
+            if ($progress->updated_at->isToday()) {
+                return response()->json([
+                    'message' => 'Anda telah mencapai batas percobaan hari ini. Silakan mulai kembali materi ini besok hari.'
+                ], 403);
+            } else {
+                $progress->status = 'Progres';
+                $progress->save();
+            }
+        }
 
         if ($urutan > $progress->urutan_selesai + 1) {
             return response()->json([
@@ -535,7 +557,9 @@ class MateriUserController extends Controller
         }
 
         // 3. Hitung Rata-rata Skor dari SEMUA kuis (selain pretest) yang ada di materi ini
-        $nonPretests = $materi->postTests->where('pretest', false);
+        $nonPretests = $materi->postTests->filter(function ($test) {
+            return !$test->pretest;
+        });
         $totalPostTestCount = $nonPretests->count();
 
         // Ambil semua skor yang sudah dikerjakan untuk materi ini
@@ -610,7 +634,9 @@ class MateriUserController extends Controller
         if (!$progress)
             return null;
 
-        $nonPretests = $materi->postTests->where('pretest', false);
+        $nonPretests = $materi->postTests->filter(function ($test) {
+            return !$test->pretest;
+        });
         $totalPostTestCount = $nonPretests->count();
 
         if ($totalPostTestCount == 0)
@@ -647,7 +673,7 @@ class MateriUserController extends Controller
         // Kunci kembali progress jika kesempatan habis dan rata-rata tidak lulus
         if ($rataRataSkor < $kkm) {
             $progress->urutan_selesai = 0;
-            $progress->status = 'Progres';
+            $progress->status = 'Gagal';
             $progress->save();
 
             // Reset percobaan agar user bisa memulai kembali kuis
@@ -692,6 +718,17 @@ class MateriUserController extends Controller
                 'status' => 'Progres'
             ]
         );
+
+        if ($progress->status === 'Gagal') {
+            if ($progress->updated_at->isToday()) {
+                return response()->json([
+                    'message' => 'Anda telah mencapai batas percobaan hari ini. Silakan mulai kembali materi ini besok hari.'
+                ], 403);
+            } else {
+                $progress->status = 'Progres';
+                $progress->save();
+            }
+        }
 
         if ($progress->urutan_selesai < $postTest->urutan_post_test - 1) {
             return response()->json([
