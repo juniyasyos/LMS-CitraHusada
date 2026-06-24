@@ -138,7 +138,7 @@
                             <select x-model="filters.unit_name"
                                 class="w-full border-gray-200 dark:border-slate-700 rounded-lg text-xs p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-white">
                                 <option value="">Semua Unit</option>
-                                @foreach($unit_kerjas as $unit)
+                                @foreach($unit_kerja as $unit)
                                     <option value="{{ $unit->unit_kerja_id }}">{{ $unit->unit_name }}</option>
                                 @endforeach
                             </select>

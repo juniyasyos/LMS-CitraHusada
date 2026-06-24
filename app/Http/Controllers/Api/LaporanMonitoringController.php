@@ -26,10 +26,12 @@ class LaporanMonitoringController extends Controller
     public function index()
     {
         $unitKerjas = UnitKerja::all();
+        $unit_kerja = $unitKerjas;
+        $unit_kerjas = $unitKerjas;
         if (auth()->user()->hasRole('admin')) {
-            return view('Admin_Views.laporan-monitoring-admin', compact('unitKerjas'));
+            return view('Admin_Views.laporan-monitoring-admin', compact('unitKerjas', 'unit_kerja', 'unit_kerjas'));
         }
-        return view('SuperAdmin_Views.laporan-monitoring', compact('unitKerjas'));
+        return view('SuperAdmin_Views.laporan-monitoring', compact('unitKerjas', 'unit_kerja', 'unit_kerjas'));
     }
 
     /**
