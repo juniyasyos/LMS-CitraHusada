@@ -128,6 +128,12 @@ class AuthController extends Controller
             $request->user()->currentAccessToken()->delete();
 
             // Bersihkan Session Web agar tidak ada bocoran state
+            $reason = $request->input('reason', 'User initiated logout via API');
+            \Illuminate\Support\Facades\Log::info('Local API Logout Initiated', [
+                'user_id' => $request->user()->id ?? null,
+                'session_id' => $request->session()->getId(),
+                'reason' => $reason,
+            ]);
             Auth::guard('web')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
@@ -150,6 +156,12 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
+        $reason = $request->input('reason', 'User initiated logout via Web');
+        \Illuminate\Support\Facades\Log::info('Local Web Logout Initiated', [
+            'user_id' => Auth::id(),
+            'session_id' => $request->session()->getId(),
+            'reason' => $reason,
+        ]);
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
