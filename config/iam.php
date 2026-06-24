@@ -206,6 +206,7 @@ return [
         'nama' => 'name',
         // Add custom mappings:
         'nip' => 'nip',
+        'roles' => 'roles',
         // 'nik' => 'nik',
         // 'employee_id' => 'employee_id',
         // 'phone' => 'phone_number',
@@ -288,7 +289,7 @@ return [
     | Role Synchronization
     |
     */
-    'sync_roles' => env('IAM_SYNC_ROLES', true),
+    'sync_roles' => false,
     'role_guard_name' => env('IAM_ROLE_GUARD_NAME', 'web'),
 
     /*

@@ -25,7 +25,7 @@ class User extends Authenticatable
         'unit_kerja_id',
         'nip',
         'password',
-        'role_id',
+        'roles',
         'status',
         'total_jpl',
     ];
@@ -37,11 +37,27 @@ class User extends Authenticatable
 
     protected $casts = [
         'password' => 'hashed',
+        'roles' => 'array',
     ];
 
-    public function role()
+    public function hasRole($role)
     {
-        return $this->belongsTo(Role::class, 'role_id', 'role_id');
+        $roles = $this->roles ?? [];
+        if (is_array($role)) {
+            return count(array_intersect($role, $roles)) > 0;
+        }
+        return in_array($role, $roles);
+    }
+
+    public function hasAnyRole(array $roles)
+    {
+        return $this->hasRole($roles);
+    }
+
+    public function syncRoles(array $roles)
+    {
+        $this->roles = $roles;
+        $this->save();
     }
 
     public function jenisTenaga()
