@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UnitKerja;
 use App\Models\JenisTenaga;
-use App\Models\Role;
 use App\Models\LogAktivitas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -21,7 +20,12 @@ class ManajemenPenggunaController extends Controller
     {
         $unit_kerjas = UnitKerja::all();
         $jenis_tenagas = JenisTenaga::all();
-        $roles = Role::all();
+        $roles = [
+            (object)['role_id' => 'super_admin', 'role' => 'Super Admin'],
+            (object)['role_id' => 'admin', 'role' => 'Admin'],
+            (object)['role_id' => 'teacher', 'role' => 'Teacher / Tutor'],
+            (object)['role_id' => 'karyawan', 'role' => 'Karyawan / Peserta'],
+        ];
 
         return view('SuperAdmin_Views.manajemen-pengguna', compact('unit_kerjas', 'jenis_tenagas', 'roles'));
     }
@@ -33,7 +37,7 @@ class ManajemenPenggunaController extends Controller
     {
         $search = $request->input('search');
 
-        $query = User::with(['jenisTenaga', 'unitKerjas', 'role'])
+        $query = User::with(['jenisTenaga', 'unitKerjas'])
             ->withSum(['sertifikatEksternals as jpl_eksternal' => function ($q) {
                 $q->where('status', 'Disetujui');
             }], 'jpl')
@@ -67,7 +71,7 @@ class ManajemenPenggunaController extends Controller
             'password' => 'required|string|min:3',
             'unit_kerja_id' => 'required|exists:unit_kerjas,unit_kerja_id',
             'jenis_tenaga_id' => 'required|exists:jenis_tenagas,jenis_tenaga_id',
-            'role_id' => 'required|exists:roles,role_id',
+            'roles' => 'required|array',
         ]);
 
         $status = $request->input('status', 'inactive');
@@ -78,7 +82,7 @@ class ManajemenPenggunaController extends Controller
             'password' => Hash::make($request->password),
             'total_jpl' => $request->total_jpl ?? 0,
             'jenis_tenaga_id' => $request->jenis_tenaga_id,
-            'role_id' => $request->role_id,
+            'roles' => $request->roles,
             'status' => $status,
         ]);
         if ($request->filled('unit_kerja_id')) {
@@ -105,14 +109,14 @@ class ManajemenPenggunaController extends Controller
             'nip' => 'required|string|max:50|unique:users,nip,' . $user->user_id . ',user_id',
             'unit_kerja_id' => 'required|exists:unit_kerjas,unit_kerja_id',
             'jenis_tenaga_id' => 'required|exists:jenis_tenagas,jenis_tenaga_id',
-            'role_id' => 'required|exists:roles,role_id',
+            'roles' => 'required|array',
         ]);
 
         $user->nama = $request->nama;
         $user->nip = $request->nip;
         
         $user->jenis_tenaga_id = $request->jenis_tenaga_id;
-        $user->role_id = $request->role_id;
+        $user->syncRoles($request->roles);
         $user->status = $request->status;
 
         if ($request->filled('password')) {

@@ -26,7 +26,7 @@ class LaporanMonitoringController extends Controller
     public function index()
     {
         $unitKerjas = UnitKerja::all();
-        if (auth()->user()->role_id == 2) {
+        if (auth()->user()->hasRole('admin')) {
             return view('Admin_Views.laporan-monitoring-admin', compact('unitKerjas'));
         }
         return view('SuperAdmin_Views.laporan-monitoring', compact('unitKerjas'));

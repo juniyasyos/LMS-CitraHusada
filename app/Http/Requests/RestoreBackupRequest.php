@@ -14,7 +14,7 @@ class RestoreBackupRequest extends FormRequest
     public function authorize(): bool
     {
         // Hanya Super Admin (role_id = 1) yang boleh restore
-        return $this->user() && $this->user()->role_id === 1;
+        return $this->user() && $this->user()->hasRole('super_admin');
     }
 
     /**

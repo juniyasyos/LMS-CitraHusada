@@ -21,7 +21,7 @@ class CheckRole
             return $next($request);
         }
 
-        if (! $request->user() || !in_array($request->user()->role_id, $roles)) {
+        if (! $request->user() || !$request->user()->hasAnyRole($roles)) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Forbidden Access.'], 403);
             }

@@ -18,7 +18,7 @@ class AuthController extends Controller
     {
         if (Auth::check()) {
             $user = Auth::user();
-            // $redirectUrl = ($user->role_id == 1) ? '/beranda-superadmin' : (($user->role_id == 2) ? '/beranda-admin' : '/pembelajaran');
+            // $redirectUrl = ($user->hasRole('super_admin')) ? '/beranda-superadmin' : (($user->hasRole('admin')) ? '/beranda-admin' : '/pembelajaran');
             $redirectUrl = '/pembelajaran';
             return redirect($redirectUrl);
         }
@@ -85,7 +85,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             // Mengatur redirect berdasarkan role! Mencegah user Karyawan dilempar ke Admin dan 403 Forbidden
-            $redirectUrl = ($user->role_id == 1) ? '/beranda-superadmin' : '/pembelajaran';
+            $redirectUrl = ($user->hasRole('super_admin')) ? '/beranda-superadmin' : '/pembelajaran';
 
             // Mengatur expiry logic manual (simulasi "remember me")
             $expires_at = $remember

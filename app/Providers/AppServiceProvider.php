@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::define('view-api-docs', function (User $user) {
-            return $user->role_id === 1;
+            return $user->hasRole('super_admin');
         });
     }
 }
