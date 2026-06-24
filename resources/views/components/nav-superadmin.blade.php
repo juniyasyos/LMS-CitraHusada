@@ -21,7 +21,7 @@
     <nav class="flex-1 p-4 space-y-1 overflow-y-auto custom-scrollbar">
 
         <!-- Superadmin -->
-        @if(auth()->user()->role_id == 1 && !session()->has('impersonate_by'))
+        @if(auth()->user()->hasRole('super_admin') && !session()->has('impersonate_by'))
         <!-- BERANDA -->
         <a href="/beranda-superadmin" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
         {{ request()->is('beranda-superadmin*', 'detail-leaderboard*') ? $active : $inactive }}">
@@ -74,7 +74,7 @@
         
 
         <!-- Admin -->
-        @if(auth()->user()->role_id == 2 && !session()->has('impersonate_by'))
+        @if(auth()->user()->hasRole('admin') && !session()->has('impersonate_by'))
         <!-- BERANDA -->
         <a href="/beranda-admin" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
         {{ request()->is('beranda-admin*') ? $active : $inactive }}">
@@ -90,7 +90,7 @@
         </a>
         @endif
         
-        @if(auth()->user()->role_id == 3 && !session()->has('impersonate_by'))
+        @if(auth()->user()->hasRole('teacher') && !session()->has('impersonate_by'))
         <!-- BERANDA -->
         <a href="/beranda-admin" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
         {{ request()->is('beranda-admin*') ? $active : $inactive }}">
@@ -148,7 +148,7 @@
             Beralih Akun
         </a>
         
-        @if(auth()->user()->role_id == 1 && !session()->has('impersonate_by'))
+        @if(auth()->user()->hasRole('super_admin') && !session()->has('impersonate_by'))
         <a href="/cadangan" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200
         {{ request()->is('cadangan*') ? $active : $inactive }}">
             <i class="fa-solid fa-cloud-arrow-up text-sm"></i>

@@ -4,11 +4,23 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\DevApiDocsController;
 
-Route::get('/', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/', [AuthController::class, 'login'])->name('login.post');
+if (config('iam.enabled')) {
+    Route::get('/', function (\Illuminate\Http\Request $request) {
+        if (\Illuminate\Support\Facades\Auth::check()) {
+            $user = \Illuminate\Support\Facades\Auth::user();
+            $redirectUrl = ($user->role_id == 1) ? '/beranda-superadmin' : '/pembelajaran';
+            return redirect($redirectUrl);
+        }
+        return app(\Juniyasyos\IamClient\Http\Controllers\SsoLoginRedirectController::class)($request);
+    })->name('login');
+} else {
+    Route::get('/', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/', [AuthController::class, 'login'])->name('login.post');
+}
 
-// Rute Terproteksi (Hanya yang sudah Login via Session Web)
-Route::middleware('auth')->group(function () {
+// Rute Terproteksi
+$authMiddleware = config('iam.enabled') ? 'iam.auth:web' : 'auth';
+Route::middleware($authMiddleware)->group(function () {
     Route::get('/dev/api-docs', [DevApiDocsController::class, 'index'])
         ->middleware('can:view-api-docs')
         ->name('dev.api-docs');
@@ -44,7 +56,7 @@ Route::middleware('auth')->group(function () {
 
 
     // Group Superadmin (Misal role_id = 1)
-    Route::middleware('role:1')->group(function () {
+    Route::middleware('role:super_admin')->group(function () {
 
         // Rute Administratif Superadmin (DIPROTEKSI: Akses ditolak saat mode impersonasi)
         Route::middleware('no.impersonate')->group(function () {
@@ -113,7 +125,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/impersonate/stop', [\App\Http\Controllers\Api\ManajemenPenggunaController::class, 'stopImpersonating'])->name('impersonate.stop');
     });
 
-    Route::middleware('role:2')->group(function () {
+    Route::middleware('role:admin')->group(function () {
         Route::middleware('no.impersonate')->group(function () {
 
             Route::get('/kelola-ttd', function () {
@@ -127,7 +139,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // Shared routes untuk Role 1 (Superadmin) dan Role 2 (Admin)
-    Route::middleware(['role:1,2', 'no.impersonate'])->group(function () {
+    Route::middleware(['role:super_admin,admin', 'no.impersonate'])->group(function () {
         
         // Single Laporan Monitoring route pointing to LaporanMonitoringController@index
         Route::get('/laporan-monitoring', [\App\Http\Controllers\Api\LaporanMonitoringController::class, 'index'])->name('laporan.monitoring');
@@ -143,7 +155,7 @@ Route::middleware('auth')->group(function () {
         // Validasi Pelatihan
     });
 
-    Route::middleware('role:2,3')->group(function () {
+    Route::middleware('role:admin,teacher')->group(function () {
         Route::middleware('no.impersonate')->group(function () {
             // DASHBOARD ADMIN
             Route::get('/beranda-admin', function () {
@@ -155,7 +167,7 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    Route::middleware('role:1,3')->group(function () {
+    Route::middleware('role:super_admin,teacher')->group(function () {
         Route::middleware('no.impersonate')->group(function () {
            // Manajemen Media
             Route::get('/manajemen-pelatihan', [\App\Http\Controllers\Api\ManajemenPelatihanController::class, 'index'])->name('manajemen-pelatihan');
@@ -167,6 +179,10 @@ Route::middleware('auth')->group(function () {
     });
 
     // Logout bersifat global untuk semua role yang login
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    if (config('iam.enabled')) {
+        Route::post('/logout', \Juniyasyos\IamClient\Http\Controllers\LogoutController::class)->name('logout');
+    } else {
+        Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    }
 
 }); // END auth

@@ -30,7 +30,7 @@ class SertifikatController extends Controller
             $request->validate([
                 'nama' => 'required|string|max:255',
                 'jabatan' => 'required|string|max:255',
-                'nik' => 'required|string|max:255',
+                'nip' => 'required|string|max:255',
                 'file_ttd' => 'nullable|image|mimes:png,jpg,jpeg|max:2048'
             ]);
 
@@ -42,7 +42,7 @@ class SertifikatController extends Controller
 
             $direktur->nama = $request->nama;
             $direktur->jabatan = $request->jabatan;
-            $direktur->nik = $request->nik;
+            $direktur->nip = $request->nip;
 
             if ($request->hasFile('file_ttd')) {
                 // Hapus file lama jika ada
@@ -77,7 +77,7 @@ class SertifikatController extends Controller
             $direktur = \App\Models\Direktur::first();
             $nama = $direktur->nama ?? 'Nama Direktur';
             $jabatan = $direktur->jabatan ?? 'Jabatan';
-            $nik = $direktur->nik ?? '0000.000';
+            $nip = $direktur->nip ?? '0000.000';
 
             // Inisialisasi ImageManager dengan driver GD
             $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
@@ -123,7 +123,7 @@ class SertifikatController extends Controller
                         $font->valign('middle');
                     });
 
-                    // $image->text('NIK. ' . $nik, $x_nik, $y_nik, function ($font) use ($fontPath) {
+                    // $image->text('NIP. ' . $nip, $x_nik, $y_nik, function ($font) use ($fontPath) {
                     //     $font->file($fontPath);
                     //     $font->size(40);
                     //     $font->color('#000000');
@@ -175,7 +175,7 @@ class SertifikatController extends Controller
                         $font->valign('middle');
                     });
 
-                    // $image->text('NIK. ' . $nik, $x_nik, $y_nik, function ($font) use ($fontPath) {
+                    // $image->text('NIP. ' . $nip, $x_nik, $y_nik, function ($font) use ($fontPath) {
                     //     $font->file($fontPath);
                     //     $font->size(40);
                     //     $font->color('#000000');
@@ -214,7 +214,7 @@ class SertifikatController extends Controller
             $direktur = \App\Models\Direktur::first();
             $namaDir = $direktur->nama ?? 'Nama Direktur';
             $jabatanDir = $direktur->jabatan ?? 'Jabatan';
-            $nikDir = $direktur->nik ?? '123456789';
+            $nikDir = $direktur->nip ?? '123456789';
 
             // Data User & Materi
             $user = \App\Models\User::find($userId);
@@ -295,7 +295,7 @@ class SertifikatController extends Controller
                     // Render Teks Direktur
                     $image->text($namaDir, $x_namaDir, $y_namaDir, function ($font) use ($fontRoboto) { $font->file($fontRoboto); $font->size(50); $font->color('#000000'); $font->align('center'); $font->valign('middle'); });
                     $image->text($jabatanDir, $x_jabatanDir, $y_jabatanDir, function ($font) use ($fontRoboto) { $font->file($fontRoboto); $font->size(50); $font->color('#000000'); $font->align('center'); $font->valign('middle'); });
-                    // $image->text('NIK. ' . $nikDir, $x_nikDir, $y_nikDir, function ($font) use ($fontRoboto) { $font->file($fontRoboto); $font->size(40); $font->color('#000000'); $font->align('center'); $font->valign('middle'); });
+                    // $image->text('NIP. ' . $nikDir, $x_nikDir, $y_nikDir, function ($font) use ($fontRoboto) { $font->file($fontRoboto); $font->size(40); $font->color('#000000'); $font->align('center'); $font->valign('middle'); });
                     
                     // Render Teks Peserta
                     // $image->text($namaUser, $x_namaUser, $y_namaUser, function ($font) use ($fontGaret) { $font->file($fontGaret); $font->size(130); $font->color('#000000'); $font->align('center'); $font->valign('middle'); });
@@ -338,7 +338,7 @@ class SertifikatController extends Controller
                     // Render Teks Direktur
                     $image->text($namaDir, $x_namaDir, $y_namaDir, function ($font) use ($fontPath) { $font->file($fontPath); $font->size(50); $font->color('#000000'); $font->align('center'); $font->valign('middle'); });
                     $image->text($jabatanDir, $x_jabatanDir, $y_jabatanDir, function ($font) use ($fontPath) { $font->file($fontPath); $font->size(50); $font->color('#000000'); $font->align('center'); $font->valign('middle'); });
-                    // $image->text('NIK. ' . $nikDir, $x_nikDir, $y_nikDir, function ($font) use ($fontPath) { $font->file($fontPath); $font->size(40); $font->color('#000000'); $font->align('center'); $font->valign('middle'); });
+                    // $image->text('NIP. ' . $nikDir, $x_nikDir, $y_nikDir, function ($font) use ($fontPath) { $font->file($fontPath); $font->size(40); $font->color('#000000'); $font->align('center'); $font->valign('middle'); });
                 }
 
                 // ==========================================
@@ -449,7 +449,7 @@ class SertifikatController extends Controller
     public function showValidasi($userId, $materiId)
     {
         $sertifikat = \App\Models\Sertifikat::with([
-            'user.unitKerja', 
+            'user.unitKerjas', 
             'user.jenisTenaga', 
             'materi.subMateris', 
             'materi.postTests'

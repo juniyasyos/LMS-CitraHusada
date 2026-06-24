@@ -40,7 +40,7 @@ class LeaderboardExport implements FromCollection, WithHeadings, WithMapping, Sh
         return [
             $this->rowNumber,
             $user->nama,
-            $user->unitKerja ? $user->unitKerja->unit_kerja : '-',
+            $user->unitKerjas->isNotEmpty() ? $user->unitKerjas->pluck('unit_name')->join(', ') : '-',
             $user->pelatihan_selesai . ' Pelatihan',
             $user->total_jpl,
             ($user->total_jpl ?? 0) >= 20 ? 'Terpenuhi' : 'Belum Terpenuhi',

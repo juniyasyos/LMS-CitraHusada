@@ -19,9 +19,9 @@ class DatabaseSeeder extends Seeder
         // Seed master data
         $this->call(RoleSeeder::class);
         $this->call(JenisTenagaSeeder::class);
-        $this->call(UnitKerjasSeeder::class); // Menggunakan UnitKerjasSeeder hasil export DB
+        // $this->call(UnitKerjasSeeder::class); // Menggunakan UnitKerjasSeeder hasil export DB
         $this->call(KategoriSeeder::class);
-        $this->call(UserSeeder::class);
+        // $this->call(UserSeeder::class);
         
         $this->call(BackupSettingSeeder::class);
         $this->call(MotivationQuoteSeeder::class);

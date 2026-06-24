@@ -89,10 +89,10 @@
                             <input type="text" x-model="form.jabatan" required class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
                         </div>
 
-                        {{-- Input NIK --}}
+                        {{-- Input NIP --}}
                         {{-- <div class="space-y-1.5">
-                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">NIK</label>
-                            <input type="text" x-model="form.nik" required class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
+                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">NIP</label>
+                            <input type="text" x-model="form.nip" required class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
                         </div> --}}
 
                         <div class="pt-4">
@@ -167,7 +167,7 @@ function kelolaTtdData() {
         form: {
             nama: '',
             jabatan: '',
-            nik: '',
+            nip: '',
             file_ttd: null,
             ttd_preview: null
         },
@@ -196,7 +196,7 @@ function kelolaTtdData() {
                 if(res.success && res.data) {
                     this.form.nama = res.data.nama || '';
                     this.form.jabatan = res.data.jabatan || '';
-                    this.form.nik = res.data.nik || '';
+                    this.form.nip = res.data.nip || '';
                     if(res.data.ttd_path) {
                         this.form.ttd_preview = '{{ Storage::url('') }}' + res.data.ttd_path;
                     }
@@ -232,7 +232,7 @@ function kelolaTtdData() {
                 const formData = new FormData();
                 formData.append('nama', this.form.nama);
                 formData.append('jabatan', this.form.jabatan);
-                formData.append('nik', this.form.nik);
+                formData.append('nip', this.form.nip);
                 if(this.form.file_ttd) {
                     formData.append('file_ttd', this.form.file_ttd);
                 }

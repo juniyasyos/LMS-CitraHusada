@@ -1,7 +1,15 @@
 import './bootstrap';
 
 function getToken() {
-    return localStorage.getItem('token') || sessionStorage.getItem('token');
+    let token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) {
+        const iamMeta = document.querySelector('meta[name="iam-access-token"]');
+        if (iamMeta) {
+            token = iamMeta.getAttribute('content');
+            sessionStorage.setItem('token', token);
+        }
+    }
+    return token;
 }
 
 function performWebLogout() {

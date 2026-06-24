@@ -18,7 +18,7 @@ class AuthController extends Controller
     {
         if (Auth::check()) {
             $user = Auth::user();
-            // $redirectUrl = ($user->role_id == 1) ? '/beranda-superadmin' : (($user->role_id == 2) ? '/beranda-admin' : '/pembelajaran');
+            // $redirectUrl = ($user->hasRole('super_admin')) ? '/beranda-superadmin' : (($user->hasRole('admin')) ? '/beranda-admin' : '/pembelajaran');
             $redirectUrl = '/pembelajaran';
             return redirect($redirectUrl);
         }
@@ -31,7 +31,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'nik' => 'required|string',
+            'nip' => 'required|string',
             'password' => 'required|string',
         ]);
 
@@ -40,7 +40,7 @@ class AuthController extends Controller
             return redirect()->intended('/pembelajaran');
         }
 
-        return back()->withErrors(["nik" => "Nomor induk atau kata sandi tidak cocok."]);
+        return back()->withErrors(["nip" => "Nomor induk atau kata sandi tidak cocok."]);
     }
 
     /**
@@ -50,18 +50,18 @@ class AuthController extends Controller
     {
         try {
             $credentials = $request->validate([
-                'nik' => 'required|string',
+                'nip' => 'required|string',
                 'password' => 'required|string',
             ]);
 
             $remember = $request->boolean('remember'); // 🔥 ini pengganti remember_token
 
-            $user = \App\Models\User::where('nik', $credentials['nik'])->first();
+            $user = \App\Models\User::where('nip', $credentials['nip'])->first();
 
             if (!$user) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'User dengan NIK tersebut tidak ditemukan',
+                    'message' => 'User dengan NIP tersebut tidak ditemukan',
                     'data' => null
                 ], 401);
             }
@@ -69,7 +69,7 @@ class AuthController extends Controller
             if (!\Illuminate\Support\Facades\Hash::check($credentials['password'], $user->password)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Password salah untuk user dengan NIK ini',
+                    'message' => 'Password salah untuk user dengan NIP ini',
                     'data' => null
                 ], 401);
             }
@@ -85,7 +85,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             // Mengatur redirect berdasarkan role! Mencegah user Karyawan dilempar ke Admin dan 403 Forbidden
-            $redirectUrl = ($user->role_id == 1) ? '/beranda-superadmin' : '/pembelajaran';
+            $redirectUrl = ($user->hasRole('super_admin')) ? '/beranda-superadmin' : '/pembelajaran';
 
             // Mengatur expiry logic manual (simulasi "remember me")
             $expires_at = $remember

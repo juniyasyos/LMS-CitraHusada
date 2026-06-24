@@ -11,7 +11,7 @@ class Direktur extends Model
     protected $fillable = [
         'nama',
         'jabatan',
-        'nik',
+        'nip',
         'ttd_path',
     ];
 }

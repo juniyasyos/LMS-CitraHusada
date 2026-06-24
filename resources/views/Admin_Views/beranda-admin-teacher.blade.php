@@ -193,13 +193,13 @@
                                                     <p class="font-bold text-gray-800 dark:text-white" x-text="user.nama">
                                                     </p>
                                                     <p class="text-[10px] text-gray-400 dark:text-gray-500 font-medium">NIP:
-                                                        <span x-text="user.nik"></span>
+                                                        <span x-text="user.nip"></span>
                                                     </p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="py-4 px-4 text-gray-500 dark:text-gray-400"
-                                            x-text="user.unit_kerja ? user.unit_kerja.unit_kerja : '-'"></td>
+                                            x-text="(user.unit_kerjas && user.unit_kerjas.length > 0) ? user.unit_kerjas.map(u => u.unit_name).join(', ') : '-'"></td>
                                         <td class="py-4 px-4 text-center font-bold" x-text="user.progresses_count"></td>
                                         <td class="py-4 px-4 text-center font-bold" x-text="user.total_jpl"></td>
                                         <td class="py-4 px-6 text-center">

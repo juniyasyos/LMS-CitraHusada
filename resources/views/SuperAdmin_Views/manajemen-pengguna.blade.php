@@ -67,7 +67,7 @@
                         </span>
                         <input type="text" x-model="filters.search" @keydown.enter.prevent="fetchData(1)" id="searchUser"
                             class="block w-full pl-9 pr-3 py-2.5 border border-gray-200 dark:border-slate-700 rounded-lg bg-gray-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-xs text-gray-700 dark:text-white transition-all placeholder:dark:text-gray-400"
-                            placeholder="Cari nama atau NIK...">
+                            placeholder="Cari nama atau NIP...">
                     </div>
                 </form>
 
@@ -79,7 +79,7 @@
                             class="text-gray-500 dark:text-white font-bold border-b dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50">
                             <tr>
                                 <th class="py-4 px-6 uppercase tracking-wider">Nama Lengkap</th>
-                                <th class="py-4 px-4 uppercase tracking-wider">NIK</th>
+                                <th class="py-4 px-4 uppercase tracking-wider">NIP</th>
                                 <th class="py-4 px-4 uppercase tracking-wider">Jenis Tenaga</th>
                                 <th class="py-4 px-4 uppercase tracking-wider">Unit Kerja</th>
                                 <th class="py-4 px-4 uppercase tracking-wider">JPL</th>
@@ -108,7 +108,7 @@
                                     <tr class="hover:bg-gray-50 dark:hover:bg-slate-800 transition">
                                         <td class="py-5 px-6 font-bold text-gray-800 dark:text-white"
                                             x-text="user.nama || '-'"></td>
-                                        <td class="py-5 px-4 text-gray-500 dark:text-gray-300" x-text="user.nik || '-'">
+                                        <td class="py-5 px-4 text-gray-500 dark:text-gray-300" x-text="user.nip || '-'">
                                         </td>
                                         <td class="py-5 px-4">
                                             <span
@@ -118,7 +118,7 @@
                                         <td class="py-5 px-4 whitespace-nowrap">
                                             <span
                                                 class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-gray-200 px-3 py-1 rounded-md font-semibold"
-                                                x-text="user.unit_kerja ? user.unit_kerja.unit_kerja : '-'"></span>
+                                                x-text="(user.unitKerjas && user.unitKerjas.length > 0) ? user.unitKerjas.map(u => u.unit_name).join(', ') : '-'"></span>
                                         </td>
                                         <td class="py-5 px-4 text-gray-500 dark:text-gray-300" x-text="(parseInt(user.total_jpl) || 0) + (parseInt(user.jpl_eksternal) || 0)">
                                         </td>
@@ -203,7 +203,7 @@
                     <div>
                         <h4 class="text-sm font-bold text-gray-800 dark:text-white">Tips Admin</h4>
                         <p class="text-xs text-gray-500 dark:text-gray-300 mt-1 leading-relaxed">Gunakan fitur pencarian
-                            untuk mempercepat pelacakan data NIK staf secara instan.</p>
+                            untuk mempercepat pelacakan data NIP staf secara instan.</p>
                     </div>
                 </div>
             </main>
@@ -243,8 +243,8 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label class="block text-xs font-bold text-gray-600 dark:text-white mb-2">Nomor
-                                            Induk Karyawan (NIK)</label>
-                                        <input type="text" x-model="editForm.nik" required
+                                            Induk Karyawan (NIP)</label>
+                                        <input type="text" x-model="editForm.nip" required
                                             class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm dark:text-white">
                                     </div>
                                     <div>
@@ -269,7 +269,7 @@
                                     <select x-model="editForm.unit_kerja_id" required
                                         class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 text-sm dark:text-white outline-none">
                                         @foreach($unit_kerjas as $uk)
-                                            <option value="{{ $uk->unit_kerja_id }}">{{ $uk->unit_kerja }}</option>
+                                            <option value="{{ $uk->unit_kerja_id }}">{{ $uk->unit_name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -286,7 +286,7 @@
                                 <div>
                                     <label
                                         class="block text-xs font-bold text-gray-600 dark:text-white mb-2">Role/Peran</label>
-                                    <select x-model="editForm.role_id" required
+                                    <select x-model="editForm.roles" required
                                         class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 text-sm dark:text-white outline-none">
                                         @foreach($roles as $role)
                                             <option value="{{ $role->role_id }}">{{ $role->role }}</option>
@@ -385,7 +385,7 @@
                 editForm: {
                     user_id: null,
                     nama: '',
-                    nik: '',
+                    nip: '',
                     total_jpl: 0,
                     unit_kerja_id: '',
                     jenis_tenaga_id: '',
@@ -436,11 +436,11 @@
                     this.editForm = {
                         user_id: user.user_id,
                         nama: user.nama,
-                        nik: user.nik,
+                        nip: user.nip,
                         total_jpl: (parseInt(user.total_jpl) || 0) + (parseInt(user.jpl_eksternal) || 0),
-                        unit_kerja_id: user.unit_kerja_id,
+                        unit_kerja_id: user.unit_kerjas && user.unit_kerjas.length > 0 ? user.unit_kerjas[0].unit_kerja_id : '',
                         jenis_tenaga_id: user.jenis_tenaga_id,
-                        role_id: user.role_id,
+                        roles: user.roles && user.roles.length ? user.roles[0] : '',
                         status: user.status,
                         password: '' // Reset password input
                     };
@@ -451,6 +451,10 @@
                     this.isSubmitting = true;
                     try {
                         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+                        // Ensure roles is an array
+                        if (typeof this.editForm.roles === 'string') {
+                            this.editForm.roles = [this.editForm.roles];
+                        }
                         const response = await fetch(`/api/admin/manajemen-pengguna/update/${this.editForm.user_id}`, {
                             method: 'PUT',
                             headers: {

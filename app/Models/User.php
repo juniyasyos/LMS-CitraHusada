@@ -23,9 +23,9 @@ class User extends Authenticatable
         'nama',
         'jenis_tenaga_id',
         'unit_kerja_id',
-        'nik',
+        'nip',
         'password',
-        'role_id',
+        'roles',
         'status',
         'total_jpl',
     ];
@@ -37,11 +37,27 @@ class User extends Authenticatable
 
     protected $casts = [
         'password' => 'hashed',
+        'roles' => 'array',
     ];
 
-    public function role()
+    public function hasRole($role)
     {
-        return $this->belongsTo(Role::class, 'role_id', 'role_id');
+        $roles = $this->roles ?? [];
+        if (is_array($role)) {
+            return count(array_intersect($role, $roles)) > 0;
+        }
+        return in_array($role, $roles);
+    }
+
+    public function hasAnyRole(array $roles)
+    {
+        return $this->hasRole($roles);
+    }
+
+    public function syncRoles(array $roles)
+    {
+        $this->roles = $roles;
+        $this->save();
     }
 
     public function jenisTenaga()
@@ -49,9 +65,9 @@ class User extends Authenticatable
         return $this->belongsTo(JenisTenaga::class, 'jenis_tenaga_id', 'jenis_tenaga_id');
     }
 
-    public function unitKerja()
+    public function unitKerjas()
     {
-        return $this->belongsTo(UnitKerja::class, 'unit_kerja_id', 'unit_kerja_id');
+        return $this->belongsToMany(UnitKerja::class, 'user_unit_kerja', 'user_id', 'unit_kerja_id');
     }
 
     public function sertifikats()

@@ -34,7 +34,7 @@
                     <p class="text-xs lg:text-sm text-gray-500 dark:text-gray-200 transition-colors leading-relaxed">Pantau kemajuan dan sertifikasi pelatihan seluruh staf rumah sakit secara real-time.</p>
                     </div>
 
-                    @if(auth()->user()->role_id == 2)
+                    @if(auth()->user()->hasRole('admin'))
                         <a href="/kelola-ttd" class="bg-amber-400 hover:bg-amber-500 text-amber-950 px-5 py-2.5 rounded-xl items-center gap-2 text-xs font-bold shadow-sm transition active:scale-95 inline-flex">
                             <i class="fa-solid fa-file-signature text-sm"></i>
                             Kelola Tanda Tangan
@@ -135,11 +135,11 @@
                             <label
                                 class="text-[11px] font-bold text-gray-500 dark:text-white uppercase mb-2 block tracking-tight">Unit
                                 Kerja</label>
-                            <select x-model="filters.unit_kerja"
+                            <select x-model="filters.unit_name"
                                 class="w-full border-gray-200 dark:border-slate-700 rounded-lg text-xs p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-white">
                                 <option value="">Semua Unit</option>
-                                @foreach($unitKerjas as $unit)
-                                    <option value="{{ $unit->unit_kerja_id }}">{{ $unit->unit_kerja }}</option>
+                                @foreach($unit_kerjas as $unit)
+                                    <option value="{{ $unit->unit_kerja_id }}">{{ $unit->unit_name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -182,7 +182,7 @@
                                     <th class="py-4 px-4 uppercase tracking-wider text-center">Progres</th>
                                     <th class="py-4 px-4 uppercase tracking-wider text-center">Status</th>
                                     <th class="py-4 px-4 uppercase tracking-wider text-center">Nilai</th>
-                                    @if(auth()->check() && auth()->user()->role_id == 2)
+                                    @if(auth()->check() && auth()->user()->hasRole('admin'))
                                         <th class="py-4 px-4 uppercase tracking-wider text-center">Sertifikat</th>
                                     @endif
                                     <th class="py-4 px-6 uppercase tracking-wider text-center">Aksi</th>
@@ -217,7 +217,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="py-4 px-4 text-gray-500 dark:text-gray-200" x-text="(report.user && report.user.unit_kerja) ? report.user.unit_kerja.unit_kerja : '-'"></td>
+                                            <td class="py-4 px-4 text-gray-500 dark:text-gray-200" x-text="(report.user && report.user.unit_kerjas && report.user.unit_kerjas.length > 0) ? report.user.unit_kerjas.map(u => u.unit_name).join(', ') : '-'"></td>
                                             <td class="py-4 px-4 font-bold text-gray-800 dark:text-white truncate max-w-[200px]" x-text="report.materi ? report.materi.judul : '-'"></td>
                                             <td class="py-4 px-4">
                                                 <div class="flex items-center gap-2 justify-center">
@@ -237,7 +237,7 @@
                                             <td class="py-4 px-4 text-center font-bold dark:text-white italic" x-text="report.skor_total !== null ? parseFloat(report.skor_total).toFixed(1) : '-'">
                                             </td>
 
-                                            @if(auth()->check() && auth()->user()->role_id == 2)
+                                            @if(auth()->check() && auth()->user()->hasRole('admin'))
                                                 <td class="py-4 px-4 text-center font-bold dark:text-white italic">
                                                     <template x-if="report.sertifikat_status">
                                                         <span
@@ -267,7 +267,7 @@
                                                                 <i class="fa-solid fa-eye"></i>
                                                             </button>
                                                         </template>
-                                                        @if(auth()->check() && auth()->user()->role_id == 2)
+                                                        @if(auth()->check() && auth()->user()->hasRole('admin'))
                                                             <a :href="`validasi-pelatihan/${report.user_id}/${report.materi_id}`" class="hover:text-emerald-600 transition"><i class="fa-solid fa-file-circle-check"></i></a>
                                                         @endif
                                                     </div>
@@ -291,7 +291,7 @@
                                     <th class="py-4 px-6 uppercase tracking-wider">Nama Karyawan</th>
                                     <th class="py-4 px-4 uppercase tracking-wider">Unit Kerja</th>
                                     <th class="py-4 px-4 uppercase tracking-wider text-center">Jumlah Sertifikat</th>
-                                    @if(auth()->check() && auth()->user()->role_id == 2)
+                                    @if(auth()->check() && auth()->user()->hasRole('admin'))
                                         <th class="py-4 px-4 uppercase tracking-wider text-center">Belum Disetujui</th>
                                     @endif
                                     <th class="py-4 px-6 uppercase tracking-wider text-center">Aksi</th>
@@ -301,7 +301,7 @@
                                 class="divide-y divide-gray-100 dark:divide-slate-800 text-gray-700 dark:text-white transition-colors">
                                 <template x-if="isLoadingEksternal">
                                     <tr>
-                                        <td colspan="{{ auth()->check() && auth()->user()->role_id == 2 ? 5 : 4 }}" class="py-10 text-center">
+                                        <td colspan="{{ auth()->check() && auth()->user()->hasRole('admin') ? 5 : 4 }}" class="py-10 text-center">
                                             <i class="fa-solid fa-spinner fa-spin text-3xl text-blue-500 mb-2"></i>
                                             <p class="text-xs text-gray-500">Memuat data...</p>
                                         </td>
@@ -309,7 +309,7 @@
                                 </template>
                                 <template x-if="!isLoadingEksternal && eksternalReports.length === 0">
                                     <tr>
-                                        <td colspan="{{ auth()->check() && auth()->user()->role_id == 2 ? 5 : 4 }}" class="py-12 text-center text-gray-400 italic">Belum ada data sertifikat eksternal.</td>
+                                        <td colspan="{{ auth()->check() && auth()->user()->hasRole('admin') ? 5 : 4 }}" class="py-12 text-center text-gray-400 italic">Belum ada data sertifikat eksternal.</td>
                                     </tr>
                                 </template>
                                 <template x-if="!isLoadingEksternal && eksternalReports.length > 0">
@@ -326,14 +326,14 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="py-4 px-4 text-gray-500 dark:text-gray-200" x-text="item.unit_kerja ? item.unit_kerja.unit_kerja : '-'"></td>
+                                            <td class="py-4 px-4 text-gray-500 dark:text-gray-200" x-text="(item.user && item.user.unit_kerjas && item.user.unit_kerjas.length > 0) ? item.user.unit_kerjas.map(u => u.unit_name).join(', ') : '-'"></td>
                                             <td class="py-4 px-4 text-center">
                                                 <span class="inline-flex items-center gap-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold px-2.5 py-1 rounded-full border border-indigo-100 dark:border-indigo-800">
                                                     <span x-text="item.jumlah_sertifikat"></span>
                                                     <i class="fa-solid text-[8px]">Sertifikat</i>
                                                 </span>
                                             </td>
-                                            @if(auth()->check() && auth()->user()->role_id == 2)
+                                            @if(auth()->check() && auth()->user()->hasRole('admin'))
                                                 <td class="py-4 px-4 text-center">
                                                     <span class="inline-flex items-center gap-1 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[10px] font-bold px-2.5 py-1 rounded-full border border-amber-100 dark:border-amber-800">
                                                         <span x-text="item.jumlah_belum_disetujui || 0"></span>
@@ -581,7 +581,7 @@
                     const end = new URLSearchParams(window.location.search).get('end_date');
                     return (start && end) ? `${start} to ${end}` : '';
                 })(),
-                unit_kerja: new URLSearchParams(window.location.search).get('unit_kerja') || '',
+                unit_name: new URLSearchParams(window.location.search).get('unit_name') || '',
                 status: new URLSearchParams(window.location.search).get('status') || ''
             },
 
@@ -619,7 +619,7 @@
                             url.searchParams.append('end_date', dates[0]);
                         }
                     }
-                    if (this.filters.unit_kerja) url.searchParams.append('unit_kerja', this.filters.unit_kerja);
+                    if (this.filters.unit_name) url.searchParams.append('unit_name', this.filters.unit_name);
                     if (this.filters.status) url.searchParams.append('status', this.filters.status);
 
                     const params = new URLSearchParams(url.search);
@@ -660,7 +660,7 @@
                             url.searchParams.append('end_date', dates[0]);
                         }
                     }
-                    if (this.filters.unit_kerja) url.searchParams.append('unit_kerja', this.filters.unit_kerja);
+                    if (this.filters.unit_name) url.searchParams.append('unit_name', this.filters.unit_name);
 
                     const response = await fetch(url.toString(), {
                         headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
@@ -704,7 +704,7 @@
                         params.append('end_date', dates[0]);
                     }
                 }
-                if (this.filters.unit_kerja) params.append('unit_kerja', this.filters.unit_kerja);
+                if (this.filters.unit_name) params.append('unit_name', this.filters.unit_name);
                 if (this.filters.status) params.append('status', this.filters.status);
                 const str = params.toString();
                 return str ? '?' + str : '';

@@ -37,7 +37,7 @@ async function loadHeaderProfile() {
         const user = response.data.data;
 
         const nama = user.nama;
-        const unit = user.unit_kerja?.unit_kerja ?? '-';
+        const unit = (user.unit_kerjas && user.unit_kerjas.length > 0) ? user.unit_kerjas.map(u => u.unit_name).join(', ') : '-';
 
         // isi nama
         document.getElementById("headerNama").innerText = nama;

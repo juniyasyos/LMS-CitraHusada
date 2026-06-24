@@ -12,7 +12,7 @@ class PembelajaranController extends Controller
 {
     public function getProfile()
     {
-        $user = User::with(['unitKerja', 'jenisTenaga'])
+        $user = User::with(['unitKerjas', 'jenisTenaga'])
             ->withSum(['sertifikatEksternals as jpl_eksternal' => function ($q) {
                 $q->where('status', 'Disetujui');
             }], 'jpl')
@@ -22,7 +22,7 @@ class PembelajaranController extends Controller
         // dd($user);
          Log::info('User Profile:', [
         'nama' => $user->nama,
-        'unit_kerja' => $user->unitKerja->unit_kerja ?? null,
+        'unit_name' => $user->unitKerjas->pluck('unit_name')->join(', ') ?: null,
         'jenis_tenaga' => $user->jenisTenaga->jenis_tenaga ?? null
     ]);
 

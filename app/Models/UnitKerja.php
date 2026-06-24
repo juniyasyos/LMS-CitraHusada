@@ -11,11 +11,11 @@ class UnitKerja extends Model
 
     protected $primaryKey = 'unit_kerja_id';
 
-    protected $fillable = ['unit_kerja', 'deskripsi'];
+    protected $fillable = ['unit_name', 'deskripsi'];
 
     public function users()
     {
-        return $this->hasMany(User::class, 'unit_kerja_id', 'unit_kerja_id');
+        return $this->belongsToMany(User::class, 'user_unit_kerja', 'unit_kerja_id', 'user_id');
     }
 
     public function materiUnitKerjas()

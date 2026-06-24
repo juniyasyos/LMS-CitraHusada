@@ -116,21 +116,21 @@
 
         <div class="p-4 border-t border-gray-100 dark:border-slate-800 space-y-1">
             {{-- PERBAIKAN: Mengubah $active menjadi $activeClass dan $inactive menjadi $inactiveClass --}}
-            @if (auth()->user()->role_id == 1 && !session()->has('impersonate_by'))
+            @if (auth()->user()->hasRole('super_admin') && !session()->has('impersonate_by'))
             <a href="/beranda-superadmin"
             class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 {{ request()->is('beranda-superadmin*') ? $activeClass : $inactiveClass }}">
                 <i class="fa-solid fa-user-gear text-sm"></i>
                 Beralih Akun
             </a>
 
-            @elseif (auth()->user()->role_id == 2 && !session()->has('impersonate_by'))
+            @elseif (auth()->user()->hasRole('admin') && !session()->has('impersonate_by'))
             <a href="/beranda-admin"
             class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 {{ request()->is('beranda-admin*') ? $activeClass : $inactiveClass }}">
                 <i class="fa-solid fa-user-gear text-sm"></i>
                 Beralih Akun
             </a>
 
-            @elseif (auth()->user()->role_id == 3 && !session()->has('impersonate_by'))
+            @elseif (auth()->user()->hasRole('teacher') && !session()->has('impersonate_by'))
             <a href="/beranda-admin"
             class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 {{ request()->is('beranda-admin*') ? $activeClass : $inactiveClass }}">
                 <i class="fa-solid fa-user-gear text-sm"></i>
@@ -173,7 +173,7 @@ async function loadUserProfile(){
             const user = response.data.data;
 
             const nama = user.nama;
-            const unitKerja = user.unit_kerja?.unit_kerja ?? '-';
+            const unitKerja = (user.unit_kerjas?.map(u => u.unit_name).join(', ') || '-');
             // const jenisTenaga = user.jenis_tenaga?.jenis_tenaga ?? '-';
             const nik = user.nik ?? '-';
 

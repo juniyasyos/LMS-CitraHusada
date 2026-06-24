@@ -28,6 +28,13 @@
         </div>
         
         {{-- Form --}}
+        @if(config('iam.enabled'))
+            <div class="text-center mt-6">
+                <a href="{{ route('iam.sso.login') }}" class="w-full inline-block bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-medium transition duration-300">
+                    <i class="fa-solid fa-right-to-bracket mr-2"></i> Login via SSO (IAM)
+                </a>
+            </div>
+        @else
         <form id="loginForm" class="space-y-5" onsubmit="handleLogin(event)">
             @csrf
 
@@ -44,8 +51,8 @@
 
                     <input 
                         type="text"
-                        id="nikInput"
-                        name="nik"
+                        id="nipInput"
+                        name="nip"
                         placeholder="1234.12345"
                         class="w-full pl-10 pr-4 py-3 
                             rounded-lg border border-gray-300 
@@ -115,6 +122,7 @@
             </button>
 
         </form>
+        @endif
 
     </div>
 
@@ -125,13 +133,13 @@ async function handleLogin(event) {
     event.preventDefault();
     console.log('handleLogin called');
 
-    const nik = document.getElementById('nikInput').value;
+    const nip = document.getElementById('nipInput').value;
     const password = document.getElementById('passwordInput').value;
     const loginBtn = document.getElementById('loginBtn');
     const errorContainer = document.getElementById('errorContainer');
     const errorText = document.getElementById('errorText');
 
-    console.log('Input values:', { nik, password });
+    console.log('Input values:', { nip, password });
 
     // Reset error container
     errorContainer.classList.add('hidden');
@@ -149,7 +157,7 @@ async function handleLogin(event) {
         
         console.log('Step 2: Sending login request...');
         const response = await window.axios.post('/api/login', {
-            nik: nik,
+            nip: nip,
             password: password,
             remember: document.getElementById('rememberInput').checked
         });

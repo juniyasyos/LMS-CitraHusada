@@ -15,7 +15,7 @@ class DirekturSeeder extends Seeder
         Direktur::create([
             'nama' => 'Nama Direktur',
             'jabatan' => 'Direktur Utama',
-            'nik' => '123456789',
+            'nip' => '123456789',
             'ttd_path' => 'Sertifikat/ttd/contoh-ttd.png',
         ]);
     }
