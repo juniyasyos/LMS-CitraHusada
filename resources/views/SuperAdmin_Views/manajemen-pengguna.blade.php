@@ -286,7 +286,7 @@
                                 <div>
                                     <label
                                         class="block text-xs font-bold text-gray-600 dark:text-white mb-2">Role/Peran</label>
-                                    <select x-model="editForm.role_id" required
+                                    <select x-model="editForm.roles" required
                                         class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg h-12 px-4 text-sm dark:text-white outline-none">
                                         @foreach($roles as $role)
                                             <option value="{{ $role->role_id }}">{{ $role->role }}</option>
@@ -440,7 +440,7 @@
                         total_jpl: (parseInt(user.total_jpl) || 0) + (parseInt(user.jpl_eksternal) || 0),
                         unit_kerja_id: user.unit_kerjas && user.unit_kerjas.length > 0 ? user.unit_kerjas[0].unit_kerja_id : '',
                         jenis_tenaga_id: user.jenis_tenaga_id,
-                        role_id: user.role_id,
+                        roles: user.roles && user.roles.length ? user.roles[0] : '',
                         status: user.status,
                         password: '' // Reset password input
                     };
@@ -451,6 +451,10 @@
                     this.isSubmitting = true;
                     try {
                         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+                        // Ensure roles is an array
+                        if (typeof this.editForm.roles === 'string') {
+                            this.editForm.roles = [this.editForm.roles];
+                        }
                         const response = await fetch(`/api/admin/manajemen-pengguna/update/${this.editForm.user_id}`, {
                             method: 'PUT',
                             headers: {

@@ -34,7 +34,7 @@
                     <p class="text-xs lg:text-sm text-gray-500 dark:text-gray-200 transition-colors leading-relaxed">Pantau kemajuan dan sertifikasi pelatihan seluruh staf rumah sakit secara real-time.</p>
                     </div>
 
-                    @if(auth()->user()->role_id == 2)
+                    @if(auth()->user()->hasRole('admin'))
                         <a href="/kelola-ttd" class="bg-amber-400 hover:bg-amber-500 text-amber-950 px-5 py-2.5 rounded-xl items-center gap-2 text-xs font-bold shadow-sm transition active:scale-95 inline-flex">
                             <i class="fa-solid fa-file-signature text-sm"></i>
                             Kelola Tanda Tangan
@@ -182,7 +182,7 @@
                                     <th class="py-4 px-4 uppercase tracking-wider text-center">Progres</th>
                                     <th class="py-4 px-4 uppercase tracking-wider text-center">Status</th>
                                     <th class="py-4 px-4 uppercase tracking-wider text-center">Nilai</th>
-                                    @if(auth()->check() && auth()->user()->role_id == 2)
+                                    @if(auth()->check() && auth()->user()->hasRole('admin'))
                                         <th class="py-4 px-4 uppercase tracking-wider text-center">Sertifikat</th>
                                     @endif
                                     <th class="py-4 px-6 uppercase tracking-wider text-center">Aksi</th>
@@ -237,7 +237,7 @@
                                             <td class="py-4 px-4 text-center font-bold dark:text-white italic" x-text="report.skor_total !== null ? parseFloat(report.skor_total).toFixed(1) : '-'">
                                             </td>
 
-                                            @if(auth()->check() && auth()->user()->role_id == 2)
+                                            @if(auth()->check() && auth()->user()->hasRole('admin'))
                                                 <td class="py-4 px-4 text-center font-bold dark:text-white italic">
                                                     <template x-if="report.sertifikat_status">
                                                         <span
@@ -267,7 +267,7 @@
                                                                 <i class="fa-solid fa-eye"></i>
                                                             </button>
                                                         </template>
-                                                        @if(auth()->check() && auth()->user()->role_id == 2)
+                                                        @if(auth()->check() && auth()->user()->hasRole('admin'))
                                                             <a :href="`validasi-pelatihan/${report.user_id}/${report.materi_id}`" class="hover:text-emerald-600 transition"><i class="fa-solid fa-file-circle-check"></i></a>
                                                         @endif
                                                     </div>
@@ -291,7 +291,7 @@
                                     <th class="py-4 px-6 uppercase tracking-wider">Nama Karyawan</th>
                                     <th class="py-4 px-4 uppercase tracking-wider">Unit Kerja</th>
                                     <th class="py-4 px-4 uppercase tracking-wider text-center">Jumlah Sertifikat</th>
-                                    @if(auth()->check() && auth()->user()->role_id == 2)
+                                    @if(auth()->check() && auth()->user()->hasRole('admin'))
                                         <th class="py-4 px-4 uppercase tracking-wider text-center">Belum Disetujui</th>
                                     @endif
                                     <th class="py-4 px-6 uppercase tracking-wider text-center">Aksi</th>
@@ -301,7 +301,7 @@
                                 class="divide-y divide-gray-100 dark:divide-slate-800 text-gray-700 dark:text-white transition-colors">
                                 <template x-if="isLoadingEksternal">
                                     <tr>
-                                        <td colspan="{{ auth()->check() && auth()->user()->role_id == 2 ? 5 : 4 }}" class="py-10 text-center">
+                                        <td colspan="{{ auth()->check() && auth()->user()->hasRole('admin') ? 5 : 4 }}" class="py-10 text-center">
                                             <i class="fa-solid fa-spinner fa-spin text-3xl text-blue-500 mb-2"></i>
                                             <p class="text-xs text-gray-500">Memuat data...</p>
                                         </td>
@@ -309,7 +309,7 @@
                                 </template>
                                 <template x-if="!isLoadingEksternal && eksternalReports.length === 0">
                                     <tr>
-                                        <td colspan="{{ auth()->check() && auth()->user()->role_id == 2 ? 5 : 4 }}" class="py-12 text-center text-gray-400 italic">Belum ada data sertifikat eksternal.</td>
+                                        <td colspan="{{ auth()->check() && auth()->user()->hasRole('admin') ? 5 : 4 }}" class="py-12 text-center text-gray-400 italic">Belum ada data sertifikat eksternal.</td>
                                     </tr>
                                 </template>
                                 <template x-if="!isLoadingEksternal && eksternalReports.length > 0">
@@ -333,7 +333,7 @@
                                                     <i class="fa-solid text-[8px]">Sertifikat</i>
                                                 </span>
                                             </td>
-                                            @if(auth()->check() && auth()->user()->role_id == 2)
+                                            @if(auth()->check() && auth()->user()->hasRole('admin'))
                                                 <td class="py-4 px-4 text-center">
                                                     <span class="inline-flex items-center gap-1 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[10px] font-bold px-2.5 py-1 rounded-full border border-amber-100 dark:border-amber-800">
                                                         <span x-text="item.jumlah_belum_disetujui || 0"></span>

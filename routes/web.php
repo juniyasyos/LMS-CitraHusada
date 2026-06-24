@@ -56,7 +56,7 @@ Route::middleware($authMiddleware)->group(function () {
 
 
     // Group Superadmin (Misal role_id = 1)
-    Route::middleware('role:1')->group(function () {
+    Route::middleware('role:super_admin')->group(function () {
 
         // Rute Administratif Superadmin (DIPROTEKSI: Akses ditolak saat mode impersonasi)
         Route::middleware('no.impersonate')->group(function () {
@@ -125,7 +125,7 @@ Route::middleware($authMiddleware)->group(function () {
         Route::get('/impersonate/stop', [\App\Http\Controllers\Api\ManajemenPenggunaController::class, 'stopImpersonating'])->name('impersonate.stop');
     });
 
-    Route::middleware('role:2')->group(function () {
+    Route::middleware('role:admin')->group(function () {
         Route::middleware('no.impersonate')->group(function () {
 
             Route::get('/kelola-ttd', function () {
@@ -139,7 +139,7 @@ Route::middleware($authMiddleware)->group(function () {
     });
 
     // Shared routes untuk Role 1 (Superadmin) dan Role 2 (Admin)
-    Route::middleware(['role:1,2', 'no.impersonate'])->group(function () {
+    Route::middleware(['role:super_admin,admin', 'no.impersonate'])->group(function () {
         
         // Single Laporan Monitoring route pointing to LaporanMonitoringController@index
         Route::get('/laporan-monitoring', [\App\Http\Controllers\Api\LaporanMonitoringController::class, 'index'])->name('laporan.monitoring');
@@ -155,7 +155,7 @@ Route::middleware($authMiddleware)->group(function () {
         // Validasi Pelatihan
     });
 
-    Route::middleware('role:2,3')->group(function () {
+    Route::middleware('role:admin,teacher')->group(function () {
         Route::middleware('no.impersonate')->group(function () {
             // DASHBOARD ADMIN
             Route::get('/beranda-admin', function () {
@@ -167,7 +167,7 @@ Route::middleware($authMiddleware)->group(function () {
         });
     });
 
-    Route::middleware('role:1,3')->group(function () {
+    Route::middleware('role:super_admin,teacher')->group(function () {
         Route::middleware('no.impersonate')->group(function () {
            // Manajemen Media
             Route::get('/manajemen-pelatihan', [\App\Http\Controllers\Api\ManajemenPelatihanController::class, 'index'])->name('manajemen-pelatihan');

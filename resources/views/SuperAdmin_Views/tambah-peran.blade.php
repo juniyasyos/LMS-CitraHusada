@@ -124,16 +124,16 @@
                             <div>
                                 <label
                                     class="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2">Role/Peran</label>
-                                <select x-model="form.role_id"
+                                <select x-model="form.roles"
                                     class="w-full bg-white dark:bg-slate-800 border rounded-lg h-12 px-4 text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
-                                    :class="errors.role_id ? 'border-red-500' : 'border-gray-200 dark:border-slate-700'">
+                                    :class="errors.roles ? 'border-red-500' : 'border-gray-200 dark:border-slate-700'">
                                     <option disabled value="">Pilih Role/Peran</option>
                                     @foreach($roles as $role)
                                         <option value="{{ $role->role_id }}">{{ $role->role }}</option>
                                     @endforeach
                                 </select>
-                                <template x-if="errors.role_id">
-                                    <p class="text-red-500 text-[10px] mt-1 font-bold" x-text="errors.role_id[0]"></p>
+                                <template x-if="errors.roles">
+                                    <p class="text-red-500 text-[10px] mt-1 font-bold" x-text="errors.roles[0]"></p>
                                 </template>
                             </div>
                         </div>
