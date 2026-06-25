@@ -1864,16 +1864,16 @@
         },
         {
             "name": "juniyasyos/nexaid-client",
-            "version": "v1.2.16",
+            "version": "v1.2.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/juniyasyos/nexaid-client.git",
-                "reference": "47e60c9fee9a6935f5720d04a513742d5cdbc7c3"
+                "reference": "c1ecb836994608cf4c7b7e479783d577080a96e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/juniyasyos/nexaid-client/zipball/47e60c9fee9a6935f5720d04a513742d5cdbc7c3",
-                "reference": "47e60c9fee9a6935f5720d04a513742d5cdbc7c3",
+                "url": "https://api.github.com/repos/juniyasyos/nexaid-client/zipball/c1ecb836994608cf4c7b7e479783d577080a96e0",
+                "reference": "c1ecb836994608cf4c7b7e479783d577080a96e0",
                 "shasum": ""
             },
             "require": {
@@ -1919,9 +1919,9 @@
             ],
             "support": {
                 "issues": "https://github.com/juniyasyos/nexaid-client/issues",
-                "source": "https://github.com/juniyasyos/nexaid-client/tree/v1.2.16"
+                "source": "https://github.com/juniyasyos/nexaid-client/tree/v1.2.17"
             },
-            "time": "2026-06-25T07:15:45+00:00"
+            "time": "2026-06-25T15:03:36+00:00"
         },
         {
             "name": "laravel/framework",
