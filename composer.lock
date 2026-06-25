@@ -1864,16 +1864,16 @@
         },
         {
             "name": "juniyasyos/nexaid-client",
-            "version": "v1.2.15",
+            "version": "v1.2.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/juniyasyos/nexaid-client.git",
-                "reference": "66b3914d3476b98ef5e717de04352fa26f86da75"
+                "reference": "47e60c9fee9a6935f5720d04a513742d5cdbc7c3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/juniyasyos/nexaid-client/zipball/66b3914d3476b98ef5e717de04352fa26f86da75",
-                "reference": "66b3914d3476b98ef5e717de04352fa26f86da75",
+                "url": "https://api.github.com/repos/juniyasyos/nexaid-client/zipball/47e60c9fee9a6935f5720d04a513742d5cdbc7c3",
+                "reference": "47e60c9fee9a6935f5720d04a513742d5cdbc7c3",
                 "shasum": ""
             },
             "require": {
@@ -1919,9 +1919,9 @@
             ],
             "support": {
                 "issues": "https://github.com/juniyasyos/nexaid-client/issues",
-                "source": "https://github.com/juniyasyos/nexaid-client/tree/v1.2.15"
+                "source": "https://github.com/juniyasyos/nexaid-client/tree/v1.2.16"
             },
-            "time": "2026-06-25T06:41:20+00:00"
+            "time": "2026-06-25T07:15:45+00:00"
         },
         {
             "name": "laravel/framework",
@@ -2585,16 +2585,16 @@
         },
         {
             "name": "league/flysystem",
-            "version": "3.35.0",
+            "version": "3.35.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "d0a405f03d980461e4b6e08cfed2c162650f9f6b"
+                "reference": "f23af6c5aafd958a7593029a271d77baf5ed793c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/d0a405f03d980461e4b6e08cfed2c162650f9f6b",
-                "reference": "d0a405f03d980461e4b6e08cfed2c162650f9f6b",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/f23af6c5aafd958a7593029a271d77baf5ed793c",
+                "reference": "f23af6c5aafd958a7593029a271d77baf5ed793c",
                 "shasum": ""
             },
             "require": {
@@ -2662,9 +2662,9 @@
             ],
             "support": {
                 "issues": "https://github.com/thephpleague/flysystem/issues",
-                "source": "https://github.com/thephpleague/flysystem/tree/3.35.0"
+                "source": "https://github.com/thephpleague/flysystem/tree/3.35.1"
             },
-            "time": "2026-06-22T20:12:06+00:00"
+            "time": "2026-06-25T06:52:23+00:00"
         },
         {
             "name": "league/flysystem-aws-s3-v3",
