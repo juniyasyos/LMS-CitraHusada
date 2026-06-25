@@ -75,7 +75,9 @@ window.axios.interceptors.response.use(
         if (error.response && error.response.status === 401 && !isLoginPage) {
             // Remove token and clear session on server side failure
             if (isServerLoggedIn) {
-                performWebLogout('API returned 401 Unauthorized (' + error.config.url + ')');
+                console.warn('API returned 401 Unauthorized (' + error.config.url + '). Mencegah auto-logout brutal.');
+                // Jangan langsung performWebLogout, biarkan sesi cookie tetap hidup
+                // performWebLogout('API returned 401 Unauthorized (' + error.config.url + ')');
             } else {
                 localStorage.removeItem('token');
                 sessionStorage.removeItem('token');
