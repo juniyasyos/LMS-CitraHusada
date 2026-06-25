@@ -14,8 +14,12 @@ if (config('iam.enabled')) {
         return app(\Juniyasyos\IamClient\Http\Controllers\SsoLoginRedirectController::class)($request);
     })->name('login');
 } else {
-    Route::get('/', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/', [AuthController::class, 'login'])->name('login.post');
+    Route::get('/', function () {
+        abort(403, 'Aplikasi tidak dapat diakses, IAM sedang tidak aktif.');
+    })->name('login');
+    Route::post('/', function () {
+        abort(403, 'Aplikasi tidak dapat diakses, IAM sedang tidak aktif.');
+    })->name('login.post');
 }
 
 // Rute Terproteksi
