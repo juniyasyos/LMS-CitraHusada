@@ -29,7 +29,7 @@
                 {{-- Welcome Section --}}
                 <div class="mb-8">
                     <h2 class="text-lg lg:text-xl font-bold text-gray-800 dark:text-white transition-colors">Selamat Datang,
-                        {{ auth()->user()->nama }}!
+                        {{ auth()->user()->name }}!
                     </h2>
                     <p class="text-xs lg:text-sm text-gray-500 dark:text-gray-400 mt-1">Pantau statistik pelatihan dan
                         aktivitas sistem Hospital LMS hari ini.</p>
@@ -187,10 +187,10 @@
                                         <td class="py-4 px-6">
                                             <div class="flex items-center gap-3">
                                                 <div class="w-8 h-8 bg-gray-100 dark:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-gray-400 dark:text-white text-[10px] shrink-0 uppercase"
-                                                    x-text="user.nama.substring(0, 2)">
+                                                    x-text="user.name.substring(0, 2)">
                                                 </div>
                                                 <div class="truncate">
-                                                    <p class="font-bold text-gray-800 dark:text-white" x-text="user.nama">
+                                                    <p class="font-bold text-gray-800 dark:text-white" x-text="user.name">
                                                     </p>
                                                     <p class="text-[10px] text-gray-400 dark:text-gray-500 font-medium">NIP:
                                                         <span x-text="user.nip"></span>

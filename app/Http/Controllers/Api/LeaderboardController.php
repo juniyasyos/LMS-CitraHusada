@@ -105,7 +105,7 @@ class LeaderboardController extends Controller
 
         // Filter Search
         if ($search) {
-            $query->where('nama', 'LIKE', "%{$search}%")
+            $query->where('name', 'LIKE', "%{$search}%")
                   ->orWhere('nip', 'LIKE', "%{$search}%");
         }
 

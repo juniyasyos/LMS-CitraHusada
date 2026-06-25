@@ -53,7 +53,7 @@ class UnitKerjaController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'type' => 'required|in:unit,tenaga',
-            'nama' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
         ]);
 
@@ -68,16 +68,16 @@ class UnitKerjaController extends Controller
 
         if ($type === 'tenaga') {
             $record = JenisTenaga::create([
-                'jenis_tenaga' => $request->nama,
+                'jenis_tenaga' => $request->name,
                 'deskripsi' => $request->deskripsi,
             ]);
-            $this->logActivity($request, 'Create', 'jenis_tenagas', $record->jenis_tenaga_id, "Menambah jenis tenaga baru: " . $request->nama);
+            $this->logActivity($request, 'Create', 'jenis_tenagas', $record->jenis_tenaga_id, "Menambah jenis tenaga baru: " . $request->name);
         } else {
             $record = UnitKerja::create([
-                'unit_name' => $request->nama,
+                'unit_name' => $request->name,
                 'deskripsi' => $request->deskripsi,
             ]);
-            $this->logActivity($request, 'Create', 'unit_kerjas', $record->unit_kerja_id, "Menambah unit kerja baru: " . $request->nama);
+            $this->logActivity($request, 'Create', 'unit_kerjas', $record->unit_kerja_id, "Menambah unit kerja baru: " . $request->name);
         }
 
         return response()->json([
@@ -94,7 +94,7 @@ class UnitKerjaController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'type' => 'required|in:unit,tenaga',
-            'nama' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
         ]);
 
@@ -112,19 +112,19 @@ class UnitKerjaController extends Controller
             if (!$record) return $this->notFoundResponse();
             
             $record->update([
-                'jenis_tenaga' => $request->nama,
+                'jenis_tenaga' => $request->name,
                 'deskripsi' => $request->deskripsi,
             ]);
-            $this->logActivity($request, 'Update', 'jenis_tenagas', $id, "Memperbarui jenis tenaga: " . $request->nama);
+            $this->logActivity($request, 'Update', 'jenis_tenagas', $id, "Memperbarui jenis tenaga: " . $request->name);
         } else {
             $record = UnitKerja::find($id);
             if (!$record) return $this->notFoundResponse();
 
             $record->update([
-                'unit_name' => $request->nama,
+                'unit_name' => $request->name,
                 'deskripsi' => $request->deskripsi,
             ]);
-            $this->logActivity($request, 'Update', 'unit_kerjas', $id, "Memperbarui unit kerja: " . $request->nama);
+            $this->logActivity($request, 'Update', 'unit_kerjas', $id, "Memperbarui unit kerja: " . $request->name);
         }
 
         return response()->json([

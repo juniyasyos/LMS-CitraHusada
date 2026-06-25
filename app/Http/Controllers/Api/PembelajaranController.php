@@ -21,7 +21,7 @@ class PembelajaranController extends Controller
 
         // dd($user);
          Log::info('User Profile:', [
-        'nama' => $user->nama,
+        'nama' => $user->name,
         'unit_name' => $user->unitKerjas->pluck('unit_name')->join(', ') ?: null,
         'jenis_tenaga' => $user->jenisTenaga->jenis_tenaga ?? null
     ]);

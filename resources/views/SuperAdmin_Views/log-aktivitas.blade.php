@@ -130,7 +130,7 @@
                                         <p class="text-gray-400 dark:text-gray-500 font-mono text-[10px]" x-text="formatTime(log.created_at)"></p>
                                     </td>
                                     <td class="py-5 px-4 leading-tight min-w-[200px]">
-                                        <p class="font-bold text-gray-800 dark:text-white" x-text="log.user ? log.user.nama : 'System'"></p>
+                                        <p class="font-bold text-gray-800 dark:text-white" x-text="log.user ? log.user.name : 'System'"></p>
                                         <p class="text-[10px] text-gray-400 dark:text-gray-500 italic truncate" x-text="(log.user?.role?.role_name || 'Staff') + ' • ' + (log.user?.nip || 'N/A')"></p>
                                     </td>
                                     <td class="py-5 px-4 text-center">

@@ -73,7 +73,7 @@
                 <i class="fa-solid fa-user-secret text-sm"></i>
             </div>
             <p class="text-xs font-bold tracking-wide">
-                MODE IMPERSONASI: Anda sedang masuk sebagai <span class="underline decoration-2 underline-offset-4">{{ Auth::user()->nama }}</span>
+                MODE IMPERSONASI: Anda sedang masuk sebagai <span class="underline decoration-2 underline-offset-4">{{ Auth::user()->name }}</span>
             </p>
         </div>
         <a href="{{ route('impersonate.stop') }}" 

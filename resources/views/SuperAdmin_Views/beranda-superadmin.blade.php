@@ -29,7 +29,7 @@
 
             <div class="mb-8">
                 <h2 class="text-lg lg:text-xl font-bold text-gray-800 dark:text-white transition-colors">
-                    Selamat Datang, {{ auth()->user()->nama }}
+                    Selamat Datang, {{ auth()->user()->name }}
                 </h2>
                 <p class="text-xs lg:text-sm text-gray-500 dark:text-gray-200 mt-1 italic">
                     Pantau statistik pelatihan sistem <span class="font-semibold text-gray-700 dark:text-white">Hospital LMS</span> hari ini.
@@ -220,7 +220,7 @@
                                 badgeColor = 'bg-rose-50 text-rose-500 dark:bg-rose-900/30 dark:text-rose-400';
                             }
                             
-                            let userNama = log.user ? log.user.nama : 'Sistem';
+                            let userNama = log.user ? log.user.name : 'Sistem';
                             let isFirst = index === 0;
                             
                             // Simple relative time format or just date

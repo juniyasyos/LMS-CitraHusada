@@ -24,7 +24,7 @@ class LogAktivitasController extends Controller
                   ->orWhere('perubahan', 'like', "%{$search}%")
                   ->orWhere('ip_address', 'like', "%{$search}%")
                   ->orWhereHas('user', function($qu) use ($search) {
-                      $qu->where('nama', 'like', "%{$search}%");
+                      $qu->where('name', 'like', "%{$search}%");
                   });
             });
         }
@@ -64,7 +64,7 @@ class LogAktivitasController extends Controller
                   ->orWhere('perubahan', 'like', "%{$search}%")
                   ->orWhere('ip_address', 'like', "%{$search}%")
                   ->orWhereHas('user', function($qu) use ($search) {
-                      $qu->where('nama', 'like', "%{$search}%");
+                      $qu->where('name', 'like', "%{$search}%");
                   });
             });
         }
@@ -104,7 +104,7 @@ class LogAktivitasController extends Controller
         foreach ($logs as $log) {
             $excelData[] = [
                 $log->created_at->format('Y-m-d H:i:s'),
-                $log->user->nama ?? 'System',
+                $log->user->name ?? 'System',
                 $log->tipe,
                 $log->tabel,
                 $log->ip_address,

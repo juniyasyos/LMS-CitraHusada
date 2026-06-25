@@ -39,7 +39,7 @@ class PelatihanExport implements FromCollection, WithHeadings, WithMapping, Shou
         $this->rowNumber++;
         return [
             $this->rowNumber,
-            $user->nama,
+            $user->name,
             $user->unitKerjas->isNotEmpty() ? $user->unitKerjas->pluck('unit_name')->join(', ') : '-',
             ($user->pelatihan_selesai ?? 0) . ' Pelatihan',
             $user->total_jpl,

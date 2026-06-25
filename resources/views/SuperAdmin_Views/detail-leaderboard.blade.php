@@ -115,9 +115,9 @@
                                         <tr class="hover:bg-gray-50 dark:hover:bg-slate-800 transition border-b border-gray-50 dark:border-slate-800 last:border-0">
                                             <td class="py-5 px-6">
                                                 <div class="flex items-center gap-3">
-                                                    <div class="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded flex items-center justify-center font-bold text-gray-500 dark:text-white text-[10px] uppercase transition-colors shrink-0" x-text="getInitials(user.nama)"></div>
+                                                    <div class="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded flex items-center justify-center font-bold text-gray-500 dark:text-white text-[10px] uppercase transition-colors shrink-0" x-text="getInitials(user.name)"></div>
                                                     <div class="truncate">
-                                                        <p class="font-bold text-gray-800 dark:text-white transition-colors truncate" x-text="user.nama"></p>
+                                                        <p class="font-bold text-gray-800 dark:text-white transition-colors truncate" x-text="user.name"></p>
                                                         <p class="text-[10px] text-gray-400 dark:text-gray-300">NIP: <span x-text="user.nip"></span></p>
                                                     </div>
                                                 </div>

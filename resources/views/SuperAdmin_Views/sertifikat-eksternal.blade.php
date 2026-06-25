@@ -1,5 +1,5 @@
 @extends('components.layout')
-@section('title', 'Sertifikat Eksternal - ' . $user->nama)
+@section('title', 'Sertifikat Eksternal - ' . $user->name)
 
 @section('content')
     <!-- Flatpickr CSS & JS -->
@@ -35,10 +35,10 @@
                             </a>
                         </div>
                         <h2 class="text-lg lg:text-xl font-bold text-gray-800 dark:text-white transition-colors">
-                            Sertifikat Eksternal: {{ $user->nama }}
+                            Sertifikat Eksternal: {{ $user->name }}
                         </h2>
                         <p class="text-xs lg:text-sm text-gray-500 dark:text-gray-200 transition-colors leading-relaxed">
-                            Daftar sertifikat eksternal yang dimiliki oleh <span class="font-bold">{{ $user->nama }}</span> ({{ $user->nik }})
+                            Daftar sertifikat eksternal yang dimiliki oleh <span class="font-bold">{{ $user->name }}</span> ({{ $user->nik }})
                         </p>
                     </div>
                 </div>

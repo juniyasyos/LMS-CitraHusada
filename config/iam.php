@@ -203,7 +203,7 @@ return [
     */
     'user_fields' => [
         'iam_id' => 'sub',        // Required: JWT sub maps to iam_id
-        'nama' => 'name',
+        'name' => 'name',
         // Add custom mappings:
         'nip' => 'nip',
         'roles' => 'roles',

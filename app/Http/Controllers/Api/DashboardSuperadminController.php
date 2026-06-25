@@ -28,7 +28,7 @@ class DashboardSuperadminController extends Controller
             $pelatihanSelesai = Materi::whereDate('tanggal_selesai', '<', $today)->count();
 
             // Ambil log aktivitas terbaru (misal batasi 10 agar response tidak terlalu berat)
-            $logAktivitas = LogAktivitas::with('user:user_id,nama') // Hanya ambil kolom yang perlu
+            $logAktivitas = LogAktivitas::with('user:user_id,name') // Hanya ambil kolom yang perlu
                 ->latest()
                 ->take(3)
                 ->get();
@@ -149,7 +149,7 @@ class DashboardSuperadminController extends Controller
                 }])
                 ->when($search, function ($query, $search) {
                     return $query->where(function ($q) use ($search) {
-                        $q->where('nama', 'like', "%{$search}%")
+                        $q->where('name', 'like', "%{$search}%")
                           ->orWhere('nip', 'like', "%{$search}%");
                     });
                 })

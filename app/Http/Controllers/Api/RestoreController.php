@@ -152,7 +152,7 @@ class RestoreController extends Controller
                     'id'                 => $log->id,
                     'backup_file'        => basename($log->backup_file),
                     'backup_file_full'   => $log->backup_file,
-                    'restored_by'        => $log->user ? $log->user->nama : 'Unknown',
+                    'restored_by'        => $log->user ? $log->user->name : 'Unknown',
                     'restore_started_at' => $log->restore_started_at ? $log->restore_started_at->format('d M Y, H:i:s') : '-',
                     'restore_finished_at'=> $log->restore_finished_at ? $log->restore_finished_at->format('d M Y, H:i:s') : '-',
                     'duration'           => $this->calculateDuration($log->restore_started_at, $log->restore_finished_at),

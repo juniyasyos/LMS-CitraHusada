@@ -141,7 +141,7 @@ class DashboardAdminController extends Controller
                 ), 0) as total_jpl')
                 ->when($search, function ($query, $search) {
                     return $query->where(function ($q) use ($search) {
-                        $q->where('nama', 'like', "%{$search}%")
+                        $q->where('name', 'like', "%{$search}%")
                             ->orWhere('nip', 'like', "%{$search}%");
                     });
                 })
@@ -203,7 +203,7 @@ class DashboardAdminController extends Controller
         // Filter Search
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('nama', 'LIKE', "%{$search}%")
+                $q->where('name', 'LIKE', "%{$search}%")
                     ->orWhere('nip', 'LIKE', "%{$search}%");
             });
         }
