@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
             'no.impersonate' => \App\Http\Middleware\PreventImpersonateAdmin::class,
+            'require.iam' => \App\Http\Middleware\RequireIam::class,
         ]);
 
         // Add session middleware to API routes for session-based authentication
@@ -25,7 +26,9 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Session\Middleware\StartSession::class,
         ]);
 
-        $middleware->append(\App\Http\Middleware\RequireIam::class);
+        // RequireIam tidak perlu sebagai global middleware.
+        // Jika IAM disabled, aplikasi tetap berjalan dengan auth lokal (Sanctum/session).
+        // Gunakan middleware 'require.iam' secara eksplisit di route yang memerlukannya.
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

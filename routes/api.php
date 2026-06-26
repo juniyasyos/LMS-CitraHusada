@@ -31,13 +31,9 @@ use App\Http\Controllers\Api\RestoreController;
 |
 */
 
-if (!config('iam.enabled')) {
-    Route::any('/login', function () {
-        abort(403, 'Aplikasi tidak dapat diakses, IAM sedang tidak aktif.');
-    });
-} else {
-    Route::post('/login', [AuthController::class, 'loginApi']);
-}
+// Saat IAM disabled → gunakan login lokal (NIP + password via Sanctum)
+// Saat IAM enabled  → loginApi tetap tersedia (hybrid session + token)
+Route::post('/login', [AuthController::class, 'loginApi']);
 
 // Debug: Check users for API test page
 Route::get('/debug-users', function () {
