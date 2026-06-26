@@ -40,9 +40,9 @@
             <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm p-4 mb-6 transition-colors">
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
                     <div class="flex items-center gap-4">
-                        <div class="w-16 h-16 bg-gray-200 dark:bg-slate-800 rounded-lg flex items-center justify-center text-gray-400 font-bold text-xl uppercase">{{ substr($sertifikat->user->nama ?? 'A', 0, 2) }}</div>
+                        <div class="w-16 h-16 bg-gray-200 dark:bg-slate-800 rounded-lg flex items-center justify-center text-gray-400 font-bold text-xl uppercase">{{ substr($sertifikat->user->name ?? 'A', 0, 2) }}</div>
                         <div>
-                            <h3 class="font-bold text-gray-800 dark:text-white">{{ $sertifikat->user->nama ?? '-' }}</h3>
+                            <h3 class="font-bold text-gray-800 dark:text-white">{{ $sertifikat->user->name ?? '-' }}</h3>
                             <p class="text-[11px] text-gray-500 dark:text-gray-400 italic font-medium tracking-wide uppercase">{{ $sertifikat->user?->unitKerjas->pluck('unit_name')->join(', ') ?: '-' }}</p>
                             <p class="text-[10px] text-gray-400 mt-1 transition-colors"><i class="fa-regular fa-clock mr-1"></i> {{ $progress->updated_at ? $progress->updated_at->diffForHumans() : '-' }}</p>
                         </div>
@@ -58,8 +58,8 @@
                 <div class="lg:col-span-4 space-y-6">
                     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
                         <div class="p-8 flex flex-col items-center text-center">
-                            <div class="w-20 h-20 bg-gray-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-gray-400 font-bold text-2xl mb-4 uppercase">{{ substr($sertifikat->user->nama ?? 'A', 0, 2) }}</div>
-                            <h3 class="font-bold text-gray-800 dark:text-white">{{ $sertifikat->user->nama ?? '-' }}</h3>
+                            <div class="w-20 h-20 bg-gray-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-gray-400 font-bold text-2xl mb-4 uppercase">{{ substr($sertifikat->user->name ?? 'A', 0, 2) }}</div>
+                            <h3 class="font-bold text-gray-800 dark:text-white">{{ $sertifikat->user->name ?? '-' }}</h3>
                             <p class="text-xs text-gray-400 transition-colors">NIP {{ $sertifikat->user->nip ?? '-' }}</p>
                         </div>
                         <div class="border-t dark:border-slate-800 grid grid-cols-2 divide-x dark:divide-slate-800 transition-colors">

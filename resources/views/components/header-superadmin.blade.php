@@ -28,7 +28,7 @@
             <div class="flex items-center gap-3 pl-2 lg:pl-4 border-l border-gray-100 dark:border-slate-800">
                 <div class="text-right hidden sm:block">
                     <p class="text-xs font-bold text-gray-800 dark:text-white leading-tight">
-                        {{ auth()->user()->nama }}
+                        {{ auth()->user()->name }}
                     </p>
                     <p class="text-[10px] text-gray-500 dark:text-gray-300 font-medium italic">
                         {{ auth()->user()->role->role ?? 'unknown' }}

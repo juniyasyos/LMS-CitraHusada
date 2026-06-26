@@ -43,7 +43,7 @@
                 @endphp
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $report->user->nama }}</td>
+                    <td>{{ $report->user->name }}</td>
                     <td>{{ $report->user->nik }}</td>
                     <td>{{ $report->user?->unitKerjas->pluck('unit_name')->join(', ') ?: '-' }}</td>
                     <td>{{ $report->materi->judul }}</td>

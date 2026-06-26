@@ -170,9 +170,9 @@
                                     <tr class="hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
                                         <td class="py-4 px-6 shrink-0">
                                             <div class="flex items-center gap-3">
-                                                <div class="w-8 h-8 bg-gray-100 dark:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-gray-400 dark:text-white text-[10px] border border-gray-200 dark:border-slate-600 uppercase" x-text="report.user && report.user.nama ? report.user.nama.substring(0, 2) : '??'"></div>
+                                                <div class="w-8 h-8 bg-gray-100 dark:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-gray-400 dark:text-white text-[10px] border border-gray-200 dark:border-slate-600 uppercase" x-text="report.user && report.user.name ? report.user.name.substring(0, 2) : '??'"></div>
                                                 <div class="truncate max-w-[120px]">
-                                                    <p class="font-bold truncate" x-text="report.user ? report.user.nama : '-'"></p>
+                                                    <p class="font-bold truncate" x-text="report.user ? report.user.name : '-'"></p>
                                                     <p class="text-[10px] text-gray-400 dark:text-gray-300" x-text="report.user ? 'NIP: ' + report.user.nip : '-'"></p>
                                                 </div>
                                             </div>

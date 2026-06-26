@@ -9,9 +9,10 @@ class UnitKerja extends Model
 {
     use HasFactory;
 
+    protected $table = 'unit_kerjas';
     protected $primaryKey = 'unit_kerja_id';
 
-    protected $fillable = ['unit_name', 'deskripsi'];
+    protected $fillable = ['slug', 'unit_name', 'deskripsi'];
 
     public function users()
     {

@@ -16,11 +16,22 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    protected static function booted()
+    {
+        static::saving(function ($user) {
+            // Berikan nilai default untuk nama jika kosong, untuk mencegah error:
+            // "1364 Field 'nama' doesn't have a default value" saat IAM SSO sync.
+            if (empty($user->name)) {
+                $user->name = $user->nip ?? 'User IAM';
+            }
+        });
+    }
+
     protected $primaryKey = 'user_id';
 
     protected $fillable = [
         'iam_id',
-        'nama',
+        'name',
         'jenis_tenaga_id',
         'unit_kerja_id',
         'nip',

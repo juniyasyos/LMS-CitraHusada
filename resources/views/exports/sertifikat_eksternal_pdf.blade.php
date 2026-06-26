@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sertifikat Eksternal - {{ $user->nama }}</title>
+    <title>Sertifikat Eksternal - {{ $user->name }}</title>
     <style>
         body { font-family: sans-serif; font-size: 10px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -19,7 +19,7 @@
 <body>
     <div class="header">
         <h2>CITRA HUSADA</h2>
-        <p>SERTIFIKAT EKSTERNAL - {{ strtoupper($user->nama) }}</p>
+        <p>SERTIFIKAT EKSTERNAL - {{ strtoupper($user->name) }}</p>
         <p>NIK: {{ $user->nik }}</p>
         <p>Dicetak pada: {{ now()->format('d F Y H:i') }}</p>
     </div>

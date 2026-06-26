@@ -36,7 +36,7 @@ async function loadHeaderProfile() {
 
         const user = response.data.data;
 
-        const nama = user.nama;
+        const nama = user.name;
         const unit = (user.unit_kerjas && user.unit_kerjas.length > 0) ? user.unit_kerjas.map(u => u.unit_name).join(', ') : '-';
 
         // isi nama

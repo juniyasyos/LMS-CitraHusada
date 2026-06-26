@@ -26,10 +26,12 @@ class LaporanMonitoringController extends Controller
     public function index()
     {
         $unitKerjas = UnitKerja::all();
+        $unit_kerja = $unitKerjas;
+        $unit_kerjas = $unitKerjas;
         if (auth()->user()->hasRole('admin')) {
-            return view('Admin_Views.laporan-monitoring-admin', compact('unitKerjas'));
+            return view('Admin_Views.laporan-monitoring-admin', compact('unitKerjas', 'unit_kerja', 'unit_kerjas'));
         }
-        return view('SuperAdmin_Views.laporan-monitoring', compact('unitKerjas'));
+        return view('SuperAdmin_Views.laporan-monitoring', compact('unitKerjas', 'unit_kerja', 'unit_kerjas'));
     }
 
     /**
@@ -37,10 +39,10 @@ class LaporanMonitoringController extends Controller
      */
     public function getSertifikatEksternalData(Request $request)
     {
-        $query = User::select('users.user_id', 'users.nama', 'users.nip', )
+        $query = User::select('users.user_id', 'users.name', 'users.nip', )
             ->join('sertifikat_eksternals', 'users.user_id', '=', 'sertifikat_eksternals.user_id')
             ->with('unitKerjas')
-            ->groupBy('users.user_id', 'users.nama', 'users.nip', )
+            ->groupBy('users.user_id', 'users.name', 'users.nip', )
             ->selectRaw('COUNT(sertifikat_eksternals.sertifikat_eksternal_id) as jumlah_sertifikat')
             ->selectRaw("SUM(CASE WHEN sertifikat_eksternals.status = 'Belum Disetujui' THEN 1 ELSE 0 END) as jumlah_belum_disetujui");
 
@@ -57,7 +59,7 @@ class LaporanMonitoringController extends Controller
             $query->whereBetween('sertifikat_eksternals.created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
         }
 
-        $data = $query->orderBy('users.nama')->paginate(10);
+        $data = $query->orderBy('users.name')->paginate(10);
 
         return response()->json([
             'data' => $data
@@ -89,7 +91,7 @@ class LaporanMonitoringController extends Controller
             $query->where(function($q) use ($search) {
                 $q->where('judul', 'like', "%{$search}%")
                   ->orWhereHas('user', function($qu) use ($search) {
-                      $qu->where('nama', 'like', "%{$search}%")
+                      $qu->where('name', 'like', "%{$search}%")
                          ->orWhere('nip', 'like', "%{$search}%");
                   });
             });
@@ -102,7 +104,7 @@ class LaporanMonitoringController extends Controller
             return [
                 'sertifikat_eksternal_id' => $item->sertifikat_eksternal_id,
                 'user_id' => $item->user_id,
-                'nama' => $item->user->nama ?? '-',
+                'nama' => $item->user->name ?? '-',
                 'nip' => $item->user->nip ?? '-',
                 'unit_name' => $item->user?->unitKerjas->pluck('unit_name')->join(', ') ?: '-',
                 'judul' => $item->judul,
@@ -226,8 +228,8 @@ class LaporanMonitoringController extends Controller
     public function exportSertifikatEksternalExcel(Request $request, $userId)
     {
         $user = User::findOrFail($userId);
-        $this->logActivity($request, 'Download', 'sertifikat_eksternals', auth()->id(), "Mengekspor sertifikat eksternal {$user->nama} (Excel)");
-        return Excel::download(new \App\Exports\SertifikatEksternalExport($request, $userId), 'sertifikat-eksternal-' . $user->nama . '-' . now()->format('Y-m-d') . '.xlsx');
+        $this->logActivity($request, 'Download', 'sertifikat_eksternals', auth()->id(), "Mengekspor sertifikat eksternal {$user->name} (Excel)");
+        return Excel::download(new \App\Exports\SertifikatEksternalExport($request, $userId), 'sertifikat-eksternal-' . $user->name . '-' . now()->format('Y-m-d') . '.xlsx');
     }
 
     /**
@@ -251,8 +253,8 @@ class LaporanMonitoringController extends Controller
         $sertifikats = $query->orderByDesc('created_at')->get();
         $pdf = Pdf::loadView('exports.sertifikat_eksternal_pdf', compact('sertifikats', 'user'))->setPaper('a4', 'landscape');
 
-        $this->logActivity($request, 'Download', 'sertifikat_eksternals', auth()->id(), "Mengekspor sertifikat eksternal {$user->nama} (PDF)");
-        return $pdf->download('sertifikat-eksternal-' . $user->nama . '-' . now()->format('Y-m-d') . '.pdf');
+        $this->logActivity($request, 'Download', 'sertifikat_eksternals', auth()->id(), "Mengekspor sertifikat eksternal {$user->name} (PDF)");
+        return $pdf->download('sertifikat-eksternal-' . $user->name . '-' . now()->format('Y-m-d') . '.pdf');
     }
 
     /**

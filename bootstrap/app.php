@@ -20,10 +20,12 @@ return Application::configure(basePath: dirname(__DIR__))
         // Add session middleware to API routes for session-based authentication
         // Use prepend to ensure session middleware runs early in the stack
         $middleware->api(prepend: [
-            \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Session\Middleware\StartSession::class,
         ]);
+
+        $middleware->append(\App\Http\Middleware\RequireIam::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

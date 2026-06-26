@@ -28,7 +28,7 @@ class SertifikatController extends Controller
     {
         try {
             $request->validate([
-                'nama' => 'required|string|max:255',
+                'name' => 'required|string|max:255',
                 'jabatan' => 'required|string|max:255',
                 'nip' => 'required|string|max:255',
                 'file_ttd' => 'nullable|image|mimes:png,jpg,jpeg|max:2048'
@@ -40,7 +40,7 @@ class SertifikatController extends Controller
                 $direktur = new \App\Models\Direktur();
             }
 
-            $direktur->nama = $request->nama;
+            $direktur->nama = $request->name;
             $direktur->jabatan = $request->jabatan;
             $direktur->nip = $request->nip;
 
@@ -224,7 +224,7 @@ class SertifikatController extends Controller
                 ->where('materi_id', $materiId)
                 ->first();
 
-            $namaUser = $user ? $user->nama : 'Nama Peserta';
+            $namaUser = $user ? $user->name : 'Nama Peserta';
             $nomorSurat = $materi ? ($materi->nomor_surat ?? '') : '';
             $judulMateri = $materi ? $materi->judul : 'Judul Pelatihan';
             
@@ -521,7 +521,7 @@ class SertifikatController extends Controller
                 }
                 
                 $namaMateri = $materi ? preg_replace('/[^A-Za-z0-9\-]/', '_', $materi->judul) : 'Materi';
-                $namaUser = $user ? preg_replace('/[^A-Za-z0-9\-]/', '_', $user->nama) : 'User';
+                $namaUser = $user ? preg_replace('/[^A-Za-z0-9\-]/', '_', $user->name) : 'User';
                 $tanggal = now()->format('Ymd');
                 
                 $fileName = "{$namaMateri}_{$namaUser}_{$tanggal}.pdf";

@@ -32,7 +32,7 @@ class MonitoringExport implements FromCollection, WithHeadings, WithMapping, Sho
 
         if ($search) {
             $query->whereHas('user', function ($q) use ($search) {
-                $q->where('nama', 'LIKE', "%{$search}%")
+                $q->where('name', 'LIKE', "%{$search}%")
                     ->orWhere('nip', 'LIKE', "%{$search}%");
             })->orWhereHas('materi', function ($q) use ($search) {
                 $q->where('judul', 'LIKE', "%{$search}%");
@@ -72,7 +72,7 @@ class MonitoringExport implements FromCollection, WithHeadings, WithMapping, Sho
         $percent = $totalSteps > 0 ? round(($report->urutan_selesai / $totalSteps) * 100) : 0;
 
         return [
-            $report->user->nama,
+            $report->user->name,
             "'" . $report->user->nip, // Force string for NIP
             $report->user?->unitKerjas->pluck('unit_name')->join(', ') ?: '-',
             $report->materi->judul,

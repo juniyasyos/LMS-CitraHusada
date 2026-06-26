@@ -43,7 +43,7 @@ class ManajemenPenggunaController extends Controller
             }], 'jpl')
             ->when($search, function ($query, $search) {
                 return $query->where(function ($q) use ($search) {
-                    $q->where('nama', 'like', "%{$search}%")
+                    $q->where('name', 'like', "%{$search}%")
                       ->orWhere('nip', 'like', "%{$search}%");
                 });
             })
@@ -66,7 +66,7 @@ class ManajemenPenggunaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'nip' => 'required|string|max:50|unique:users,nip',
             'password' => 'required|string|min:3',
             'unit_kerja_id' => 'required|exists:unit_kerjas,unit_kerja_id',
@@ -77,7 +77,7 @@ class ManajemenPenggunaController extends Controller
         $status = $request->input('status', 'inactive');
 
         $user = User::create([
-            'nama' => $request->nama,
+            'name' => $request->name,
             'nip' => $request->nip,
             'password' => Hash::make($request->password),
             'total_jpl' => $request->total_jpl ?? 0,
@@ -89,7 +89,7 @@ class ManajemenPenggunaController extends Controller
             $user->unitKerjas()->sync([$request->unit_kerja_id]);
         }
 
-        $this->logActivity($request, 'Create', 'users', $user->user_id, "Menambah pengguna baru: [{$user->nama}]");
+        $this->logActivity($request, 'Create', 'users', $user->user_id, "Menambah pengguna baru: [{$user->name}]");
 
         return response()->json([
             'status' => 'success',
@@ -105,14 +105,14 @@ class ManajemenPenggunaController extends Controller
         $user = User::findOrFail($id);
 
         $request->validate([
-            'nama' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'nip' => 'required|string|max:50|unique:users,nip,' . $user->user_id . ',user_id',
             'unit_kerja_id' => 'required|exists:unit_kerjas,unit_kerja_id',
             'jenis_tenaga_id' => 'required|exists:jenis_tenagas,jenis_tenaga_id',
             'roles' => 'required|array',
         ]);
 
-        $user->nama = $request->nama;
+        $user->name = $request->name;
         $user->nip = $request->nip;
         
         $user->jenis_tenaga_id = $request->jenis_tenaga_id;
@@ -126,7 +126,7 @@ class ManajemenPenggunaController extends Controller
         $user->save();
         if ($request->filled('unit_kerja_id')) { $user->unitKerjas()->sync([$request->unit_kerja_id]); }
 
-        $this->logActivity($request, 'Update', 'users', $id, "Memperbarui data pengguna: [{$user->nama}]");
+        $this->logActivity($request, 'Update', 'users', $id, "Memperbarui data pengguna: [{$user->name}]");
 
         return response()->json([
             'status' => 'success',
@@ -140,7 +140,7 @@ class ManajemenPenggunaController extends Controller
     public function destroy(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        $nama = $user->nama;
+        $nama = $user->name;
         $user->delete();
 
         $this->logActivity($request, 'Delete', 'users', $id, "Menghapus pengguna: [{$nama}]");

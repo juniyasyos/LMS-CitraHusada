@@ -138,7 +138,7 @@
                             <select x-model="filters.unit_name"
                                 class="w-full border-gray-200 dark:border-slate-700 rounded-lg text-xs p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-white">
                                 <option value="">Semua Unit</option>
-                                @foreach($unit_kerjas as $unit)
+                                @foreach($unit_kerja as $unit)
                                     <option value="{{ $unit->unit_kerja_id }}">{{ $unit->unit_name }}</option>
                                 @endforeach
                             </select>
@@ -209,10 +209,10 @@
                                             <td class="py-4 px-6">
                                                 <div class="flex items-center gap-3">
                                                     <div
-                                                        class="w-8 h-8 bg-gray-100 dark:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-gray-400 dark:text-white text-[10px] border border-gray-200 dark:border-slate-600 uppercase" x-text="report.user && report.user.nama ? report.user.nama.substring(0, 2) : '??'">
+                                                        class="w-8 h-8 bg-gray-100 dark:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-gray-400 dark:text-white text-[10px] border border-gray-200 dark:border-slate-600 uppercase" x-text="report.user && report.user.name ? report.user.name.substring(0, 2) : '??'">
                                                     </div>
                                                     <div class="truncate max-w-[150px]">
-                                                        <p class="font-bold text-gray-800 dark:text-white truncate" x-text="report.user ? report.user.nama : '-'"></p>
+                                                        <p class="font-bold text-gray-800 dark:text-white truncate" x-text="report.user ? report.user.name : '-'"></p>
                                                         <p class="text-[10px] text-gray-400 dark:text-gray-300 italic" x-text="report.user ? report.user.nik : '-'"></p>
                                                     </div>
                                                 </div>
